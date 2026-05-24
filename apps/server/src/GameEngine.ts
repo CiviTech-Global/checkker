@@ -125,19 +125,19 @@ export class GameEngine {
 
   getPublicState(color: Color): object {
     const state = this.getState();
+    const player = state[color];
+    const opp = state[color === "white" ? "black" : "white"];
     return {
       id: state.id,
       fen: state.fen,
       turn: state.turn,
-      [color]: {
-        hand: state[color].hand,
-        scorePile: state[color].scorePile,
-        timeRemainingMs: state[color].timeRemainingMs,
-      },
+      hand: player.hand,
+      scorePile: player.scorePile,
+      timeRemainingMs: player.timeRemainingMs,
       opponent: {
-        hand: state[color === "white" ? "black" : "white"].hand.map(() => null),
-        scorePile: state[color === "white" ? "black" : "white"].scorePile,
-        timeRemainingMs: state[color === "white" ? "black" : "white"].timeRemainingMs,
+        hand: opp.hand.map(() => null),
+        scorePile: opp.scorePile,
+        timeRemainingMs: opp.timeRemainingMs,
       },
       drawPileCount: state.drawPile.length,
       moveHistory: state.moveHistory,
