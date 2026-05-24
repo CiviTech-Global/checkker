@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Gambit",
+    "slug": "gambit",
+    "version": "0.1.0",
+    "orientation": "default",
+    "scheme": "gambit",
+    "platforms": ["ios", "android", "web"],
+    "ios": { "supportsTablet": true },
+    "web": { "bundler": "metro" }
+  }
+}
