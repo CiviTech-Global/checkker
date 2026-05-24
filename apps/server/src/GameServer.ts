@@ -7,6 +7,7 @@ interface Player {
   id: string;
   socket: Socket;
   rating: number;
+  casual: boolean;
 }
 
 interface Match {
@@ -26,7 +27,12 @@ export class GameServer {
 
   handleConnection(socket: Socket): void {
     socket.on("join_queue", ({ rating, tc }: { rating: number; tc: TimeControl }) => {
-      const player: Player = { id: socket.id, socket, rating };
+      const player: Player = { id: socket.id, socket, rating, casual: false };
+      this.addToQueue(player, tc);
+    });
+
+    socket.on("join_casual", ({ tc }: { tc: TimeControl }) => {
+      const player: Player = { id: socket.id, socket, rating: 0, casual: true };
       this.addToQueue(player, tc);
     });
 
@@ -74,7 +80,11 @@ export class GameServer {
   }
 
   private addToQueue(player: Player, tc: TimeControl): void {
-    const opponent = this.queue.find((q) => q.tc === tc && Math.abs(q.player.rating - player.rating) <= 150);
+    const opponent = this.queue.find((q) => {
+      if (q.tc !== tc) return false;
+      if (q.player.casual || player.casual) return true;
+      return Math.abs(q.player.rating - player.rating) <= 150;
+    });
     if (opponent) {
       this.queue = this.queue.filter((q) => q !== opponent);
       this.startGame(opponent.player, player, tc);
