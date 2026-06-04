@@ -24,5 +24,23 @@ app.get("/health", (_req, res) => {
 
 const PORT = process.env.PORT ?? 3001;
 httpServer.listen(PORT, () => {
-  console.log(`Gambit server running on port ${PORT}`);
+  console.log(`Checkker server running on port ${PORT}`);
+  console.log(`[AIBrain] Set STOCKFISH_PATH to enable Stockfish engine`);
+  console.log(`[AIBrain] Set AI_COACH_PROVIDER + AI_COACH_API_KEY to enable LLM Coach`);
+  console.log(`[AIBrain] Set AI_BRAIN_PERSISTENCE=true to persist player models (dir: ${process.env.AI_BRAIN_STORAGE ?? "./data/player-models"})`);
+  console.log(`[AIBrain] Set SMART_MATCHMAKING=true to enable playstyle-based pairing`);
+});
+
+process.on("SIGTERM", async () => {
+  console.log("Shutting down gracefully...");
+  await gameServer.dispose();
+  httpServer.close();
+  process.exit(0);
+});
+
+process.on("SIGINT", async () => {
+  console.log("Shutting down gracefully...");
+  await gameServer.dispose();
+  httpServer.close();
+  process.exit(0);
 });

@@ -25,7 +25,7 @@ export default function GameInfoBar({ label, rating, tierLabel, side, timeMs, ac
     <View style={[styles.bar, active && styles.active]}>
       <View style={styles.left}>
         <View style={[styles.dot, { backgroundColor: active ? colors.accent.green : colors.text.muted }]} />
-        <Text style={[styles.label, { color: side === "white" ? "#fff" : colors.text.secondary }]}>{label}</Text>
+        <Text style={[styles.label, { color: side === "white" ? "#fff" : colors.text.secondary }]} numberOfLines={1}>{label}</Text>
       </View>
       <View style={styles.right}>
         <Text style={[
@@ -51,11 +51,13 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     borderRadius: radius.md,
     backgroundColor: colors.bg.secondary,
+    borderWidth: 1,
+    borderColor: colors.border.subtle,
   },
-  active: { backgroundColor: colors.accent.primary + "44" },
-  left: { flexDirection: "row", alignItems: "center", gap: spacing.xs },
+  active: { backgroundColor: colors.accent.primary + "44", borderColor: colors.border.gold },
+  left: { flexDirection: "row", alignItems: "center", gap: spacing.xs, flex: 1, minWidth: 0 },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  label: { fontSize: 14, fontWeight: "600" },
+  label: { fontSize: 14, fontWeight: "600", flexShrink: 1 },
   right: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   time: { fontSize: 16, fontWeight: "600", color: colors.text.primary, minWidth: 50, textAlign: "right" },
   lowTime: { color: colors.accent.red },

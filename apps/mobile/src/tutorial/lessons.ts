@@ -1,0 +1,223 @@
+import type { LessonConfig } from "./types";
+
+export const LESSONS: LessonConfig[] = [
+  {
+    id: 1,
+    title: "The Board",
+    description: "Learn how the chess board works and make your first move.",
+    fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    hand: [{ suit: "hearts", rank: "4" }],
+    color: "white",
+    steps: [
+      {
+        id: 1,
+        instruction: "Checkker is chess with cards. Here's a standard chess board. The 4♥ card lets you move a pawn. Pawns move forward one square (or two on their first move).",
+        hint: "",
+        isInfoOnly: true,
+      },
+      {
+        id: 2,
+        instruction: "Move the e2 pawn to e4 by playing the 4♥ card.",
+        hint: "Tap the card, then tap the pawn on e2, then tap e4 as the destination.",
+        expectedMove: "e2e4",
+      },
+    ],
+    successMessage: "Great! You made your first move. Pawns move forward and capture diagonally.",
+  },
+  {
+    id: 2,
+    title: "Pieces & Cards",
+    description: "Learn how each card maps to a chess piece.",
+    fen: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+    hand: [
+      { suit: "spades", rank: "K" },
+      { suit: "diamonds", rank: "J" },
+    ],
+    color: "white",
+    steps: [
+      {
+        id: 1,
+        instruction: "Each card in your hand maps to a chess piece: K→King, Q→Queen, J→Knight, 10→Rook, 2→Bishop, 3-9→Pawn, A→Wild. You have K♠ (King) and J♦ (Knight). The e4 pawn was already played — your turn now.",
+        hint: "",
+        isInfoOnly: true,
+      },
+      {
+        id: 2,
+        instruction: "Play K♠ to move your King from e1 to e2.",
+        hint: "Select K♠ first, then tap e1, then tap e2.",
+        expectedMove: "e1e2",
+      },
+      {
+        id: 3,
+        instruction: "Now play J♦ to move your Knight from g1 to f3.",
+        hint: "Select J♦ first, then tap g1, then tap f3.",
+        expectedMove: "g1f3",
+      },
+    ],
+    successMessage: "You connected cards to pieces! Each turn you draw 3 cards and pick one to play.",
+  },
+  {
+    id: 3,
+    title: "Your Turn",
+    description: "Experience a full turn cycle with 3 cards to choose from.",
+    fen: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+    hand: [
+      { suit: "hearts", rank: "4" },
+      { suit: "diamonds", rank: "3" },
+      { suit: "clubs", rank: "J" },
+    ],
+    color: "black",
+    steps: [
+      {
+        id: 1,
+        instruction: "On your turn, you draw 3 cards. You must play ONE card to move its matching piece. You have 4♥ (Pawn), 3♥... ah, that's another pawn, and J♣ (Knight).",
+        hint: "",
+        isInfoOnly: true,
+      },
+      {
+        id: 2,
+        instruction: "Move the e7 pawn to e5 using one of your pawn cards.",
+        hint: "Select a pawn card (4♥ or 3♦), then tap e7, then tap e5.",
+        expectedMove: "e7e5",
+      },
+    ],
+    successMessage: "You completed a full turn! The card you played goes to the discard pile (no capture).",
+  },
+  {
+    id: 4,
+    title: "Captures",
+    description: "Learn how captures feed your score pile.",
+    fen: "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+    hand: [{ suit: "hearts", rank: "4" }],
+    color: "white",
+    steps: [
+      {
+        id: 1,
+        instruction: "When you capture an opponent's piece, the card you played goes to your SCORE PILE instead of the discard pile. Your score pile builds your poker hand for end-game scoring.",
+        hint: "",
+        isInfoOnly: true,
+      },
+      {
+        id: 2,
+        instruction: "Capture the black pawn on d5 with your e4 pawn.",
+        hint: "Select 4♥, tap e4, then tap d5 where the black pawn is.",
+        expectedMove: "e4d5",
+      },
+      {
+        id: 3,
+        instruction: "The 4♥ goes to your score pile. At game end, your best 5-card poker hand from your score pile is scored separately.",
+        hint: "",
+        isInfoOnly: true,
+      },
+    ],
+    successMessage: "Captures feed your score pile! Collect strong cards for better poker hands.",
+  },
+  {
+    id: 5,
+    title: "Ace Wild Card",
+    description: "Learn how the Ace works as a wild card.",
+    fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    hand: [{ suit: "spades", rank: "A" }],
+    color: "white",
+    steps: [
+      {
+        id: 1,
+        instruction: "The Ace is a WILD card. It can move ANY piece on the board. On capture, the Ace goes to your score pile like other cards — but you won't draw bonus cards. Use it for flexibility!",
+        hint: "",
+        isInfoOnly: true,
+      },
+      {
+        id: 2,
+        instruction: "Play the Ace to move your knight from g1 to f3.",
+        hint: "Select A♠, then tap g1, then tap f3.",
+        expectedMove: "g1f3",
+      },
+      {
+        id: 3,
+        instruction: "The Ace is great when you need to move a specific piece but don't have the matching card. Capture with it to add it to your score pile — no bonus draw though!",
+        hint: "",
+        isInfoOnly: true,
+      },
+    ],
+    successMessage: "The Ace gives you flexibility! Use it when you need any piece to move.",
+  },
+  {
+    id: 6,
+    title: "Checkmate",
+    description: "Learn how to deliver checkmate — one way to win.",
+    fen: "k7/8/8/8/8/8/8/1Q2K3 w - - 0 1",
+    hand: [{ suit: "hearts", rank: "Q" }],
+    color: "white",
+    steps: [
+      {
+        id: 1,
+        instruction: "Checkmate is one way to win in Checkker (worth 30 points). You need to attack the king in a way they can't escape. Here, black's king is trapped on a8.",
+        hint: "",
+        isInfoOnly: true,
+      },
+      {
+        id: 2,
+        instruction: "Deliver checkmate by moving your queen from b1 to b8.",
+        hint: "Select Q♥, then tap b1, then tap b8. This attacks a8 and covers all escape squares.",
+        expectedMove: "b1b8",
+      },
+    ],
+    successMessage: "Checkmate! The other way to win is by having the better poker hand when the deck runs out.",
+  },
+  {
+    id: 7,
+    title: "Poker Scoring",
+    description: "Understand how poker scoring works alongside chess.",
+    fen: "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+    hand: [{ suit: "hearts", rank: "K" }],
+    color: "white",
+    steps: [
+      {
+        id: 1,
+        instruction: "Checkker has TWO ways to win. Checkmate gives 30 points. Draw gives 10 each. Resignation gives 25 to the winner.",
+        hint: "",
+        isInfoOnly: true,
+      },
+      {
+        id: 2,
+        instruction: "Additionally, at game end your best 5-card poker hand from your score pile is scored: Royal Flush=25, Straight Flush=18, Four of a Kind=14, Full House=10, Flush=8, Straight=6, Three of a Kind=4, Two Pair=3, Pair=1, High Card=0.",
+        hint: "",
+        isInfoOnly: true,
+      },
+      {
+        id: 3,
+        instruction: "Your total = chess result + poker score + capture bonuses. Plan your captures to build strong poker hands while playing good chess!",
+        hint: "",
+        isInfoOnly: true,
+      },
+    ],
+    successMessage: "Know the scoring to plan your strategy!",
+  },
+  {
+    id: 8,
+    title: "Full Game",
+    description: "Put everything together in a practice game.",
+    fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    hand: [
+      { suit: "spades", rank: "K" },
+      { suit: "hearts", rank: "4" },
+      { suit: "diamonds", rank: "8" },
+    ],
+    color: "white",
+    steps: [
+      {
+        id: 1,
+        instruction: "Now put it all together! K♠ → King, 4♥ → Pawn, 8♦ → Pawn. Choose any card and make a legal move.",
+        hint: "",
+        isInfoOnly: true,
+      },
+      {
+        id: 2,
+        instruction: "Make any legal move to complete the tutorial!",
+        hint: "Select one of your cards, then tap a piece, then tap a highlighted destination square.",
+        expectedMove: "",
+      },
+    ],
+    successMessage: "Congratulations! You've completed the Checkker tutorial. Now try playing against a bot!",
+  },
+];

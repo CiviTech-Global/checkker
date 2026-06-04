@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { View, Text, StyleSheet, LayoutChangeEvent } from "react-native";
 import ChessSquare from "./ChessSquare";
-import { colors, typography } from "../theme/tokens";
+import { colors, radius } from "../theme/tokens";
 
 const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"];
 const RANKS = [8, 7, 6, 5, 4, 3, 2, 1];
@@ -23,6 +23,14 @@ function parseFen(fen: string): string[][] {
 
 function isLightSquare(file: number, rank: number): boolean {
   return (file + rank) % 2 === 0;
+}
+
+/** Convert square name to board indices {file: 0-7, rank: 0-7 from top} */
+function sqToIdx(sq: string): { file: number; rank: number } {
+  return {
+    file: sq.charCodeAt(0) - 97, // a=0
+    rank: 8 - parseInt(sq[1]),   // 8=0, 1=7
+  };
 }
 
 interface ChessBoardProps {
@@ -56,6 +64,80 @@ function ChessBoard({
     return s;
   }, [lastMove]);
 
+  // Track previous FEN to detect piece movement
+  const prevPiecesRef = useRef<string[][] | null>(null);
+  const animatingSquare = useRef<{
+    sq: string;
+    dx: number;
+    dy: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const prev = prevPiecesRef.current;
+    if (prev) {
+      // Find the piece that moved: find a square that lost a piece and one that gained
+      let fromSq: string | null = null;
+      let toSq: string | null = null;
+      let movedPiece: string | null = null;
+
+      for (let r = 0; r < 8; r++) {
+        for (let f = 0; f < 8; f++) {
+          const oldP = prev[r]?.[f] ?? "";
+          const newP = pieces[r]?.[f] ?? "";
+          if (oldP && !newP) {
+            // Piece left this square
+            if (!fromSq) {
+              fromSq = `${FILES[f]}${8 - r}`;
+              movedPiece = oldP;
+            }
+          }
+          if (newP && oldP !== newP) {
+            // Piece appeared here (or different piece)
+            if (!toSq && newP === movedPiece) {
+              toSq = `${FILES[f]}${8 - r}`;
+            }
+          }
+        }
+      }
+
+      // Second pass: if movedPiece was set but toSq wasn't found (e.g. capture),
+      // look for any square that gained movedPiece
+      if (fromSq && movedPiece && !toSq) {
+        for (let r = 0; r < 8; r++) {
+          for (let f = 0; f < 8; f++) {
+            const oldP = prev[r]?.[f] ?? "";
+            const newP = pieces[r]?.[f] ?? "";
+            const sq = `${FILES[f]}${8 - r}`;
+            if (newP === movedPiece && oldP !== newP && sq !== fromSq) {
+              toSq = sq;
+              break;
+            }
+          }
+          if (toSq) break;
+        }
+      }
+
+      if (fromSq && toSq) {
+        const from = sqToIdx(fromSq);
+        const to = sqToIdx(toSq);
+        // Calculate pixel offset (from → to means we animate FROM the old position)
+        const fileDiff = from.file - to.file;
+        const rankDiff = from.rank - to.rank;
+        // Adjust for orientation
+        const signF = orientation === "white" ? 1 : -1;
+        const signR = orientation === "white" ? 1 : -1;
+        animatingSquare.current = {
+          sq: toSq,
+          dx: fileDiff * squareSize * signF,
+          dy: rankDiff * squareSize * signR,
+        };
+      } else {
+        animatingSquare.current = null;
+      }
+    }
+    prevPiecesRef.current = pieces;
+  }, [pieces, squareSize, orientation]);
+
   const onLayout = (e: LayoutChangeEvent) => {
     setBoardWidth(e.nativeEvent.layout.width);
   };
@@ -81,6 +163,12 @@ function ChessBoard({
                 const boardFi = orientation === "white" ? fi : FILES.length - 1 - fi;
                 const piece = pieces[boardRi]?.[boardFi] ?? "";
                 const sq = `${file}${rank}`;
+
+                const anim = animatingSquare.current;
+                const animFrom = anim && anim.sq === sq
+                  ? { dx: anim.dx, dy: anim.dy }
+                  : null;
+
                 return (
                   <ChessSquare
                     key={sq}
@@ -93,6 +181,7 @@ function ChessBoard({
                     isCheck={false}
                     onPress={interactive ? onSquarePress : () => {}}
                     size={squareSize}
+                    animateFrom={animFrom}
                   />
                 );
               })}
@@ -114,6 +203,15 @@ function ChessBoard({
 export default React.memo(ChessBoard);
 
 const styles = StyleSheet.create({
-  container: { width: "100%", maxWidth: 480, alignSelf: "center" },
-  coord: { fontSize: 12, color: colors.text.muted },
+  container: {
+    width: "100%",
+    maxWidth: 480,
+    alignSelf: "center",
+    borderWidth: 2,
+    borderColor: colors.border.gold,
+    borderRadius: radius.md,
+    padding: 2,
+    backgroundColor: colors.bg.secondary,
+  },
+  coord: { fontSize: 12, color: colors.text.secondary },
 });

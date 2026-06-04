@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(py:*)",
+      "Bash(py -m pip install:*)",
+      "Bash(py -c \"import sys; open\\(''.graphify_python'', ''w''\\).write\\(sys.executable\\)\")",
+      "Bash(npx turbo typecheck)",
+      "Bash(npx expo install:*)",
+      "Bash(npm install:*)",
+      "Bash(npm --version:*)",
+      "Bash(node -e:*)",
+      "Bash(node --disable-warning=ExperimentalWarning -e:*)",
+      "Bash(node --version:*)",
+      "Bash(node --input-type=commonjs:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(npx claude-mem install:*)"
+    ]
+  }
+}

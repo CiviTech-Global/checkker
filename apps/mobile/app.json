@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Gambit",
-    "slug": "gambit",
+    "name": "Checkker",
+    "slug": "checkker",
     "version": "0.1.0",
     "orientation": "default",
-    "scheme": "gambit",
+    "scheme": "checkker",
     "platforms": ["ios", "android", "web"],
     "ios": { "supportsTablet": true },
     "web": { "bundler": "metro" }

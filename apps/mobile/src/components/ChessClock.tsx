@@ -66,7 +66,7 @@ export default function ChessClock({
         <View
           style={[
             styles.sideDot,
-            { backgroundColor: side === 'white' ? '#ffffff' : '#1a1a2e' },
+            { backgroundColor: side === 'white' ? '#ffffff' : '#0b1a12' },
           ]}
         />
         <Text style={styles.label}>{label}</Text>

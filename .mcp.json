@@ -1,0 +1,36 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "claude-mem": {
+      "command": "npx",
+      "args": ["-y", "claude-mem", "serve"]
+    },
+    "perplexity": {
+      "command": "npx",
+      "args": ["-y", "@perplexity-ai/mcp-server"],
+      "env": {
+        "PERPLEXITY_API_KEY": "YOUR_KEY_HERE"
+      },
+      "disabled": true
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "YOUR_KEY_HERE"
+      },
+      "disabled": true
+    },
+    "glif": {
+      "command": "npx",
+      "args": ["-y", "@glifxyz/glif-mcp-server@latest"],
+      "env": {
+        "GLIF_API_TOKEN": "YOUR_KEY_HERE"
+      },
+      "disabled": true
+    }
+  }
+}

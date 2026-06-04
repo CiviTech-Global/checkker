@@ -1,31 +1,133 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, {
+  FadeIn,
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  withSequence,
+} from "react-native-reanimated";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Chess } from "chess.js";
-import type { Card, Color, GameResult } from "@gambit/shared";
-import { cardToPiece, cardId } from "@gambit/shared";
-import { getLegalMovesForHand } from "@gambit/chess";
+import type { Card, Color, GameResult } from "@checkker/shared";
+import { cardToPiece, cardId } from "@checkker/shared";
+import { getLegalMovesForHand } from "@checkker/chess";
 import ChessBoard from "../../src/components/ChessBoard";
+import ChessBoardGL from "../../src/components/ChessBoardGL";
+import { features } from "../../src/config/features";
 import CardHand from "../../src/components/CardHand";
 import OpponentHand from "../../src/components/OpponentHand";
 import ScorePile from "../../src/components/ScorePile";
 import GameInfoBar from "../../src/components/GameInfoBar";
+import PlayerPanel from "../../src/components/PlayerPanel";
+import OddsIndicator from "../../src/components/OddsIndicator";
+import ChatPanel from "../../src/components/ChatPanel";
+import BestMovesPanel from "../../src/components/BestMovesPanel";
+import PlayerMoveHistory from "../../src/components/PlayerMoveHistory";
+import GameMenuButton from "../../src/components/GameMenuButton";
 import ResignButton from "../../src/components/ResignButton";
 import GameResultOverlay from "../../src/components/GameResultOverlay";
 import MoveErrorToast from "../../src/components/MoveErrorToast";
+import PromotionPicker from "../../src/components/PromotionPicker";
+import CoachingTipBanner from "../../src/components/CoachingTipBanner";
+import SpectatorBanner from "../../src/components/SpectatorBanner";
 import { useSocket } from "../../src/hooks/useSocket";
-import { colors, spacing } from "../../src/theme/tokens";
+import { colors, spacing, glassStyle } from "../../src/theme/tokens";
+
+/* ── Bot Thinking Indicator ──────────────────────────────────────────── */
+
+function BotThinkingIndicator() {
+  const opacity1 = useSharedValue(0.3);
+  const opacity2 = useSharedValue(0.3);
+  const opacity3 = useSharedValue(0.3);
+
+  useEffect(() => {
+    opacity1.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 400 }),
+        withTiming(0.3, { duration: 400 })
+      ),
+      -1,
+      false
+    );
+    opacity2.value = withRepeat(
+      withSequence(
+        withTiming(0.3, { duration: 200 }),
+        withTiming(1, { duration: 400 }),
+        withTiming(0.3, { duration: 400 })
+      ),
+      -1,
+      false
+    );
+    opacity3.value = withRepeat(
+      withSequence(
+        withTiming(0.3, { duration: 400 }),
+        withTiming(1, { duration: 400 }),
+        withTiming(0.3, { duration: 400 })
+      ),
+      -1,
+      false
+    );
+  }, [opacity1, opacity2, opacity3]);
+
+  const dot1 = useAnimatedStyle(() => ({ opacity: opacity1.value }));
+  const dot2 = useAnimatedStyle(() => ({ opacity: opacity2.value }));
+  const dot3 = useAnimatedStyle(() => ({ opacity: opacity3.value }));
+
+  return (
+    <Animated.View entering={FadeIn.duration(200)} style={styles.botThinkingRow}>
+      <Text style={styles.botThinkingText}>{"\uD83E\uDD16"} Bot is thinking</Text>
+      <Animated.Text style={[styles.botDot, dot1]}>.</Animated.Text>
+      <Animated.Text style={[styles.botDot, dot2]}>.</Animated.Text>
+      <Animated.Text style={[styles.botDot, dot3]}>.</Animated.Text>
+    </Animated.View>
+  );
+}
 
 export default function GameScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { width } = useWindowDimensions();
-  const { gameState, playMove, resign, onMoveError } = useSocket();
+  const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const {
+    gameState,
+    scores,
+    chatMessages,
+    playMove,
+    resign,
+    requestRematch,
+    onMoveError,
+    sendChat,
+    undoMove,
+    onCoachingTip,
+    onSpectatorComment,
+  } = useSocket();
 
   const [selectedCardIdx, setSelectedCardIdx] = useState<number | null>(null);
+  const [selectedSourceSquare, setSelectedSourceSquare] = useState<string | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
+  const [promotionMoves, setPromotionMoves] = useState<string[] | null>(null);
+  const [chatExpanded, setChatExpanded] = useState(false);
+  const [coachingTip, setCoachingTip] = useState<string | null>(null);
+  const [spectatorComment, setSpectatorComment] = useState<string | null>(null);
 
-  useEffect(() => { onMoveError((msg: string) => setMoveError(msg)); }, []);
+  useEffect(() => {
+    onMoveError((msg: string) => setMoveError(msg));
+    onCoachingTip((tip: string) => setCoachingTip(tip));
+    onSpectatorComment((comment: string) => setSpectatorComment(comment));
+  }, []);
+
+  const isBotGame = id?.startsWith("bot-") ?? false;
 
   const gs = gameState as any;
   const color: Color = gs?.color ?? "white";
@@ -40,6 +142,15 @@ export default function GameScreen() {
   const myTimeMs = gs?.timeRemainingMs ?? 420000;
   const opponentTimeMs = gs?.opponent?.timeRemainingMs ?? 420000;
   const result: GameResult | null = gs?.result ?? null;
+  const moveHistory = gs?.moveHistory ?? [];
+  const odds = gs?.odds ?? null;
+  const playerProfile = gs?.playerProfile ?? null;
+  const opponentProfile = gs?.opponentProfile ?? null;
+  const bestMoves = gs?.bestMoves ?? { white: [], black: [] };
+
+  const myBestMoves = bestMoves[color] ?? [];
+  const opponentColor: Color = color === "white" ? "black" : "white";
+  const opponentBestMoves = bestMoves[opponentColor] ?? [];
 
   const legalMovesMap = useMemo(() => {
     try {
@@ -55,12 +166,21 @@ export default function GameScreen() {
     if (selectedCardIdx == null) return [];
     const card = myHand[selectedCardIdx];
     if (!card) return [];
-    return legalMovesMap.get(cardId(card))?.map((m: string) => m.slice(-2)) ?? [];
-  }, [selectedCardIdx, myHand, legalMovesMap]);
+    const allMoves = legalMovesMap.get(cardId(card)) ?? [];
+    if (selectedSourceSquare != null) {
+      return [...new Set(
+        allMoves
+          .filter((m: string) => m.startsWith(selectedSourceSquare))
+          .map((m: string) => m.slice(2, 4))
+      )];
+    }
+    return [...new Set(allMoves.map((m: string) => m.slice(2, 4)))];
+  }, [selectedCardIdx, myHand, legalMovesMap, selectedSourceSquare]);
 
   const handleCardTap = useCallback((idx: number) => {
     if (!myTurn) return;
     setSelectedCardIdx((prev) => (prev === idx ? null : idx));
+    setSelectedSourceSquare(null);
   }, [myTurn]);
 
   const handleSquarePress = useCallback((square: string) => {
@@ -68,48 +188,230 @@ export default function GameScreen() {
     const card = myHand[selectedCardIdx];
     if (!card) return;
     const cid = cardId(card);
-    const moves = legalMovesMap.get(cid) ?? [];
-    const uciMove = moves.find((m: string) => m.endsWith(square));
-    if (uciMove) {
-      playMove(cid, uciMove);
+    const allMoves = legalMovesMap.get(cid) ?? [];
+
+    if (selectedSourceSquare == null) {
+      const hasMovesFromHere = allMoves.some((m: string) => m.startsWith(square));
+      if (hasMovesFromHere) {
+        setSelectedSourceSquare(square);
+        return;
+      }
+      const matching = allMoves.filter((m: string) => m.slice(2, 4) === square);
+      if (matching.length === 0) return;
+      if (matching.length > 1 && matching[0].length > 4) {
+        setPromotionMoves(matching);
+        return;
+      }
+      playMove(cid, matching[0]);
       setSelectedCardIdx(null);
+      setSelectedSourceSquare(null);
+    } else {
+      const matching = allMoves.filter(
+        (m: string) => m.startsWith(selectedSourceSquare) && m.slice(2, 4) === square
+      );
+      if (matching.length === 0) return;
+      if (matching.length > 1 && matching[0].length > 4) {
+        setPromotionMoves(matching);
+        return;
+      }
+      playMove(cid, matching[0]);
+      setSelectedCardIdx(null);
+      setSelectedSourceSquare(null);
     }
-  }, [myTurn, selectedCardIdx, myHand, legalMovesMap, playMove]);
+  }, [myTurn, selectedCardIdx, myHand, legalMovesMap, selectedSourceSquare, playMove]);
+
+  const handlePromotionSelect = useCallback((piece: string) => {
+    if (!promotionMoves || selectedCardIdx == null) return;
+    const card = myHand[selectedCardIdx];
+    if (!card) return;
+    const move = promotionMoves.find((m: string) => m.endsWith(piece));
+    if (move) {
+      playMove(cardId(card), move);
+    }
+    setPromotionMoves(null);
+    setSelectedCardIdx(null);
+    setSelectedSourceSquare(null);
+  }, [promotionMoves, selectedCardIdx, myHand, playMove]);
 
   const isLandscape = width >= 600;
 
+  const handleGoHome = useCallback(() => {
+    resign();
+    router.replace("/");
+  }, [resign, router]);
+
+  const BoardComponent = features.use3DBoard ? ChessBoardGL : ChessBoard;
+
+  const safeStyle = {
+    paddingTop: insets.top,
+    paddingBottom: insets.bottom,
+    paddingLeft: insets.left,
+    paddingRight: insets.right,
+  };
+
+  /* ── Landscape: 3-panel layout ─────────────────────────────────────── */
+
+  if (isLandscape) {
+    return (
+      <View style={[styles.container, safeStyle]}>
+        <View style={styles.landscapeRow}>
+          {/* Left Panel — Player */}
+          <ScrollView
+            style={styles.sidePanel}
+            contentContainerStyle={styles.panelScroll}
+            showsVerticalScrollIndicator={true}
+            bounces={false}
+          >
+            <PlayerPanel
+              profile={playerProfile}
+              cards={myHand}
+              scorePile={myScorePile}
+              moves={moveHistory}
+              bestMoves={myBestMoves}
+              isOpponent={false}
+              isActive={turn === color}
+              timeMs={myTimeMs}
+              side="left"
+              color={color}
+              isBotGame={isBotGame}
+              selectedCardIdx={selectedCardIdx}
+              onCardTap={handleCardTap}
+              disabled={!myTurn}
+              onResign={resign}
+              onMenuPress={handleGoHome}
+              onUndo={isBotGame ? undoMove : undefined}
+            />
+          </ScrollView>
+
+          {/* Center Column — Board + Odds + Chat */}
+          <KeyboardAvoidingView
+            style={styles.centerColumn}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            keyboardVerticalOffset={insets.top}
+          >
+            <ScrollView
+              contentContainerStyle={styles.centerScroll}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+            >
+              <View style={styles.boardWrapper}>
+                <BoardComponent
+                  fen={fen}
+                  orientation={color}
+                  highlightedSquares={highlightedSquares}
+                  interactive={myTurn}
+                  onSquarePress={handleSquarePress}
+                />
+                <Text style={styles.deckCount}>Deck: {gs?.drawPileCount ?? 0}</Text>
+              </View>
+              {isBotGame && !myTurn && <BotThinkingIndicator />}
+              <OddsIndicator odds={odds} playerColor={color} />
+              <ChatPanel
+                messages={chatMessages}
+                onSend={sendChat}
+                playerColor={color}
+                playerId={gs?.id}
+              />
+            </ScrollView>
+          </KeyboardAvoidingView>
+
+          {/* Right Panel — Opponent */}
+          <ScrollView
+            style={styles.sidePanel}
+            contentContainerStyle={styles.panelScroll}
+            showsVerticalScrollIndicator={true}
+            bounces={false}
+          >
+            <PlayerPanel
+              profile={opponentProfile}
+              cards={Array(opponentHandCount).fill(null)}
+              scorePile={opponentScorePile}
+              moves={moveHistory}
+              bestMoves={opponentBestMoves}
+              isOpponent={true}
+              isActive={turn === opponentColor}
+              timeMs={opponentTimeMs}
+              side="right"
+              color={opponentColor}
+              isBotGame={isBotGame}
+            />
+          </ScrollView>
+        </View>
+
+        <GameResultOverlay
+          visible={result !== null}
+          result={result}
+          playerColor={color}
+          scores={scores}
+          onRematch={requestRematch}
+          onHome={() => router.replace("/")}
+        />
+        <PromotionPicker
+          visible={promotionMoves !== null}
+          onSelect={handlePromotionSelect}
+          onCancel={() => setPromotionMoves(null)}
+        />
+        <MoveErrorToast message={moveError} onDismiss={() => setMoveError(null)} />
+      </View>
+    );
+  }
+
+  /* ── Portrait: single-column layout ────────────────────────────────── */
+
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={[styles.scroll, isLandscape ? styles.row : styles.column]}>
-        <View style={styles.topSection}>
-          <GameInfoBar
-            label={color === "black" ? "You" : "Opponent"}
-            side="black"
-            timeMs={color === "black" ? myTimeMs : opponentTimeMs}
-            active={turn === "black"}
-          />
+    <View style={[styles.container, safeStyle]}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={insets.top}
+      >
+        <ScrollView
+          contentContainerStyle={styles.portraitScroll}
+          showsVerticalScrollIndicator={true}
+          bounces={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Opponent section */}
+          <View style={styles.fullWidthRow}>
+            <GameInfoBar
+              label={isBotGame ? "Bot" : (opponentProfile?.displayName ?? "Opponent")}
+              side={opponentColor}
+              timeMs={opponentTimeMs}
+              active={turn === opponentColor}
+              rating={opponentProfile?.rating}
+            />
+          </View>
           <OpponentHand cardCount={opponentHandCount} />
-          <ScorePile cards={opponentScorePile} label="Captured" />
-        </View>
+          <View style={styles.fullWidthRow}>
+            <ScorePile cards={opponentScorePile} label="Captured" />
+          </View>
 
-        <View style={styles.boardSection}>
-          <ChessBoard
-            fen={fen}
-            orientation={color}
-            highlightedSquares={highlightedSquares}
-            interactive={myTurn}
-            onSquarePress={handleSquarePress}
-          />
-        </View>
+          {/* Board */}
+          <View style={styles.boardContainerPortrait}>
+            <BoardComponent
+              fen={fen}
+              orientation={color}
+              highlightedSquares={highlightedSquares}
+              interactive={myTurn}
+              onSquarePress={handleSquarePress}
+            />
+          </View>
+          <Text style={styles.deckCount}>Deck: {gs?.drawPileCount ?? 0}</Text>
 
-        <View style={styles.bottomSection}>
-          <ScorePile cards={myScorePile} label="Your Captures" />
-          <GameInfoBar
-            label={color === "white" ? "You" : "Opponent"}
-            side="white"
-            timeMs={color === "white" ? myTimeMs : opponentTimeMs}
-            active={turn === "white"}
-          />
+          {isBotGame && !myTurn && <BotThinkingIndicator />}
+
+          {/* Odds */}
+          <View style={styles.fullWidthRow}>
+            <OddsIndicator odds={odds} playerColor={color} />
+          </View>
+
+          {/* Coaching Tip */}
+          <CoachingTipBanner tip={coachingTip} onDismiss={() => setCoachingTip(null)} />
+
+          {/* Spectator Commentary */}
+          <SpectatorBanner comment={spectatorComment} onDismiss={() => setSpectatorComment(null)} />
+
+          {/* Player section */}
           <CardHand
             cards={myHand}
             selectedIndex={selectedCardIdx}
@@ -118,20 +420,69 @@ export default function GameScreen() {
           />
           {selectedCardIdx != null && myHand[selectedCardIdx] && (
             <Text style={styles.selectedInfo}>
-              Selected: {cardId(myHand[selectedCardIdx])} → {cardToPiece(myHand[selectedCardIdx])}
+              Selected: {cardId(myHand[selectedCardIdx])} {"\u2192"} {cardToPiece(myHand[selectedCardIdx])}
             </Text>
           )}
-          <ResignButton onResign={resign} />
-        </View>
-      </ScrollView>
+          <View style={styles.fullWidthRow}>
+            <GameInfoBar
+              label={playerProfile?.displayName ?? "You"}
+              side={color}
+              timeMs={myTimeMs}
+              active={turn === color}
+              rating={playerProfile?.rating}
+            />
+          </View>
+          <View style={styles.fullWidthRow}>
+            <ScorePile cards={myScorePile} label="Your Captures" />
+          </View>
+
+          {/* Best Moves */}
+          <View style={styles.fullWidthRow}>
+            <BestMovesPanel moves={myBestMoves} />
+          </View>
+
+          {/* Move History */}
+          <View style={styles.fullWidthRow}>
+            <PlayerMoveHistory moves={moveHistory} maxMoves={6} />
+          </View>
+
+          {/* Chat */}
+          <View style={styles.fullWidthRow}>
+            <ChatPanel
+              messages={chatMessages}
+              onSend={sendChat}
+              playerColor={color}
+              playerId={gs?.id}
+              collapsed={!chatExpanded}
+              onToggle={() => setChatExpanded((v) => !v)}
+            />
+          </View>
+
+          {/* Actions */}
+          <View style={styles.actionRow}>
+            <GameMenuButton
+              onGoHome={handleGoHome}
+              onUndo={isBotGame ? undoMove : undefined}
+              isBotGame={isBotGame}
+            />
+            <ResignButton onResign={resign} />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <GameResultOverlay
         visible={result !== null}
         result={result}
         playerColor={color}
+        scores={scores}
+        onRematch={requestRematch}
         onHome={() => router.replace("/")}
       />
-
+      <PromotionPicker
+        visible={promotionMoves !== null}
+        onSelect={handlePromotionSelect}
+        onCancel={() => setPromotionMoves(null)}
+      />
       <MoveErrorToast message={moveError} onDismiss={() => setMoveError(null)} />
     </View>
   );
@@ -139,11 +490,75 @@ export default function GameScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg.primary },
-  scroll: { padding: spacing.sm, gap: spacing.sm, paddingBottom: 60 },
-  row: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center" },
-  column: { flexDirection: "column", alignItems: "center" },
-  topSection: { alignItems: "center", gap: spacing.xs, width: "100%", maxWidth: 480 },
-  boardSection: { width: "100%", maxWidth: 480, alignSelf: "center" },
-  bottomSection: { alignItems: "center", gap: spacing.sm, width: "100%", maxWidth: 480 },
+  flex: { flex: 1 },
+
+  /* Landscape */
+  landscapeRow: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  sidePanel: {
+    flex: 1,
+    maxWidth: "28%",
+  },
+  panelScroll: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xxs,
+    flexGrow: 1,
+  },
+  centerColumn: {
+    flex: 2,
+    minWidth: 0,
+  },
+  centerScroll: {
+    padding: spacing.sm,
+    gap: spacing.sm,
+    alignItems: "center",
+    flexGrow: 1,
+    justifyContent: "center",
+  },
+  boardWrapper: {
+    width: "100%",
+    maxWidth: 480,
+  },
+
+  /* Portrait */
+  portraitScroll: {
+    padding: spacing.sm,
+    gap: spacing.sm,
+    paddingBottom: 120,
+    alignItems: "center",
+  },
+  fullWidthRow: {
+    width: "100%",
+    maxWidth: 480,
+  },
+  boardContainerPortrait: {
+    width: "100%",
+    maxWidth: 480,
+  },
+
+  /* Shared */
   selectedInfo: { fontSize: 12, color: colors.text.secondary },
+  deckCount: { fontSize: 12, color: colors.text.muted, textAlign: "center", marginTop: 4 },
+  actionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    width: "100%",
+    maxWidth: 480,
+    justifyContent: "center",
+    paddingBottom: spacing.sm,
+  },
+  botThinkingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 4,
+    ...glassStyle,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+  },
+  botThinkingText: { fontSize: 12, color: colors.text.muted, fontStyle: "italic" },
+  botDot: { fontSize: 16, color: colors.text.muted, fontWeight: "700" },
 });

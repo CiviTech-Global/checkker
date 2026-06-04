@@ -1,16 +1,42 @@
+import { useEffect, useMemo } from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
-import { colors, radius, spacing } from "../theme/tokens";
-import type { GameResult, Color, PokerResult } from "@gambit/shared";
+import Animated, {
+  FadeIn,
+  SlideInUp,
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  withDelay,
+  Easing,
+} from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
+import { colors, radius, spacing, glassStyle, gradients, springConfig, shadows } from "../theme/tokens";
+import { useSpringPress, staggerDelay } from "../utils/animations";
+import type { GameResult, Color, ScoredGame, PokerResult } from "@checkker/shared";
+import { PokerHand } from "@checkker/shared";
 
 interface GameResultOverlayProps {
   visible: boolean;
   result: GameResult | null;
   playerColor: Color;
-  opponentScore?: number;
-  playerScore?: number;
+  scores?: ScoredGame | null;
   onRematch?: () => void;
   onHome: () => void;
 }
+
+const HAND_NAMES: Record<number, string> = {
+  [PokerHand.HIGH_CARD]: "High Card",
+  [PokerHand.ONE_PAIR]: "Pair",
+  [PokerHand.TWO_PAIR]: "Two Pair",
+  [PokerHand.THREE_OF_A_KIND]: "Three of a Kind",
+  [PokerHand.STRAIGHT]: "Straight",
+  [PokerHand.FLUSH]: "Flush",
+  [PokerHand.FULL_HOUSE]: "Full House",
+  [PokerHand.FOUR_OF_A_KIND]: "Four of a Kind",
+  [PokerHand.STRAIGHT_FLUSH]: "Straight Flush",
+  [PokerHand.ROYAL_FLUSH]: "Royal Flush",
+};
 
 function resultLabel(r: GameResult): string {
   switch (r.type) {
@@ -32,8 +58,166 @@ function resultReason(r: GameResult): string {
   }
 }
 
+function pokerSummary(poker: PokerResult): string {
+  if (poker.hands.length === 0) return "No poker hand";
+  return poker.hands.map((h) => `${HAND_NAMES[h.hand] ?? "?"} (+${h.points})`).join(", ");
+}
+
+/* ── Count-Up Score ─────────────────────────────────────────────────── */
+
+function AnimatedScore({
+  target,
+  delay: d,
+}: {
+  target: number | null;
+  delay: number;
+}) {
+  const displayValue = useSharedValue(0);
+
+  useEffect(() => {
+    if (target != null) {
+      displayValue.value = 0;
+      displayValue.value = withDelay(
+        d,
+        withTiming(target, { duration: 800, easing: Easing.out(Easing.cubic) })
+      );
+    }
+  }, [target, d, displayValue]);
+
+  const textStyle = useAnimatedStyle(() => ({
+    opacity: target != null ? 1 : 0.5,
+  }));
+
+  return (
+    <Animated.Text style={[styles.scoreVal, textStyle]}>
+      {target ?? "-"}
+    </Animated.Text>
+  );
+}
+
+/* ── Confetti Particle ──────────────────────────────────────────────── */
+
+const CONFETTI_COLORS = [
+  colors.accent.gold,
+  colors.accent.goldBright,
+  colors.accent.burgundy,
+  colors.accent.bronze,
+  "#f5d680",
+  "#d4a843",
+];
+
+function ConfettiParticle({ index }: { index: number }) {
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const opacity = useSharedValue(1);
+  const rotation = useSharedValue(0);
+
+  const color = CONFETTI_COLORS[index % CONFETTI_COLORS.length];
+  const size = 6 + (index % 4) * 2;
+
+  useEffect(() => {
+    const angle = (index / 20) * Math.PI * 2 + (Math.random() - 0.5) * 0.8;
+    const distance = 80 + Math.random() * 100;
+    const targetX = Math.cos(angle) * distance;
+    const targetY = Math.sin(angle) * distance - 40;
+
+    translateX.value = withDelay(
+      100 + index * 30,
+      withSpring(targetX, { damping: 12, stiffness: 80 })
+    );
+    translateY.value = withDelay(
+      100 + index * 30,
+      withSpring(targetY, { damping: 12, stiffness: 80 })
+    );
+    rotation.value = withDelay(
+      100 + index * 30,
+      withTiming(360 + Math.random() * 360, { duration: 1200 })
+    );
+    opacity.value = withDelay(
+      800 + index * 30,
+      withTiming(0, { duration: 600 })
+    );
+  }, [index, translateX, translateY, opacity, rotation]);
+
+  const particleStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+      { rotate: `${rotation.value}deg` },
+    ],
+    opacity: opacity.value,
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        styles.confettiParticle,
+        {
+          width: size,
+          height: size,
+          backgroundColor: color,
+          borderRadius: size / 2,
+        },
+        particleStyle,
+      ]}
+    />
+  );
+}
+
+function ConfettiBurst() {
+  const particles = useMemo(() => Array.from({ length: 20 }, (_, i) => i), []);
+  return (
+    <View style={styles.confettiContainer}>
+      {particles.map((i) => (
+        <ConfettiParticle key={i} index={i} />
+      ))}
+    </View>
+  );
+}
+
+/* ── Action Button ──────────────────────────────────────────────────── */
+
+function ActionButton({
+  label,
+  primary,
+  onPress,
+  delay: d,
+}: {
+  label: string;
+  primary?: boolean;
+  onPress: () => void;
+  delay: number;
+}) {
+  const { onPressIn, onPressOut, animatedStyle } = useSpringPress();
+
+  return (
+    <Animated.View
+      entering={FadeIn.duration(300).delay(d)}
+      style={animatedStyle}
+    >
+      <TouchableOpacity
+        style={primary ? styles.primaryBtn : styles.secondaryBtn}
+        onPress={onPress}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+      >
+        <Text style={primary ? styles.primaryText : styles.secondaryText}>
+          {label}
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
+/* ── Main Overlay ───────────────────────────────────────────────────── */
+
 export default function GameResultOverlay({
-  visible, result, playerColor, opponentScore, playerScore, onRematch, onHome,
+  visible,
+  result,
+  playerColor,
+  scores,
+  onRematch,
+  onHome,
 }: GameResultOverlayProps) {
   if (!result) return null;
 
@@ -42,49 +226,126 @@ export default function GameResultOverlay({
   const playerWon = winner === playerColor;
 
   const headerText = isDraw ? "Draw" : playerWon ? "You Win!" : "You Lose";
-  const headerColor: string = isDraw ? colors.accent.blue : playerWon ? colors.accent.gold : colors.text.muted;
+  const headerColor: string = isDraw
+    ? colors.accent.blue
+    : playerWon
+    ? colors.accent.gold
+    : colors.text.muted;
+
+  const playerTotal = scores
+    ? playerColor === "white"
+      ? scores.whiteTotal
+      : scores.blackTotal
+    : null;
+  const opponentTotal = scores
+    ? playerColor === "white"
+      ? scores.blackTotal
+      : scores.whiteTotal
+    : null;
+  const playerPoker = scores
+    ? playerColor === "white"
+      ? scores.whitePoker
+      : scores.blackPoker
+    : null;
+  const opponentPoker = scores
+    ? playerColor === "white"
+      ? scores.blackPoker
+      : scores.whitePoker
+    : null;
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.scrim}>
-        <View style={styles.card}>
-          <Text style={[styles.header, { color: headerColor }]}>{headerText}</Text>
+    <Modal visible={visible} transparent animationType="none">
+      <Animated.View
+        entering={FadeIn.duration(300)}
+        style={styles.scrim}
+      >
+        {/* Confetti for wins */}
+        {playerWon && <ConfettiBurst />}
 
-          <View style={styles.scoreRow}>
-            <View style={styles.scoreBox}>
-              <Text style={styles.scoreLabel}>You</Text>
-              <Text style={styles.scoreVal}>{playerScore ?? "-"}</Text>
+        <Animated.View
+          entering={SlideInUp.duration(400).springify().damping(14)}
+        >
+          <View style={[styles.card, glassStyle]}>
+            <LinearGradient
+              colors={gradients.glass }
+              style={styles.cardGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            />
+
+            {/* Header */}
+            <Animated.Text
+              entering={FadeIn.duration(300).delay(staggerDelay(0, 100))}
+              style={[styles.header, { color: headerColor }]}
+            >
+              {headerText}
+            </Animated.Text>
+
+            {/* Scores */}
+            <Animated.View
+              entering={FadeIn.duration(300).delay(staggerDelay(1, 100))}
+              style={styles.scoreRow}
+            >
+              <View style={styles.scoreBox}>
+                <Text style={styles.scoreLabel}>You</Text>
+                <AnimatedScore target={playerTotal} delay={300} />
+                {playerPoker && (
+                  <Text style={styles.pokerDetail}>
+                    {pokerSummary(playerPoker)}
+                  </Text>
+                )}
+              </View>
+              <Text style={styles.vs}>vs</Text>
+              <View style={styles.scoreBox}>
+                <Text style={styles.scoreLabel}>Opponent</Text>
+                <AnimatedScore target={opponentTotal} delay={500} />
+                {opponentPoker && (
+                  <Text style={styles.pokerDetail}>
+                    {pokerSummary(opponentPoker)}
+                  </Text>
+                )}
+              </View>
+            </Animated.View>
+
+            {/* Result detail */}
+            <Animated.View
+              entering={FadeIn.duration(300).delay(staggerDelay(2, 100))}
+              style={styles.detailBox}
+            >
+              <Text style={styles.reason}>{resultReason(result)}</Text>
+              <Text style={styles.type}>({resultLabel(result)})</Text>
+            </Animated.View>
+
+            {/* Actions */}
+            <View style={styles.actions}>
+              {onRematch && (
+                <ActionButton
+                  label="Rematch"
+                  primary
+                  onPress={onRematch}
+                  delay={staggerDelay(3, 100)}
+                />
+              )}
+              <ActionButton
+                label="Return Home"
+                onPress={onHome}
+                delay={staggerDelay(4, 100)}
+              />
             </View>
-            <Text style={styles.vs}>vs</Text>
-            <View style={styles.scoreBox}>
-              <Text style={styles.scoreLabel}>Opponent</Text>
-              <Text style={styles.scoreVal}>{opponentScore ?? "-"}</Text>
-            </View>
           </View>
-
-          <View style={styles.detailBox}>
-            <Text style={styles.reason}>{resultReason(result)}</Text>
-            <Text style={styles.type}>({resultLabel(result)})</Text>
-          </View>
-
-          <View style={styles.actions}>
-            {onRematch && (
-              <TouchableOpacity style={styles.primaryBtn} onPress={onRematch}>
-                <Text style={styles.primaryText}>Rematch</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity style={styles.secondaryBtn} onPress={onHome}>
-              <Text style={styles.secondaryText}>Return Home</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  scrim: { flex: 1, backgroundColor: colors.overlay, justifyContent: "center", alignItems: "center" },
+  scrim: {
+    flex: 1,
+    backgroundColor: colors.overlay,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   card: {
     backgroundColor: colors.bg.primary,
     borderRadius: radius.lg,
@@ -92,20 +353,76 @@ const styles = StyleSheet.create({
     width: 320,
     alignItems: "center",
     gap: spacing.md,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.5, shadowRadius: 24, elevation: 12,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: colors.border.gold,
+    ...shadows.gold,
   },
-  header: { fontSize: 28, fontWeight: "700" },
-  scoreRow: { flexDirection: "row", alignItems: "center", gap: spacing.lg },
+  cardGradient: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  header: { fontSize: 28, fontWeight: "700", zIndex: 1 },
+  scoreRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.lg,
+    zIndex: 1,
+  },
   scoreBox: { alignItems: "center" },
   scoreLabel: { fontSize: 12, color: colors.text.muted },
   scoreVal: { fontSize: 36, fontWeight: "700", color: colors.text.primary },
+  pokerDetail: {
+    fontSize: 10,
+    color: colors.text.muted,
+    textAlign: "center",
+    maxWidth: 120,
+    marginTop: 2,
+  },
   vs: { fontSize: 16, color: colors.text.muted },
-  detailBox: { alignItems: "center", gap: spacing.xxs },
-  reason: { fontSize: 14, color: colors.text.secondary, textAlign: "center" },
+  detailBox: { alignItems: "center", gap: spacing.xxs, zIndex: 1 },
+  reason: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    textAlign: "center",
+  },
   type: { fontSize: 12, color: colors.text.muted },
-  actions: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.sm },
-  primaryBtn: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, borderRadius: radius.md, backgroundColor: colors.accent.primary },
+  actions: {
+    flexDirection: "row",
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+    zIndex: 1,
+  },
+  primaryBtn: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.accent.primary,
+  },
   primaryText: { color: "#fff", fontSize: 14, fontWeight: "600" },
-  secondaryBtn: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, borderRadius: radius.md, backgroundColor: colors.bg.secondary },
-  secondaryText: { color: colors.text.primary, fontSize: 14, fontWeight: "600" },
+  secondaryBtn: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.bg.secondary,
+  },
+  secondaryText: {
+    color: colors.text.primary,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  confettiContainer: {
+    position: "absolute",
+    top: "40%",
+    left: "50%",
+    width: 0,
+    height: 0,
+    zIndex: 10,
+  },
+  confettiParticle: {
+    position: "absolute",
+  },
 });

@@ -1,4 +1,18 @@
-import type { Card, Color, MoveRecord, GameResult, TimeControl, PlayerState } from "@gambit/shared";
+import type {
+  Card,
+  Color,
+  MoveRecord,
+  GameResult,
+  TimeControl,
+  PlayerState,
+  ScoredGame,
+  MoveEvaluation,
+  GameOdds,
+  PlayerProfile,
+  ChatMessage,
+} from "@checkker/shared";
+
+export type { MoveEvaluation, GameOdds, PlayerProfile, ChatMessage };
 
 export interface GameClientState {
   id: string;
@@ -17,6 +31,10 @@ export interface GameClientState {
   moveHistory: MoveRecord[];
   result: GameResult | null;
   timeControl: TimeControl;
+  bestMoves?: { white: MoveEvaluation[]; black: MoveEvaluation[] };
+  odds?: GameOdds;
+  playerProfile?: PlayerProfile;
+  opponentProfile?: PlayerProfile;
 }
 
 export interface GameStartPayload extends GameClientState {
@@ -31,4 +49,5 @@ export interface MoveErrorPayload {
 
 export interface GameOverPayload {
   result: GameResult;
+  scores?: ScoredGame;
 }

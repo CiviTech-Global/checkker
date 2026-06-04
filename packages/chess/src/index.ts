@@ -1,5 +1,5 @@
 import { Chess } from "chess.js";
-import { cardToPiece, type Card, type PieceType, type Color } from "@gambit/shared";
+import { cardToPiece, type Card, type PieceType } from "@checkker/shared";
 
 export { Chess };
 export type { PieceType };
@@ -10,22 +10,28 @@ export interface LegalMovesForCard {
   moves: string[];
 }
 
-const FILE_LETTERS = new Set(["a", "b", "c", "d", "e", "f", "g", "h"]);
-
 export function getLegalMovesForCard(game: Chess, card: Card): string[] {
   const piece = cardToPiece(card);
+  const allMoves = game.moves({ verbose: true });
+
   if (piece === "wild") {
-    return game.moves({ verbose: false });
+    return allMoves.map((m) => m.from + m.to + (m.promotion ?? ""));
   }
-  return game.moves({ verbose: false }).filter((move) => {
-    if (piece === "pawn") {
-      return FILE_LETTERS.has(move[0]);
-    }
-    if (move === "O-O" || move === "O-O-O") {
-      return piece === "king";
-    }
-    return move[0] === getPieceChar(piece);
-  });
+
+  const targetType = (
+    piece === "pawn" ? "p" :
+    piece === "king" ? "k" :
+    piece === "queen" ? "q" :
+    piece === "rook" ? "r" :
+    piece === "bishop" ? "b" :
+    piece === "knight" ? "n" :
+    null
+  );
+  if (!targetType) return [];
+
+  return allMoves
+    .filter((move) => move.piece === targetType)
+    .map((m) => m.from + m.to + (m.promotion ?? ""));
 }
 
 export function getLegalMovesForHand(
@@ -37,18 +43,6 @@ export function getLegalMovesForHand(
     piece: cardToPiece(card),
     moves: getLegalMovesForCard(game, card),
   }));
-}
-
-function getPieceChar(piece: PieceType): string | undefined {
-  switch (piece) {
-    case "king": return "K";
-    case "queen": return "Q";
-    case "rook": return "R";
-    case "bishop": return "B";
-    case "knight": return "N";
-    case "pawn": return "";
-    case "wild": return undefined;
-  }
 }
 
 export function getCaptureBonus(capturedPiece: string, isCheck: boolean): number {

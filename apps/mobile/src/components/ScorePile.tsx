@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Card, cardToPiece } from '@gambit/shared';
+import { Card, cardToPiece } from '@checkker/shared';
 import { colors, spacing, typography, radius } from '../theme/tokens';
 
 const SUIT_SYMBOL: Record<string, string> = {

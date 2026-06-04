@@ -1,0 +1,4020 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L1",
+      "community": 7,
+      "id": "index"
+    },
+    {
+      "label": "HomeScreen()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\index.tsx",
+      "source_location": "L4",
+      "community": 7,
+      "id": "index_homescreen"
+    },
+    {
+      "label": "_layout.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\_layout.tsx",
+      "source_location": "L1",
+      "community": 14,
+      "id": "layout"
+    },
+    {
+      "label": "RootLayout()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\_layout.tsx",
+      "source_location": "L4",
+      "community": 14,
+      "id": "layout_rootlayout"
+    },
+    {
+      "label": "difficulty.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\bot\\difficulty.tsx",
+      "source_location": "L1",
+      "community": 4,
+      "id": "difficulty"
+    },
+    {
+      "label": "renderStars()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\bot\\difficulty.tsx",
+      "source_location": "L52",
+      "community": 4,
+      "id": "difficulty_renderstars"
+    },
+    {
+      "label": "DifficultyCard()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\bot\\difficulty.tsx",
+      "source_location": "L58",
+      "community": 4,
+      "id": "difficulty_difficultycard"
+    },
+    {
+      "label": "handleSelectDifficulty()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\bot\\difficulty.tsx",
+      "source_location": "L136",
+      "community": 4,
+      "id": "difficulty_handleselectdifficulty"
+    },
+    {
+      "label": "casual.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\game\\casual.tsx",
+      "source_location": "L1",
+      "community": 4,
+      "id": "casual"
+    },
+    {
+      "label": "queue.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\game\\queue.tsx",
+      "source_location": "L1",
+      "community": 4,
+      "id": "queue"
+    },
+    {
+      "label": "[id].tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L1",
+      "community": 0,
+      "id": "id"
+    },
+    {
+      "label": "handleLessonPress()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\tutorial\\index.tsx",
+      "source_location": "L46",
+      "community": 7,
+      "id": "index_handlelessonpress"
+    },
+    {
+      "label": "handleReset()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\tutorial\\index.tsx",
+      "source_location": "L55",
+      "community": 7,
+      "id": "index_handlereset"
+    },
+    {
+      "label": "onTrackLayout()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\tutorial\\index.tsx",
+      "source_location": "L128",
+      "community": 7,
+      "id": "index_ontracklayout"
+    },
+    {
+      "label": "findRecommendedCardIndex()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L92",
+      "community": 0,
+      "id": "id_findrecommendedcardindex"
+    },
+    {
+      "label": "CardHand.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\CardHand.tsx",
+      "source_location": "L1",
+      "community": 3,
+      "id": "cardhand"
+    },
+    {
+      "label": "CardItem()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\CardHand.tsx",
+      "source_location": "L37",
+      "community": 3,
+      "id": "cardhand_carditem"
+    },
+    {
+      "label": "EmptySlot()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\CardHand.tsx",
+      "source_location": "L97",
+      "community": 3,
+      "id": "cardhand_emptyslot"
+    },
+    {
+      "label": "ChessBoard.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\ChessBoard.tsx",
+      "source_location": "L1",
+      "community": 0,
+      "id": "chessboard"
+    },
+    {
+      "label": "parseFen()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\ChessBoard.tsx",
+      "source_location": "L9",
+      "community": 0,
+      "id": "chessboard_parsefen"
+    },
+    {
+      "label": "isLightSquare()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\ChessBoard.tsx",
+      "source_location": "L24",
+      "community": 0,
+      "id": "chessboard_islightsquare"
+    },
+    {
+      "label": "onLayout()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\ChessBoard.tsx",
+      "source_location": "L141",
+      "community": 0,
+      "id": "chessboard_onlayout"
+    },
+    {
+      "label": "ChessClock.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\ChessClock.tsx",
+      "source_location": "L1",
+      "community": 15,
+      "id": "chessclock"
+    },
+    {
+      "label": "formatTime()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\ChessClock.tsx",
+      "source_location": "L15",
+      "community": 15,
+      "id": "chessclock_formattime"
+    },
+    {
+      "label": "ChessSquare.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\ChessSquare.tsx",
+      "source_location": "L1",
+      "community": 0,
+      "id": "chesssquare"
+    },
+    {
+      "label": "GameInfoBar.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\GameInfoBar.tsx",
+      "source_location": "L1",
+      "community": 0,
+      "id": "gameinfobar"
+    },
+    {
+      "label": "formatTime()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\GameInfoBar.tsx",
+      "source_location": "L13",
+      "community": 0,
+      "id": "gameinfobar_formattime"
+    },
+    {
+      "label": "GameResultOverlay.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\GameResultOverlay.tsx",
+      "source_location": "L1",
+      "community": 3,
+      "id": "gameresultoverlay"
+    },
+    {
+      "label": "resultLabel()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\GameResultOverlay.tsx",
+      "source_location": "L41",
+      "community": 3,
+      "id": "gameresultoverlay_resultlabel"
+    },
+    {
+      "label": "resultReason()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\GameResultOverlay.tsx",
+      "source_location": "L51",
+      "community": 3,
+      "id": "gameresultoverlay_resultreason"
+    },
+    {
+      "label": "MoveErrorToast.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\MoveErrorToast.tsx",
+      "source_location": "L1",
+      "community": 0,
+      "id": "moveerrortoast"
+    },
+    {
+      "label": "MoveErrorToast()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\MoveErrorToast.tsx",
+      "source_location": "L10",
+      "community": 0,
+      "id": "moveerrortoast_moveerrortoast"
+    },
+    {
+      "label": "OpponentHand.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\OpponentHand.tsx",
+      "source_location": "L1",
+      "community": 0,
+      "id": "opponenthand"
+    },
+    {
+      "label": "ResignButton.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\ResignButton.tsx",
+      "source_location": "L1",
+      "community": 0,
+      "id": "resignbutton"
+    },
+    {
+      "label": "ScorePile.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\ScorePile.tsx",
+      "source_location": "L1",
+      "community": 0,
+      "id": "scorepile"
+    },
+    {
+      "label": "MiniCard()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\ScorePile.tsx",
+      "source_location": "L36",
+      "community": 0,
+      "id": "scorepile_minicard"
+    },
+    {
+      "label": "useSocket.ts",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\hooks\\useSocket.ts",
+      "source_location": "L1",
+      "community": 4,
+      "id": "usesocket"
+    },
+    {
+      "label": "useSocket()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\hooks\\useSocket.ts",
+      "source_location": "L58",
+      "community": 4,
+      "id": "usesocket_usesocket"
+    },
+    {
+      "label": "lessons.ts",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\lessons.ts",
+      "source_location": "L1",
+      "community": 0,
+      "id": "lessons"
+    },
+    {
+      "label": "TutorialEngine.ts",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L1",
+      "community": 0,
+      "id": "tutorialengine"
+    },
+    {
+      "label": "TutorialEngine",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L6",
+      "community": 6,
+      "id": "tutorialengine_tutorialengine"
+    },
+    {
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L12",
+      "community": 6,
+      "id": "tutorialengine_tutorialengine_constructor"
+    },
+    {
+      "label": ".loadLesson()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L16",
+      "community": 6,
+      "id": "tutorialengine_tutorialengine_loadlesson"
+    },
+    {
+      "label": ".getState()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L29",
+      "community": 6,
+      "id": "tutorialengine_tutorialengine_getstate"
+    },
+    {
+      "label": ".validateMove()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L44",
+      "community": 6,
+      "id": "tutorialengine_tutorialengine_validatemove"
+    },
+    {
+      "label": ".advanceStep()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L116",
+      "community": 6,
+      "id": "tutorialengine_tutorialengine_advancestep"
+    },
+    {
+      "label": ".getHint()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L125",
+      "community": 6,
+      "id": "tutorialengine_tutorialengine_gethint"
+    },
+    {
+      "label": ".resetLesson()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L132",
+      "community": 6,
+      "id": "tutorialengine_tutorialengine_resetlesson"
+    },
+    {
+      "label": ".getLesson()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L141",
+      "community": 6,
+      "id": "tutorialengine_tutorialengine_getlesson"
+    },
+    {
+      "label": ".getAllLessons()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L145",
+      "community": 6,
+      "id": "tutorialengine_tutorialengine_getalllessons"
+    },
+    {
+      "label": ".isLessonComplete()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L149",
+      "community": 6,
+      "id": "tutorialengine_tutorialengine_islessoncomplete"
+    },
+    {
+      "label": "TutorialStorage.ts",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L1",
+      "community": 0,
+      "id": "tutorialstorage"
+    },
+    {
+      "label": "getAsyncStorage()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L7",
+      "community": 11,
+      "id": "tutorialstorage_getasyncstorage"
+    },
+    {
+      "label": "TutorialStorage",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L16",
+      "community": 11,
+      "id": "tutorialstorage_tutorialstorage"
+    },
+    {
+      "label": ".loadProgress()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L17",
+      "community": 11,
+      "id": "tutorialstorage_tutorialstorage_loadprogress"
+    },
+    {
+      "label": ".markLessonComplete()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L28",
+      "community": 11,
+      "id": "tutorialstorage_tutorialstorage_marklessoncomplete"
+    },
+    {
+      "label": ".isLessonUnlocked()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L44",
+      "community": 11,
+      "id": "tutorialstorage_tutorialstorage_islessonunlocked"
+    },
+    {
+      "label": ".resetProgress()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L49",
+      "community": 11,
+      "id": "tutorialstorage_tutorialstorage_resetprogress"
+    },
+    {
+      "label": "types.ts",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\tutorial\\types.ts",
+      "source_location": "L1",
+      "community": 0,
+      "id": "types"
+    },
+    {
+      "label": "async-storage.d.ts",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\types\\async-storage.d.ts",
+      "source_location": "L1",
+      "community": 17,
+      "id": "async_storage_d"
+    },
+    {
+      "label": "game.ts",
+      "file_type": "code",
+      "source_file": "packages\\shared\\src\\game.ts",
+      "source_location": "L1",
+      "community": 4,
+      "id": "game"
+    },
+    {
+      "label": "tutorial.test.ts",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\__tests__\\tutorial.test.ts",
+      "source_location": "L1",
+      "community": 0,
+      "id": "tutorial_test"
+    },
+    {
+      "label": "GameEngine.ts",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L1",
+      "community": 2,
+      "id": "gameengine"
+    },
+    {
+      "label": "shuffle()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L21",
+      "community": 1,
+      "id": "gameengine_shuffle"
+    },
+    {
+      "label": "GameEngine",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L30",
+      "community": 1,
+      "id": "gameengine_gameengine"
+    },
+    {
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L46",
+      "community": 1,
+      "id": "gameengine_gameengine_constructor"
+    },
+    {
+      "label": ".currentPlayer()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L83",
+      "community": 1,
+      "id": "gameengine_gameengine_currentplayer"
+    },
+    {
+      "label": ".opponent()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L87",
+      "community": 1,
+      "id": "gameengine_gameengine_opponent"
+    },
+    {
+      "label": ".drawToFull()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L91",
+      "community": 1,
+      "id": "gameengine_gameengine_drawtofull"
+    },
+    {
+      "label": ".reshuffleDead()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L110",
+      "community": 1,
+      "id": "gameengine_gameengine_reshuffledead"
+    },
+    {
+      "label": ".getState()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L120",
+      "community": 1,
+      "id": "gameengine_gameengine_getstate"
+    },
+    {
+      "label": ".getPublicState()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L135",
+      "community": 1,
+      "id": "gameengine_gameengine_getpublicstate"
+    },
+    {
+      "label": ".getLegalMoves()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L159",
+      "community": 1,
+      "id": "gameengine_gameengine_getlegalmoves"
+    },
+    {
+      "label": ".playCard()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L164",
+      "community": 1,
+      "id": "gameengine_gameengine_playcard"
+    },
+    {
+      "label": ".drawCards()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L238",
+      "community": 1,
+      "id": "gameengine_gameengine_drawcards"
+    },
+    {
+      "label": ".checkGameEnd()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L252",
+      "community": 1,
+      "id": "gameengine_gameengine_checkgameend"
+    },
+    {
+      "label": ".resign()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L275",
+      "community": 1,
+      "id": "gameengine_gameengine_resign"
+    },
+    {
+      "label": ".timeOut()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L279",
+      "community": 1,
+      "id": "gameengine_gameengine_timeout"
+    },
+    {
+      "label": ".isOver()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L283",
+      "community": 1,
+      "id": "gameengine_gameengine_isover"
+    },
+    {
+      "label": ".getResult()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L287",
+      "community": 1,
+      "id": "gameengine_gameengine_getresult"
+    },
+    {
+      "label": "GameServer.ts",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L1",
+      "community": 2,
+      "id": "gameserver"
+    },
+    {
+      "label": "GameServer",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L22",
+      "community": 8,
+      "id": "gameserver_gameserver"
+    },
+    {
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L29",
+      "community": 8,
+      "id": "gameserver_gameserver_constructor"
+    },
+    {
+      "label": ".handleConnection()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L34",
+      "community": 8,
+      "id": "gameserver_gameserver_handleconnection"
+    },
+    {
+      "label": ".addToQueue()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L109",
+      "community": 8,
+      "id": "gameserver_gameserver_addtoqueue"
+    },
+    {
+      "label": ".startGame()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L137",
+      "community": 8,
+      "id": "gameserver_gameserver_startgame"
+    },
+    {
+      "label": ".broadcastGame()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L167",
+      "community": 8,
+      "id": "gameserver_gameserver_broadcastgame"
+    },
+    {
+      "label": ".endGame()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L181",
+      "community": 8,
+      "id": "gameserver_gameserver_endgame"
+    },
+    {
+      "label": ".removeFromQueue()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L197",
+      "community": 8,
+      "id": "gameserver_gameserver_removefromqueue"
+    },
+    {
+      "label": "BotManager.ts",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L1",
+      "community": 2,
+      "id": "botmanager"
+    },
+    {
+      "label": "BotManager",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L33",
+      "community": 9,
+      "id": "botmanager_botmanager"
+    },
+    {
+      "label": ".createBotGame()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L37",
+      "community": 9,
+      "id": "botmanager_botmanager_createbotgame"
+    },
+    {
+      "label": ".setupHandlers()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L70",
+      "community": 9,
+      "id": "botmanager_botmanager_setuphandlers"
+    },
+    {
+      "label": ".broadcastToHuman()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L117",
+      "community": 9,
+      "id": "botmanager_botmanager_broadcasttohuman"
+    },
+    {
+      "label": ".scheduleBotTurn()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L129",
+      "community": 9,
+      "id": "botmanager_botmanager_schedulebotturn"
+    },
+    {
+      "label": ".disposeBotGame()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L146",
+      "community": 9,
+      "id": "botmanager_botmanager_disposebotgame"
+    },
+    {
+      "label": ".disposeByHumanId()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L165",
+      "community": 9,
+      "id": "botmanager_botmanager_disposebyhumanid"
+    },
+    {
+      "label": ".isBot()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L177",
+      "community": 9,
+      "id": "botmanager_botmanager_isbot"
+    },
+    {
+      "label": ".triggerBotTurn()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L181",
+      "community": 9,
+      "id": "botmanager_botmanager_triggerbotturn"
+    },
+    {
+      "label": "BotPlayer.ts",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotPlayer.ts",
+      "source_location": "L1",
+      "community": 2,
+      "id": "botplayer"
+    },
+    {
+      "label": "BotPlayer",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotPlayer.ts",
+      "source_location": "L20",
+      "community": 2,
+      "id": "botplayer_botplayer"
+    },
+    {
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotPlayer.ts",
+      "source_location": "L29",
+      "community": 2,
+      "id": "botplayer_botplayer_constructor"
+    },
+    {
+      "label": ".playTurn()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotPlayer.ts",
+      "source_location": "L37",
+      "community": 2,
+      "id": "botplayer_botplayer_playturn"
+    },
+    {
+      "label": ".dispose()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\BotPlayer.ts",
+      "source_location": "L87",
+      "community": 2,
+      "id": "botplayer_botplayer_dispose"
+    },
+    {
+      "label": "evaluators.ts",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L1",
+      "community": 2,
+      "id": "evaluators"
+    },
+    {
+      "label": "toChessColor()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L115",
+      "community": 2,
+      "id": "evaluators_tochesscolor"
+    },
+    {
+      "label": "oppositeColor()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L119",
+      "community": 2,
+      "id": "evaluators_oppositecolor"
+    },
+    {
+      "label": "opponentChessColor()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L123",
+      "community": 2,
+      "id": "evaluators_opponentchesscolor"
+    },
+    {
+      "label": "getAllMoves()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L133",
+      "community": 2,
+      "id": "evaluators_getallmoves"
+    },
+    {
+      "label": "pickRandom()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L139",
+      "community": 2,
+      "id": "evaluators_pickrandom"
+    },
+    {
+      "label": "applyUCIMove()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L143",
+      "community": 2,
+      "id": "evaluators_applyucimove"
+    },
+    {
+      "label": "evaluatePosition()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L151",
+      "community": 2,
+      "id": "evaluators_evaluateposition"
+    },
+    {
+      "label": "evaluatePositionSimple()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L178",
+      "community": 2,
+      "id": "evaluators_evaluatepositionsimple"
+    },
+    {
+      "label": "bot.test.ts",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\__tests__\\bot.test.ts",
+      "source_location": "L1",
+      "community": 2,
+      "id": "bot_test"
+    },
+    {
+      "label": "firstMoveFor()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\__tests__\\bot.test.ts",
+      "source_location": "L167",
+      "community": 2,
+      "id": "bot_test_firstmovefor"
+    },
+    {
+      "label": "getLegalMovesForCard()",
+      "file_type": "code",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L13",
+      "community": 7,
+      "id": "index_getlegalmovesforcard"
+    },
+    {
+      "label": "getLegalMovesForHand()",
+      "file_type": "code",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L37",
+      "community": 7,
+      "id": "index_getlegalmovesforhand"
+    },
+    {
+      "label": "getCaptureBonus()",
+      "file_type": "code",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L48",
+      "community": 7,
+      "id": "index_getcapturebonus"
+    },
+    {
+      "label": "isCheck()",
+      "file_type": "code",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L60",
+      "community": 7,
+      "id": "index_ischeck"
+    },
+    {
+      "label": "isCheckmate()",
+      "file_type": "code",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L64",
+      "community": 7,
+      "id": "index_ischeckmate"
+    },
+    {
+      "label": "isDraw()",
+      "file_type": "code",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L68",
+      "community": 7,
+      "id": "index_isdraw"
+    },
+    {
+      "label": "evaluator.ts",
+      "file_type": "code",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L1",
+      "community": 10,
+      "id": "evaluator"
+    },
+    {
+      "label": "sortByRank()",
+      "file_type": "code",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L9",
+      "community": 10,
+      "id": "evaluator_sortbyrank"
+    },
+    {
+      "label": "isFlush()",
+      "file_type": "code",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L13",
+      "community": 10,
+      "id": "evaluator_isflush"
+    },
+    {
+      "label": "isStraight()",
+      "file_type": "code",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L17",
+      "community": 10,
+      "id": "evaluator_isstraight"
+    },
+    {
+      "label": "getRankCounts()",
+      "file_type": "code",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L33",
+      "community": 10,
+      "id": "evaluator_getrankcounts"
+    },
+    {
+      "label": "evaluateFive()",
+      "file_type": "code",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L41",
+      "community": 10,
+      "id": "evaluator_evaluatefive"
+    },
+    {
+      "label": "combinations()",
+      "file_type": "code",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L86",
+      "community": 10,
+      "id": "evaluator_combinations"
+    },
+    {
+      "label": "evaluateScorePile()",
+      "file_type": "code",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L99",
+      "community": 10,
+      "id": "evaluator_evaluatescorepile"
+    },
+    {
+      "label": "cards.ts",
+      "file_type": "code",
+      "source_file": "packages\\shared\\src\\cards.ts",
+      "source_location": "L1",
+      "community": 4,
+      "id": "cards"
+    },
+    {
+      "label": "createDeck()",
+      "file_type": "code",
+      "source_file": "packages\\shared\\src\\cards.ts",
+      "source_location": "L34",
+      "community": 4,
+      "id": "cards_createdeck"
+    },
+    {
+      "label": "cardToPiece()",
+      "file_type": "code",
+      "source_file": "packages\\shared\\src\\cards.ts",
+      "source_location": "L44",
+      "community": 4,
+      "id": "cards_cardtopiece"
+    },
+    {
+      "label": "cardId()",
+      "file_type": "code",
+      "source_file": "packages\\shared\\src\\cards.ts",
+      "source_location": "L48",
+      "community": 4,
+      "id": "cards_cardid"
+    },
+    {
+      "label": "poker.ts",
+      "file_type": "code",
+      "source_file": "packages\\shared\\src\\poker.ts",
+      "source_location": "L1",
+      "community": 4,
+      "id": "poker"
+    },
+    {
+      "label": "rating.ts",
+      "file_type": "code",
+      "source_file": "packages\\shared\\src\\rating.ts",
+      "source_location": "L1",
+      "community": 12,
+      "id": "rating"
+    },
+    {
+      "label": "getTier()",
+      "file_type": "code",
+      "source_file": "packages\\shared\\src\\rating.ts",
+      "source_location": "L17",
+      "community": 12,
+      "id": "rating_gettier"
+    },
+    {
+      "label": "expectedScore()",
+      "file_type": "code",
+      "source_file": "packages\\shared\\src\\rating.ts",
+      "source_location": "L25",
+      "community": 12,
+      "id": "rating_expectedscore"
+    },
+    {
+      "label": "newRating()",
+      "file_type": "code",
+      "source_file": "packages\\shared\\src\\rating.ts",
+      "source_location": "L29",
+      "community": 12,
+      "id": "rating_newrating"
+    },
+    {
+      "label": "Gambit Game Design Document",
+      "file_type": "document",
+      "source_file": "Game.md",
+      "source_location": null,
+      "community": 5,
+      "id": "game_gambit"
+    },
+    {
+      "label": "Core Ruleset",
+      "file_type": "document",
+      "source_file": "Game.md",
+      "source_location": "line 13",
+      "community": 5,
+      "id": "game_core_ruleset"
+    },
+    {
+      "label": "Card-to-Piece Mapping",
+      "file_type": "document",
+      "source_file": "Game.md",
+      "source_location": "line 19",
+      "community": 5,
+      "id": "game_card_to_piece_mapping"
+    },
+    {
+      "label": "Hand of 3 Cards Turn Structure",
+      "file_type": "document",
+      "source_file": "Game.md",
+      "source_location": "line 31",
+      "community": 5,
+      "id": "game_hand_of_3_cards"
+    },
+    {
+      "label": "Ace Rebalanced Rule",
+      "file_type": "document",
+      "source_file": "Game.md",
+      "source_location": "line 47",
+      "community": 5,
+      "id": "game_ace_rebalanced"
+    },
+    {
+      "label": "Captured Piece Bonus System",
+      "file_type": "document",
+      "source_file": "Game.md",
+      "source_location": "line 51",
+      "community": 5,
+      "id": "game_captured_piece_bonus"
+    },
+    {
+      "label": "Dual Win Conditions",
+      "file_type": "document",
+      "source_file": "Game.md",
+      "source_location": "line 64",
+      "community": 5,
+      "id": "game_dual_win_conditions"
+    },
+    {
+      "label": "Skill Tiers (ELO-Based)",
+      "file_type": "document",
+      "source_file": "Game.md",
+      "source_location": "line 111",
+      "community": 5,
+      "id": "game_skill_tiers"
+    },
+    {
+      "label": "Time Control Options",
+      "file_type": "document",
+      "source_file": "Game.md",
+      "source_location": "line 100",
+      "community": 5,
+      "id": "game_time_control"
+    },
+    {
+      "label": "V1 Ship Scope",
+      "file_type": "document",
+      "source_file": "Game.md",
+      "source_location": "line 193",
+      "community": 18,
+      "id": "game_v1_scope"
+    },
+    {
+      "label": "QA Report",
+      "file_type": "document",
+      "source_file": "QA_REPORT.md",
+      "community": 19,
+      "id": "qa_report"
+    },
+    {
+      "label": "BUG-002: No Rematch",
+      "file_type": "document",
+      "source_file": "QA_REPORT.md",
+      "community": 5,
+      "id": "qa_bug002_no_rematch"
+    },
+    {
+      "label": "UX/UI Specs V1.0",
+      "file_type": "document",
+      "source_file": "specs/ui-ux-specs.md",
+      "community": 20,
+      "id": "specs_uiux"
+    },
+    {
+      "label": "ChessBoard Spec",
+      "file_type": "document",
+      "source_file": "specs/ui-ux-specs.md",
+      "community": 21,
+      "id": "specs_component_chessboard"
+    },
+    {
+      "label": "CardHand Spec",
+      "file_type": "document",
+      "source_file": "specs/ui-ux-specs.md",
+      "community": 5,
+      "id": "specs_component_cardhand"
+    },
+    {
+      "label": "ScorePile Spec",
+      "file_type": "document",
+      "source_file": "specs/ui-ux-specs.md",
+      "community": 5,
+      "id": "specs_component_scorepile"
+    },
+    {
+      "label": "ChessClock Spec",
+      "file_type": "document",
+      "source_file": "specs/ui-ux-specs.md",
+      "community": 5,
+      "id": "specs_component_chessclock"
+    },
+    {
+      "label": "GameOverOverlay Spec",
+      "file_type": "document",
+      "source_file": "specs/ui-ux-specs.md",
+      "community": 5,
+      "id": "specs_component_gameoveroverlay"
+    },
+    {
+      "label": "Design Tokens",
+      "file_type": "document",
+      "source_file": "specs/ui-ux-specs.md",
+      "community": 22,
+      "id": "specs_design_tokens"
+    },
+    {
+      "label": "Coding Standards",
+      "file_type": "document",
+      "source_file": "rules/CodeRules.md",
+      "community": 23,
+      "id": "rules_code"
+    },
+    {
+      "label": "UI/UX Standards",
+      "file_type": "document",
+      "source_file": "rules/UiUxRules.md",
+      "community": 24,
+      "id": "rules_uiux"
+    },
+    {
+      "label": "Team Workflow",
+      "file_type": "document",
+      "source_file": "agents/00-TEAM_WORKFLOW.md",
+      "community": 25,
+      "id": "workflow_team"
+    },
+    {
+      "label": "Master Orchestrator",
+      "file_type": "document",
+      "source_file": "agents/agent.md",
+      "community": 26,
+      "id": "agent_orchestrator"
+    },
+    {
+      "label": "babel.config.js",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\babel.config.js",
+      "source_location": "L1",
+      "community": 27,
+      "id": "babel_config"
+    },
+    {
+      "label": "sqToIdx()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\ChessBoard.tsx",
+      "source_location": "L29",
+      "community": 0,
+      "id": "chessboard_sqtoidx"
+    },
+    {
+      "label": "pokerSummary()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\GameResultOverlay.tsx",
+      "source_location": "L61",
+      "community": 3,
+      "id": "gameresultoverlay_pokersummary"
+    },
+    {
+      "label": "AnimatedScore()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\GameResultOverlay.tsx",
+      "source_location": "L68",
+      "community": 3,
+      "id": "gameresultoverlay_animatedscore"
+    },
+    {
+      "label": "MoveHistory.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\MoveHistory.tsx",
+      "source_location": "L1",
+      "community": 0,
+      "id": "movehistory"
+    },
+    {
+      "label": "PromotionPicker.tsx",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\components\\PromotionPicker.tsx",
+      "source_location": "L1",
+      "community": 3,
+      "id": "promotionpicker"
+    },
+    {
+      "label": "useReducedMotion.ts",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\hooks\\useReducedMotion.ts",
+      "source_location": "L1",
+      "community": 3,
+      "id": "usereducedmotion"
+    },
+    {
+      "label": "useReducedMotion()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\hooks\\useReducedMotion.ts",
+      "source_location": "L8",
+      "community": 3,
+      "id": "usereducedmotion_usereducedmotion"
+    },
+    {
+      "label": "animations.ts",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L1",
+      "community": 3,
+      "id": "animations"
+    },
+    {
+      "label": "useSpringPress()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L26",
+      "community": 3,
+      "id": "animations_usespringpress"
+    },
+    {
+      "label": "usePulse()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L52",
+      "community": 3,
+      "id": "animations_usepulse"
+    },
+    {
+      "label": "useCountUp()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L82",
+      "community": 3,
+      "id": "animations_usecountup"
+    },
+    {
+      "label": "staggerDelay()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L99",
+      "community": 3,
+      "id": "animations_staggerdelay"
+    },
+    {
+      "label": "useShake()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L122",
+      "community": 3,
+      "id": "animations_useshake"
+    },
+    {
+      "label": ".startTimeoutCheck()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L291",
+      "community": 1,
+      "id": "gameengine_gameengine_starttimeoutcheck"
+    },
+    {
+      "label": ".dispose()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L305",
+      "community": 1,
+      "id": "gameengine_gameengine_dispose"
+    },
+    {
+      "label": ".getScores()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L313",
+      "community": 1,
+      "id": "gameengine_gameengine_getscores"
+    },
+    {
+      "label": ".findEndedMatch()",
+      "file_type": "code",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L189",
+      "community": 8,
+      "id": "gameserver_gameserver_findendedmatch"
+    },
+    {
+      "label": "scoreGame()",
+      "file_type": "code",
+      "source_file": "packages\\shared\\src\\game.ts",
+      "source_location": "L74",
+      "community": 4,
+      "id": "game_scoregame"
+    },
+    {
+      "label": "GameEngine",
+      "file_type": "document",
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "source_location": "line 12",
+      "community": 13,
+      "id": "graph_report_game_engine"
+    },
+    {
+      "label": "TutorialEngine",
+      "file_type": "document",
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "source_location": "line 13",
+      "community": 13,
+      "id": "graph_report_tutorial_engine"
+    },
+    {
+      "label": "BotManager",
+      "file_type": "document",
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "source_location": "line 14",
+      "community": 13,
+      "id": "graph_report_bot_manager"
+    },
+    {
+      "label": "GameServer",
+      "file_type": "document",
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "source_location": "line 15",
+      "community": 28,
+      "id": "graph_report_game_server"
+    },
+    {
+      "label": "Core Ruleset",
+      "file_type": "document",
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "source_location": "line 16",
+      "community": 29,
+      "id": "graph_report_core_ruleset"
+    },
+    {
+      "label": "Gambit Core Game Loop",
+      "file_type": "document",
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "source_location": "line 36",
+      "community": 30,
+      "id": "graph_report_gambit_core_game_loop"
+    },
+    {
+      "label": "BotPlayer",
+      "file_type": "document",
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "source_location": "line 50",
+      "community": 13,
+      "id": "graph_report_bot_player"
+    },
+    {
+      "label": "QA Report",
+      "file_type": "document",
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "source_location": "line 102",
+      "community": 16,
+      "id": "graph_report_qa_report"
+    },
+    {
+      "label": "UX/UI Specs V1.0",
+      "file_type": "document",
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "source_location": "line 106",
+      "community": 16,
+      "id": "graph_report_ux_specs"
+    },
+    {
+      "label": "if()",
+      "file_type": "code",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L212",
+      "id": "id_if",
+      "community": 0
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\index.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "index_homescreen",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "index_homescreen"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\index.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "tutorialstorage",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "tutorialstorage"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\index.tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "lessons",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "lessons"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\index.tsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "types",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "types"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\index.tsx",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "index_handlelessonpress",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "index_handlelessonpress"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\index.tsx",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "index_handlereset",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "index_handlereset"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\index.tsx",
+      "source_location": "L128",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "index_ontracklayout",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "index_ontracklayout"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\index.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "gameserver",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "gameserver"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "index_getlegalmovesforcard",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "index_getlegalmovesforcard"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "index_getlegalmovesforhand",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "index_getlegalmovesforhand"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "index_getcapturebonus",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "index_getcapturebonus"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "index_ischeck",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "index_ischeck"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L64",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "index_ischeckmate",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "index_ischeckmate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\chess\\src\\index.ts",
+      "source_location": "L68",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "index_isdraw",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "index_isdraw"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\index.tsx",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "index",
+      "_tgt": "animations",
+      "confidence_score": 1.0,
+      "source": "index",
+      "target": "animations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\_layout.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "layout",
+      "_tgt": "layout_rootlayout",
+      "confidence_score": 1.0,
+      "source": "layout",
+      "target": "layout_rootlayout"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\bot\\difficulty.tsx",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_src": "difficulty",
+      "_tgt": "usesocket",
+      "confidence_score": 1.0,
+      "source": "difficulty",
+      "target": "usesocket"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\bot\\difficulty.tsx",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_src": "difficulty",
+      "_tgt": "difficulty_renderstars",
+      "confidence_score": 1.0,
+      "source": "difficulty",
+      "target": "difficulty_renderstars"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\bot\\difficulty.tsx",
+      "source_location": "L58",
+      "weight": 1.0,
+      "_src": "difficulty",
+      "_tgt": "difficulty_difficultycard",
+      "confidence_score": 1.0,
+      "source": "difficulty",
+      "target": "difficulty_difficultycard"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\bot\\difficulty.tsx",
+      "source_location": "L136",
+      "weight": 1.0,
+      "_src": "difficulty",
+      "_tgt": "difficulty_handleselectdifficulty",
+      "confidence_score": 1.0,
+      "source": "difficulty",
+      "target": "difficulty_handleselectdifficulty"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\bot\\difficulty.tsx",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "difficulty",
+      "_tgt": "animations",
+      "confidence_score": 1.0,
+      "source": "difficulty",
+      "target": "animations"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\game\\casual.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "casual",
+      "_tgt": "usesocket",
+      "confidence_score": 1.0,
+      "source": "casual",
+      "target": "usesocket"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\game\\queue.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "queue",
+      "_tgt": "usesocket",
+      "confidence_score": 1.0,
+      "source": "queue",
+      "target": "usesocket"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "chessboard",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "chessboard"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "cardhand",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "cardhand"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\game\\[id].tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "opponenthand",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "opponenthand"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\game\\[id].tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "scorepile",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "scorepile"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\game\\[id].tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "gameinfobar",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "gameinfobar"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\game\\[id].tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "resignbutton",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "resignbutton"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\game\\[id].tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "gameresultoverlay",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "gameresultoverlay"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\game\\[id].tsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "moveerrortoast",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "moveerrortoast"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\game\\[id].tsx",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "usesocket",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "usesocket"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "tutorialengine",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "tutorialengine"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "tutorialstorage",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "tutorialstorage"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "lessons",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "lessons"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "types",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "types"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L92",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "id_findrecommendedcardindex",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "id_findrecommendedcardindex"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\game\\[id].tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "movehistory",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "movehistory"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\game\\[id].tsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "promotionpicker",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "promotionpicker"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "animations",
+      "confidence_score": 1.0,
+      "source": "id",
+      "target": "animations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\app\\tutorial\\[id].tsx",
+      "source_location": "L212",
+      "weight": 1.0,
+      "_src": "id",
+      "_tgt": "id_if",
+      "source": "id",
+      "target": "id_if",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\CardHand.tsx",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_src": "cardhand",
+      "_tgt": "cardhand_carditem",
+      "confidence_score": 1.0,
+      "source": "cardhand",
+      "target": "cardhand_carditem"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\CardHand.tsx",
+      "source_location": "L97",
+      "weight": 1.0,
+      "_src": "cardhand",
+      "_tgt": "cardhand_emptyslot",
+      "confidence_score": 1.0,
+      "source": "cardhand",
+      "target": "cardhand_emptyslot"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\CardHand.tsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "cardhand",
+      "_tgt": "animations",
+      "confidence_score": 1.0,
+      "source": "cardhand",
+      "target": "animations"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\ChessBoard.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "chessboard",
+      "_tgt": "chesssquare",
+      "confidence_score": 1.0,
+      "source": "chessboard",
+      "target": "chesssquare"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\ChessBoard.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "chessboard",
+      "_tgt": "chessboard_parsefen",
+      "confidence_score": 1.0,
+      "source": "chessboard",
+      "target": "chessboard_parsefen"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\ChessBoard.tsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_src": "chessboard",
+      "_tgt": "chessboard_islightsquare",
+      "confidence_score": 1.0,
+      "source": "chessboard",
+      "target": "chessboard_islightsquare"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\ChessBoard.tsx",
+      "source_location": "L141",
+      "weight": 1.0,
+      "_src": "chessboard",
+      "_tgt": "chessboard_onlayout",
+      "confidence_score": 1.0,
+      "source": "chessboard",
+      "target": "chessboard_onlayout"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\ChessBoard.tsx",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "chessboard",
+      "_tgt": "chessboard_sqtoidx",
+      "confidence_score": 1.0,
+      "source": "chessboard",
+      "target": "chessboard_sqtoidx"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\ChessClock.tsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "chessclock",
+      "_tgt": "chessclock_formattime",
+      "confidence_score": 1.0,
+      "source": "chessclock",
+      "target": "chessclock_formattime"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\GameInfoBar.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "gameinfobar",
+      "_tgt": "gameinfobar_formattime",
+      "confidence_score": 1.0,
+      "source": "gameinfobar",
+      "target": "gameinfobar_formattime"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\GameResultOverlay.tsx",
+      "source_location": "L41",
+      "weight": 1.0,
+      "_src": "gameresultoverlay",
+      "_tgt": "gameresultoverlay_resultlabel",
+      "confidence_score": 1.0,
+      "source": "gameresultoverlay",
+      "target": "gameresultoverlay_resultlabel"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\GameResultOverlay.tsx",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_src": "gameresultoverlay",
+      "_tgt": "gameresultoverlay_resultreason",
+      "confidence_score": 1.0,
+      "source": "gameresultoverlay",
+      "target": "gameresultoverlay_resultreason"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\GameResultOverlay.tsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "gameresultoverlay",
+      "_tgt": "animations",
+      "confidence_score": 1.0,
+      "source": "gameresultoverlay",
+      "target": "animations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\GameResultOverlay.tsx",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_src": "gameresultoverlay",
+      "_tgt": "gameresultoverlay_pokersummary",
+      "confidence_score": 1.0,
+      "source": "gameresultoverlay",
+      "target": "gameresultoverlay_pokersummary"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\GameResultOverlay.tsx",
+      "source_location": "L68",
+      "weight": 1.0,
+      "_src": "gameresultoverlay",
+      "_tgt": "gameresultoverlay_animatedscore",
+      "confidence_score": 1.0,
+      "source": "gameresultoverlay",
+      "target": "gameresultoverlay_animatedscore"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\MoveErrorToast.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "moveerrortoast",
+      "_tgt": "moveerrortoast_moveerrortoast",
+      "confidence_score": 1.0,
+      "source": "moveerrortoast",
+      "target": "moveerrortoast_moveerrortoast"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\ScorePile.tsx",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_src": "scorepile",
+      "_tgt": "scorepile_minicard",
+      "confidence_score": 1.0,
+      "source": "scorepile",
+      "target": "scorepile_minicard"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\hooks\\useSocket.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "usesocket",
+      "_tgt": "game",
+      "confidence_score": 1.0,
+      "source": "usesocket",
+      "target": "game"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\hooks\\useSocket.ts",
+      "source_location": "L58",
+      "weight": 1.0,
+      "_src": "usesocket",
+      "_tgt": "usesocket_usesocket",
+      "confidence_score": 1.0,
+      "source": "usesocket",
+      "target": "usesocket_usesocket"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\lessons.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "lessons",
+      "_tgt": "types",
+      "confidence_score": 1.0,
+      "source": "lessons",
+      "target": "types"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "lessons",
+      "_tgt": "tutorialengine",
+      "confidence_score": 1.0,
+      "source": "lessons",
+      "target": "tutorialengine"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "tutorialengine",
+      "_tgt": "types",
+      "confidence_score": 1.0,
+      "source": "tutorialengine",
+      "target": "types"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "tutorialengine",
+      "_tgt": "tutorialengine_tutorialengine",
+      "confidence_score": 1.0,
+      "source": "tutorialengine",
+      "target": "tutorialengine_tutorialengine"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\__tests__\\tutorial.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "tutorialengine",
+      "_tgt": "tutorial_test",
+      "confidence_score": 1.0,
+      "source": "tutorialengine",
+      "target": "tutorial_test"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "tutorialengine_tutorialengine",
+      "_tgt": "tutorialengine_tutorialengine_constructor",
+      "confidence_score": 1.0,
+      "source": "tutorialengine_tutorialengine",
+      "target": "tutorialengine_tutorialengine_constructor"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "tutorialengine_tutorialengine",
+      "_tgt": "tutorialengine_tutorialengine_loadlesson",
+      "confidence_score": 1.0,
+      "source": "tutorialengine_tutorialengine",
+      "target": "tutorialengine_tutorialengine_loadlesson"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "tutorialengine_tutorialengine",
+      "_tgt": "tutorialengine_tutorialengine_getstate",
+      "confidence_score": 1.0,
+      "source": "tutorialengine_tutorialengine",
+      "target": "tutorialengine_tutorialengine_getstate"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_src": "tutorialengine_tutorialengine",
+      "_tgt": "tutorialengine_tutorialengine_validatemove",
+      "confidence_score": 1.0,
+      "source": "tutorialengine_tutorialengine",
+      "target": "tutorialengine_tutorialengine_validatemove"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L116",
+      "weight": 1.0,
+      "_src": "tutorialengine_tutorialengine",
+      "_tgt": "tutorialengine_tutorialengine_advancestep",
+      "confidence_score": 1.0,
+      "source": "tutorialengine_tutorialengine",
+      "target": "tutorialengine_tutorialengine_advancestep"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L125",
+      "weight": 1.0,
+      "_src": "tutorialengine_tutorialengine",
+      "_tgt": "tutorialengine_tutorialengine_gethint",
+      "confidence_score": 1.0,
+      "source": "tutorialengine_tutorialengine",
+      "target": "tutorialengine_tutorialengine_gethint"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L132",
+      "weight": 1.0,
+      "_src": "tutorialengine_tutorialengine",
+      "_tgt": "tutorialengine_tutorialengine_resetlesson",
+      "confidence_score": 1.0,
+      "source": "tutorialengine_tutorialengine",
+      "target": "tutorialengine_tutorialengine_resetlesson"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L141",
+      "weight": 1.0,
+      "_src": "tutorialengine_tutorialengine",
+      "_tgt": "tutorialengine_tutorialengine_getlesson",
+      "confidence_score": 1.0,
+      "source": "tutorialengine_tutorialengine",
+      "target": "tutorialengine_tutorialengine_getlesson"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L145",
+      "weight": 1.0,
+      "_src": "tutorialengine_tutorialengine",
+      "_tgt": "tutorialengine_tutorialengine_getalllessons",
+      "confidence_score": 1.0,
+      "source": "tutorialengine_tutorialengine",
+      "target": "tutorialengine_tutorialengine_getalllessons"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialEngine.ts",
+      "source_location": "L149",
+      "weight": 1.0,
+      "_src": "tutorialengine_tutorialengine",
+      "_tgt": "tutorialengine_tutorialengine_islessoncomplete",
+      "confidence_score": 1.0,
+      "source": "tutorialengine_tutorialengine",
+      "target": "tutorialengine_tutorialengine_islessoncomplete"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "tutorialstorage",
+      "_tgt": "types",
+      "confidence_score": 1.0,
+      "source": "tutorialstorage",
+      "target": "types"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "tutorialstorage",
+      "_tgt": "tutorialstorage_getasyncstorage",
+      "confidence_score": 1.0,
+      "source": "tutorialstorage",
+      "target": "tutorialstorage_getasyncstorage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "tutorialstorage",
+      "_tgt": "tutorialstorage_tutorialstorage",
+      "confidence_score": 1.0,
+      "source": "tutorialstorage",
+      "target": "tutorialstorage_tutorialstorage"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\__tests__\\tutorial.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_src": "tutorialstorage",
+      "_tgt": "tutorial_test",
+      "confidence_score": 1.0,
+      "source": "tutorialstorage",
+      "target": "tutorial_test"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L18",
+      "weight": 0.8,
+      "_src": "tutorialstorage_getasyncstorage",
+      "_tgt": "tutorialstorage_tutorialstorage_loadprogress",
+      "confidence_score": 0.5,
+      "source": "tutorialstorage_getasyncstorage",
+      "target": "tutorialstorage_tutorialstorage_loadprogress"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L36",
+      "weight": 0.8,
+      "_src": "tutorialstorage_getasyncstorage",
+      "_tgt": "tutorialstorage_tutorialstorage_marklessoncomplete",
+      "confidence_score": 0.5,
+      "source": "tutorialstorage_getasyncstorage",
+      "target": "tutorialstorage_tutorialstorage_marklessoncomplete"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L51",
+      "weight": 0.8,
+      "_src": "tutorialstorage_getasyncstorage",
+      "_tgt": "tutorialstorage_tutorialstorage_resetprogress",
+      "confidence_score": 0.5,
+      "source": "tutorialstorage_getasyncstorage",
+      "target": "tutorialstorage_tutorialstorage_resetprogress"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "tutorialstorage_tutorialstorage",
+      "_tgt": "tutorialstorage_tutorialstorage_loadprogress",
+      "confidence_score": 1.0,
+      "source": "tutorialstorage_tutorialstorage",
+      "target": "tutorialstorage_tutorialstorage_loadprogress"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_src": "tutorialstorage_tutorialstorage",
+      "_tgt": "tutorialstorage_tutorialstorage_marklessoncomplete",
+      "confidence_score": 1.0,
+      "source": "tutorialstorage_tutorialstorage",
+      "target": "tutorialstorage_tutorialstorage_marklessoncomplete"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_src": "tutorialstorage_tutorialstorage",
+      "_tgt": "tutorialstorage_tutorialstorage_islessonunlocked",
+      "confidence_score": 1.0,
+      "source": "tutorialstorage_tutorialstorage",
+      "target": "tutorialstorage_tutorialstorage_islessonunlocked"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L49",
+      "weight": 1.0,
+      "_src": "tutorialstorage_tutorialstorage",
+      "_tgt": "tutorialstorage_tutorialstorage_resetprogress",
+      "confidence_score": 1.0,
+      "source": "tutorialstorage_tutorialstorage",
+      "target": "tutorialstorage_tutorialstorage_resetprogress"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\mobile\\src\\tutorial\\TutorialStorage.ts",
+      "source_location": "L29",
+      "weight": 0.8,
+      "_src": "tutorialstorage_tutorialstorage_loadprogress",
+      "_tgt": "tutorialstorage_tutorialstorage_marklessoncomplete",
+      "confidence_score": 0.5,
+      "source": "tutorialstorage_tutorialstorage_loadprogress",
+      "target": "tutorialstorage_tutorialstorage_marklessoncomplete"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\shared\\src\\game.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "game",
+      "_tgt": "cards",
+      "confidence_score": 1.0,
+      "source": "game",
+      "target": "cards"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\shared\\src\\game.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_src": "game",
+      "_tgt": "poker",
+      "confidence_score": 1.0,
+      "source": "game",
+      "target": "poker"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\shared\\src\\game.ts",
+      "source_location": "L74",
+      "weight": 1.0,
+      "_src": "game",
+      "_tgt": "game_scoregame",
+      "confidence_score": 1.0,
+      "source": "game",
+      "target": "game_scoregame"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_src": "gameengine",
+      "_tgt": "gameengine_shuffle",
+      "confidence_score": 1.0,
+      "source": "gameengine",
+      "target": "gameengine_shuffle"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_src": "gameengine",
+      "_tgt": "gameengine_gameengine",
+      "confidence_score": 1.0,
+      "source": "gameengine",
+      "target": "gameengine_gameengine"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "gameengine",
+      "_tgt": "gameserver",
+      "confidence_score": 1.0,
+      "source": "gameengine",
+      "target": "gameserver"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "gameengine",
+      "_tgt": "botmanager",
+      "confidence_score": 1.0,
+      "source": "gameengine",
+      "target": "botmanager"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotPlayer.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "gameengine",
+      "_tgt": "botplayer",
+      "confidence_score": 1.0,
+      "source": "gameengine",
+      "target": "botplayer"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\__tests__\\bot.test.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_src": "gameengine",
+      "_tgt": "bot_test",
+      "confidence_score": 1.0,
+      "source": "gameengine",
+      "target": "bot_test"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L55",
+      "weight": 0.8,
+      "_src": "gameengine_shuffle",
+      "_tgt": "gameengine_gameengine_constructor",
+      "confidence_score": 0.5,
+      "source": "gameengine_shuffle",
+      "target": "gameengine_gameengine_constructor"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L115",
+      "weight": 0.8,
+      "_src": "gameengine_shuffle",
+      "_tgt": "gameengine_gameengine_reshuffledead",
+      "confidence_score": 0.5,
+      "source": "gameengine_shuffle",
+      "target": "gameengine_gameengine_reshuffledead"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_constructor",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_constructor"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L83",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_currentplayer",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_currentplayer"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_opponent",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_opponent"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L91",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_drawtofull",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_drawtofull"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L110",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_reshuffledead",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_reshuffledead"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L120",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_getstate",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_getstate"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L135",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_getpublicstate",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_getpublicstate"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L159",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_getlegalmoves",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_getlegalmoves"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L164",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_playcard",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_playcard"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L238",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_drawcards",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_drawcards"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L252",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_checkgameend",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_checkgameend"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L275",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_resign",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_resign"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L279",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_timeout",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_timeout"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L283",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_isover",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_isover"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L287",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_getresult",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_getresult"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L291",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_starttimeoutcheck",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_starttimeoutcheck"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L305",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_dispose",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_dispose"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L313",
+      "weight": 1.0,
+      "_src": "gameengine_gameengine",
+      "_tgt": "gameengine_gameengine_getscores",
+      "confidence_score": 1.0,
+      "source": "gameengine_gameengine",
+      "target": "gameengine_gameengine_getscores"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L79",
+      "weight": 0.8,
+      "_src": "gameengine_gameengine_constructor",
+      "_tgt": "gameengine_gameengine_drawtofull",
+      "confidence_score": 0.5,
+      "source": "gameengine_gameengine_constructor",
+      "target": "gameengine_gameengine_drawtofull"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L100",
+      "weight": 0.8,
+      "_src": "gameengine_gameengine_drawtofull",
+      "_tgt": "gameengine_gameengine_reshuffledead",
+      "confidence_score": 0.5,
+      "source": "gameengine_gameengine_drawtofull",
+      "target": "gameengine_gameengine_reshuffledead"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L232",
+      "weight": 0.8,
+      "_src": "gameengine_gameengine_drawtofull",
+      "_tgt": "gameengine_gameengine_playcard",
+      "confidence_score": 0.5,
+      "source": "gameengine_gameengine_drawtofull",
+      "target": "gameengine_gameengine_playcard"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L241",
+      "weight": 0.8,
+      "_src": "gameengine_gameengine_reshuffledead",
+      "_tgt": "gameengine_gameengine_drawcards",
+      "confidence_score": 0.5,
+      "source": "gameengine_gameengine_reshuffledead",
+      "target": "gameengine_gameengine_drawcards"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L136",
+      "weight": 0.8,
+      "_src": "gameengine_gameengine_getstate",
+      "_tgt": "gameengine_gameengine_getpublicstate",
+      "confidence_score": 0.5,
+      "source": "gameengine_gameengine_getstate",
+      "target": "gameengine_gameengine_getpublicstate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L199",
+      "weight": 0.8,
+      "_src": "gameengine_gameengine_playcard",
+      "_tgt": "gameengine_gameengine_drawcards",
+      "confidence_score": 0.5,
+      "source": "gameengine_gameengine_playcard",
+      "target": "gameengine_gameengine_drawcards"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L228",
+      "weight": 0.8,
+      "_src": "gameengine_gameengine_playcard",
+      "_tgt": "gameengine_gameengine_checkgameend",
+      "confidence_score": 0.5,
+      "source": "gameengine_gameengine_playcard",
+      "target": "gameengine_gameengine_checkgameend"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\GameEngine.ts",
+      "source_location": "L224",
+      "weight": 0.8,
+      "_src": "gameengine_gameengine_playcard",
+      "_tgt": "gameengine_gameengine_timeout",
+      "confidence_score": 0.5,
+      "source": "gameengine_gameengine_playcard",
+      "target": "gameengine_gameengine_timeout"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "gameserver",
+      "_tgt": "botmanager",
+      "confidence_score": 1.0,
+      "source": "gameserver",
+      "target": "botmanager"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_src": "gameserver",
+      "_tgt": "gameserver_gameserver",
+      "confidence_score": 1.0,
+      "source": "gameserver",
+      "target": "gameserver_gameserver"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "gameserver_gameserver",
+      "_tgt": "gameserver_gameserver_constructor",
+      "confidence_score": 1.0,
+      "source": "gameserver_gameserver",
+      "target": "gameserver_gameserver_constructor"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_src": "gameserver_gameserver",
+      "_tgt": "gameserver_gameserver_handleconnection",
+      "confidence_score": 1.0,
+      "source": "gameserver_gameserver",
+      "target": "gameserver_gameserver_handleconnection"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L109",
+      "weight": 1.0,
+      "_src": "gameserver_gameserver",
+      "_tgt": "gameserver_gameserver_addtoqueue",
+      "confidence_score": 1.0,
+      "source": "gameserver_gameserver",
+      "target": "gameserver_gameserver_addtoqueue"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L137",
+      "weight": 1.0,
+      "_src": "gameserver_gameserver",
+      "_tgt": "gameserver_gameserver_startgame",
+      "confidence_score": 1.0,
+      "source": "gameserver_gameserver",
+      "target": "gameserver_gameserver_startgame"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L167",
+      "weight": 1.0,
+      "_src": "gameserver_gameserver",
+      "_tgt": "gameserver_gameserver_broadcastgame",
+      "confidence_score": 1.0,
+      "source": "gameserver_gameserver",
+      "target": "gameserver_gameserver_broadcastgame"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L181",
+      "weight": 1.0,
+      "_src": "gameserver_gameserver",
+      "_tgt": "gameserver_gameserver_endgame",
+      "confidence_score": 1.0,
+      "source": "gameserver_gameserver",
+      "target": "gameserver_gameserver_endgame"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L197",
+      "weight": 1.0,
+      "_src": "gameserver_gameserver",
+      "_tgt": "gameserver_gameserver_removefromqueue",
+      "confidence_score": 1.0,
+      "source": "gameserver_gameserver",
+      "target": "gameserver_gameserver_removefromqueue"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L189",
+      "weight": 1.0,
+      "_src": "gameserver_gameserver",
+      "_tgt": "gameserver_gameserver_findendedmatch",
+      "confidence_score": 1.0,
+      "source": "gameserver_gameserver",
+      "target": "gameserver_gameserver_findendedmatch"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\GameServer.ts",
+      "source_location": "L122",
+      "weight": 0.8,
+      "_src": "gameserver_gameserver_addtoqueue",
+      "_tgt": "gameserver_gameserver_startgame",
+      "confidence_score": 0.5,
+      "source": "gameserver_gameserver_addtoqueue",
+      "target": "gameserver_gameserver_startgame"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_src": "botmanager",
+      "_tgt": "botplayer",
+      "confidence_score": 1.0,
+      "source": "botmanager",
+      "target": "botplayer"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "botmanager",
+      "_tgt": "evaluators",
+      "confidence_score": 1.0,
+      "source": "botmanager",
+      "target": "evaluators"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "botmanager",
+      "_tgt": "botmanager_botmanager",
+      "confidence_score": 1.0,
+      "source": "botmanager",
+      "target": "botmanager_botmanager"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_src": "botmanager_botmanager",
+      "_tgt": "botmanager_botmanager_createbotgame",
+      "confidence_score": 1.0,
+      "source": "botmanager_botmanager",
+      "target": "botmanager_botmanager_createbotgame"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_src": "botmanager_botmanager",
+      "_tgt": "botmanager_botmanager_setuphandlers",
+      "confidence_score": 1.0,
+      "source": "botmanager_botmanager",
+      "target": "botmanager_botmanager_setuphandlers"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L117",
+      "weight": 1.0,
+      "_src": "botmanager_botmanager",
+      "_tgt": "botmanager_botmanager_broadcasttohuman",
+      "confidence_score": 1.0,
+      "source": "botmanager_botmanager",
+      "target": "botmanager_botmanager_broadcasttohuman"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L129",
+      "weight": 1.0,
+      "_src": "botmanager_botmanager",
+      "_tgt": "botmanager_botmanager_schedulebotturn",
+      "confidence_score": 1.0,
+      "source": "botmanager_botmanager",
+      "target": "botmanager_botmanager_schedulebotturn"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L146",
+      "weight": 1.0,
+      "_src": "botmanager_botmanager",
+      "_tgt": "botmanager_botmanager_disposebotgame",
+      "confidence_score": 1.0,
+      "source": "botmanager_botmanager",
+      "target": "botmanager_botmanager_disposebotgame"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L165",
+      "weight": 1.0,
+      "_src": "botmanager_botmanager",
+      "_tgt": "botmanager_botmanager_disposebyhumanid",
+      "confidence_score": 1.0,
+      "source": "botmanager_botmanager",
+      "target": "botmanager_botmanager_disposebyhumanid"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L177",
+      "weight": 1.0,
+      "_src": "botmanager_botmanager",
+      "_tgt": "botmanager_botmanager_isbot",
+      "confidence_score": 1.0,
+      "source": "botmanager_botmanager",
+      "target": "botmanager_botmanager_isbot"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L181",
+      "weight": 1.0,
+      "_src": "botmanager_botmanager",
+      "_tgt": "botmanager_botmanager_triggerbotturn",
+      "confidence_score": 1.0,
+      "source": "botmanager_botmanager",
+      "target": "botmanager_botmanager_triggerbotturn"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L59",
+      "weight": 0.8,
+      "_src": "botmanager_botmanager_createbotgame",
+      "_tgt": "botmanager_botmanager_setuphandlers",
+      "confidence_score": 0.5,
+      "source": "botmanager_botmanager_createbotgame",
+      "target": "botmanager_botmanager_setuphandlers"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\bot\\BotManager.ts",
+      "source_location": "L173",
+      "weight": 0.8,
+      "_src": "botmanager_botmanager_disposebotgame",
+      "_tgt": "botmanager_botmanager_disposebyhumanid",
+      "confidence_score": 0.5,
+      "source": "botmanager_botmanager_disposebotgame",
+      "target": "botmanager_botmanager_disposebyhumanid"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotPlayer.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "botplayer",
+      "_tgt": "evaluators",
+      "confidence_score": 1.0,
+      "source": "botplayer",
+      "target": "evaluators"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotPlayer.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_src": "botplayer",
+      "_tgt": "botplayer_botplayer",
+      "confidence_score": 1.0,
+      "source": "botplayer",
+      "target": "botplayer_botplayer"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\__tests__\\bot.test.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "botplayer",
+      "_tgt": "bot_test",
+      "confidence_score": 1.0,
+      "source": "botplayer",
+      "target": "bot_test"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotPlayer.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "botplayer_botplayer",
+      "_tgt": "botplayer_botplayer_constructor",
+      "confidence_score": 1.0,
+      "source": "botplayer_botplayer",
+      "target": "botplayer_botplayer_constructor"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotPlayer.ts",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_src": "botplayer_botplayer",
+      "_tgt": "botplayer_botplayer_playturn",
+      "confidence_score": 1.0,
+      "source": "botplayer_botplayer",
+      "target": "botplayer_botplayer_playturn"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\BotPlayer.ts",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_src": "botplayer_botplayer",
+      "_tgt": "botplayer_botplayer_dispose",
+      "confidence_score": 1.0,
+      "source": "botplayer_botplayer",
+      "target": "botplayer_botplayer_dispose"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L115",
+      "weight": 1.0,
+      "_src": "evaluators",
+      "_tgt": "evaluators_tochesscolor",
+      "confidence_score": 1.0,
+      "source": "evaluators",
+      "target": "evaluators_tochesscolor"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L119",
+      "weight": 1.0,
+      "_src": "evaluators",
+      "_tgt": "evaluators_oppositecolor",
+      "confidence_score": 1.0,
+      "source": "evaluators",
+      "target": "evaluators_oppositecolor"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L123",
+      "weight": 1.0,
+      "_src": "evaluators",
+      "_tgt": "evaluators_opponentchesscolor",
+      "confidence_score": 1.0,
+      "source": "evaluators",
+      "target": "evaluators_opponentchesscolor"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L133",
+      "weight": 1.0,
+      "_src": "evaluators",
+      "_tgt": "evaluators_getallmoves",
+      "confidence_score": 1.0,
+      "source": "evaluators",
+      "target": "evaluators_getallmoves"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L139",
+      "weight": 1.0,
+      "_src": "evaluators",
+      "_tgt": "evaluators_pickrandom",
+      "confidence_score": 1.0,
+      "source": "evaluators",
+      "target": "evaluators_pickrandom"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L143",
+      "weight": 1.0,
+      "_src": "evaluators",
+      "_tgt": "evaluators_applyucimove",
+      "confidence_score": 1.0,
+      "source": "evaluators",
+      "target": "evaluators_applyucimove"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L151",
+      "weight": 1.0,
+      "_src": "evaluators",
+      "_tgt": "evaluators_evaluateposition",
+      "confidence_score": 1.0,
+      "source": "evaluators",
+      "target": "evaluators_evaluateposition"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L178",
+      "weight": 1.0,
+      "_src": "evaluators",
+      "_tgt": "evaluators_evaluatepositionsimple",
+      "confidence_score": 1.0,
+      "source": "evaluators",
+      "target": "evaluators_evaluatepositionsimple"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\__tests__\\bot.test.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "evaluators",
+      "_tgt": "bot_test",
+      "confidence_score": 1.0,
+      "source": "evaluators",
+      "target": "bot_test"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L154",
+      "weight": 0.8,
+      "_src": "evaluators_tochesscolor",
+      "_tgt": "evaluators_evaluateposition",
+      "confidence_score": 0.5,
+      "source": "evaluators_tochesscolor",
+      "target": "evaluators_evaluateposition"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "apps\\server\\src\\bot\\evaluators.ts",
+      "source_location": "L181",
+      "weight": 0.8,
+      "_src": "evaluators_tochesscolor",
+      "_tgt": "evaluators_evaluatepositionsimple",
+      "confidence_score": 0.5,
+      "source": "evaluators_tochesscolor",
+      "target": "evaluators_evaluatepositionsimple"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\server\\src\\__tests__\\bot.test.ts",
+      "source_location": "L167",
+      "weight": 1.0,
+      "_src": "bot_test",
+      "_tgt": "bot_test_firstmovefor",
+      "confidence_score": 1.0,
+      "source": "bot_test",
+      "target": "bot_test_firstmovefor"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "evaluator",
+      "_tgt": "evaluator_sortbyrank",
+      "confidence_score": 1.0,
+      "source": "evaluator",
+      "target": "evaluator_sortbyrank"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "evaluator",
+      "_tgt": "evaluator_isflush",
+      "confidence_score": 1.0,
+      "source": "evaluator",
+      "target": "evaluator_isflush"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "evaluator",
+      "_tgt": "evaluator_isstraight",
+      "confidence_score": 1.0,
+      "source": "evaluator",
+      "target": "evaluator_isstraight"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "evaluator",
+      "_tgt": "evaluator_getrankcounts",
+      "confidence_score": 1.0,
+      "source": "evaluator",
+      "target": "evaluator_getrankcounts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L41",
+      "weight": 1.0,
+      "_src": "evaluator",
+      "_tgt": "evaluator_evaluatefive",
+      "confidence_score": 1.0,
+      "source": "evaluator",
+      "target": "evaluator_evaluatefive"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L86",
+      "weight": 1.0,
+      "_src": "evaluator",
+      "_tgt": "evaluator_combinations",
+      "confidence_score": 1.0,
+      "source": "evaluator",
+      "target": "evaluator_combinations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L99",
+      "weight": 1.0,
+      "_src": "evaluator",
+      "_tgt": "evaluator_evaluatescorepile",
+      "confidence_score": 1.0,
+      "source": "evaluator",
+      "target": "evaluator_evaluatescorepile"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L44",
+      "weight": 0.8,
+      "_src": "evaluator_isflush",
+      "_tgt": "evaluator_evaluatefive",
+      "confidence_score": 0.5,
+      "source": "evaluator_isflush",
+      "target": "evaluator_evaluatefive"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L45",
+      "weight": 0.8,
+      "_src": "evaluator_isstraight",
+      "_tgt": "evaluator_evaluatefive",
+      "confidence_score": 0.5,
+      "source": "evaluator_isstraight",
+      "target": "evaluator_evaluatefive"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L42",
+      "weight": 0.8,
+      "_src": "evaluator_getrankcounts",
+      "_tgt": "evaluator_evaluatefive",
+      "confidence_score": 0.5,
+      "source": "evaluator_getrankcounts",
+      "target": "evaluator_evaluatefive"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L109",
+      "weight": 0.8,
+      "_src": "evaluator_evaluatefive",
+      "_tgt": "evaluator_evaluatescorepile",
+      "confidence_score": 0.5,
+      "source": "evaluator_evaluatefive",
+      "target": "evaluator_evaluatescorepile"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "packages\\poker\\src\\evaluator.ts",
+      "source_location": "L104",
+      "weight": 0.8,
+      "_src": "evaluator_combinations",
+      "_tgt": "evaluator_evaluatescorepile",
+      "confidence_score": 0.5,
+      "source": "evaluator_combinations",
+      "target": "evaluator_evaluatescorepile"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\shared\\src\\cards.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_src": "cards",
+      "_tgt": "cards_createdeck",
+      "confidence_score": 1.0,
+      "source": "cards",
+      "target": "cards_createdeck"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\shared\\src\\cards.ts",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_src": "cards",
+      "_tgt": "cards_cardtopiece",
+      "confidence_score": 1.0,
+      "source": "cards",
+      "target": "cards_cardtopiece"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\shared\\src\\cards.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_src": "cards",
+      "_tgt": "cards_cardid",
+      "confidence_score": 1.0,
+      "source": "cards",
+      "target": "cards_cardid"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\shared\\src\\poker.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "cards",
+      "_tgt": "poker",
+      "confidence_score": 1.0,
+      "source": "cards",
+      "target": "poker"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\shared\\src\\rating.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "rating",
+      "_tgt": "rating_gettier",
+      "confidence_score": 1.0,
+      "source": "rating",
+      "target": "rating_gettier"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\shared\\src\\rating.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_src": "rating",
+      "_tgt": "rating_expectedscore",
+      "confidence_score": 1.0,
+      "source": "rating",
+      "target": "rating_expectedscore"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages\\shared\\src\\rating.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "rating",
+      "_tgt": "rating_newrating",
+      "confidence_score": 1.0,
+      "source": "rating",
+      "target": "rating_newrating"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Game.md",
+      "weight": 1.0,
+      "_src": "game_gambit",
+      "_tgt": "game_core_ruleset",
+      "source": "game_gambit",
+      "target": "game_core_ruleset"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Game.md",
+      "weight": 1.0,
+      "_src": "game_gambit",
+      "_tgt": "game_skill_tiers",
+      "source": "game_gambit",
+      "target": "game_skill_tiers"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Game.md",
+      "weight": 1.0,
+      "_src": "game_gambit",
+      "_tgt": "game_time_control",
+      "source": "game_gambit",
+      "target": "game_time_control"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Game.md",
+      "weight": 1.0,
+      "_src": "game_core_ruleset",
+      "_tgt": "game_card_to_piece_mapping",
+      "source": "game_core_ruleset",
+      "target": "game_card_to_piece_mapping"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Game.md",
+      "weight": 1.0,
+      "_src": "game_core_ruleset",
+      "_tgt": "game_hand_of_3_cards",
+      "source": "game_core_ruleset",
+      "target": "game_hand_of_3_cards"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Game.md",
+      "weight": 1.0,
+      "_src": "game_core_ruleset",
+      "_tgt": "game_ace_rebalanced",
+      "source": "game_core_ruleset",
+      "target": "game_ace_rebalanced"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Game.md",
+      "weight": 1.0,
+      "_src": "game_core_ruleset",
+      "_tgt": "game_captured_piece_bonus",
+      "source": "game_core_ruleset",
+      "target": "game_captured_piece_bonus"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Game.md",
+      "weight": 1.0,
+      "_src": "game_core_ruleset",
+      "_tgt": "game_dual_win_conditions",
+      "source": "game_core_ruleset",
+      "target": "game_dual_win_conditions"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "specs/ui-ux-specs.md",
+      "weight": 0.9,
+      "_src": "game_hand_of_3_cards",
+      "_tgt": "specs_component_cardhand",
+      "source": "game_hand_of_3_cards",
+      "target": "specs_component_cardhand"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "specs/ui-ux-specs.md",
+      "weight": 0.8,
+      "_src": "game_captured_piece_bonus",
+      "_tgt": "specs_component_scorepile",
+      "source": "game_captured_piece_bonus",
+      "target": "specs_component_scorepile"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "specs/ui-ux-specs.md",
+      "weight": 0.8,
+      "_src": "game_dual_win_conditions",
+      "_tgt": "specs_component_gameoveroverlay",
+      "source": "game_dual_win_conditions",
+      "target": "specs_component_gameoveroverlay"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "specs/ui-ux-specs.md",
+      "weight": 0.9,
+      "_src": "game_time_control",
+      "_tgt": "specs_component_chessclock",
+      "source": "game_time_control",
+      "target": "specs_component_chessclock"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "QA_REPORT.md",
+      "weight": 0.8,
+      "_src": "qa_bug002_no_rematch",
+      "_tgt": "specs_component_gameoveroverlay",
+      "source": "qa_bug002_no_rematch",
+      "target": "specs_component_gameoveroverlay"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\components\\PromotionPicker.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "promotionpicker",
+      "_tgt": "animations",
+      "confidence_score": 1.0,
+      "source": "promotionpicker",
+      "target": "animations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\hooks\\useReducedMotion.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "usereducedmotion",
+      "_tgt": "usereducedmotion_usereducedmotion",
+      "confidence_score": 1.0,
+      "source": "usereducedmotion",
+      "target": "usereducedmotion_usereducedmotion"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_src": "usereducedmotion",
+      "_tgt": "animations",
+      "confidence_score": 1.0,
+      "source": "usereducedmotion",
+      "target": "animations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_src": "animations",
+      "_tgt": "animations_usespringpress",
+      "confidence_score": 1.0,
+      "source": "animations",
+      "target": "animations_usespringpress"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_src": "animations",
+      "_tgt": "animations_usepulse",
+      "confidence_score": 1.0,
+      "source": "animations",
+      "target": "animations_usepulse"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_src": "animations",
+      "_tgt": "animations_usecountup",
+      "confidence_score": 1.0,
+      "source": "animations",
+      "target": "animations_usecountup"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L99",
+      "weight": 1.0,
+      "_src": "animations",
+      "_tgt": "animations_staggerdelay",
+      "confidence_score": 1.0,
+      "source": "animations",
+      "target": "animations_staggerdelay"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps\\mobile\\src\\utils\\animations.ts",
+      "source_location": "L122",
+      "weight": 1.0,
+      "_src": "animations",
+      "_tgt": "animations_useshake",
+      "confidence_score": 1.0,
+      "source": "animations",
+      "target": "animations_useshake"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "weight": 1.0,
+      "_src": "graph_report_game_engine",
+      "_tgt": "graph_report_bot_manager",
+      "source": "graph_report_game_engine",
+      "target": "graph_report_bot_manager"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "weight": 1.0,
+      "_src": "graph_report_game_engine",
+      "_tgt": "graph_report_tutorial_engine",
+      "source": "graph_report_game_engine",
+      "target": "graph_report_tutorial_engine"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "weight": 1.0,
+      "_src": "graph_report_bot_manager",
+      "_tgt": "graph_report_bot_player",
+      "source": "graph_report_bot_manager",
+      "target": "graph_report_bot_player"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "weight": 1.0,
+      "_src": "graph_report_qa_report",
+      "_tgt": "graph_report_ux_specs",
+      "source": "graph_report_qa_report",
+      "target": "graph_report_ux_specs"
+    }
+  ],
+  "hyperedges": []
+}

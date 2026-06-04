@@ -14,7 +14,7 @@ export default function OpponentHand({ cardCount = 3 }: OpponentHandProps) {
           <View style={styles.pattern}>
             <Text style={styles.symbol}>{'\u2660'}</Text>
           </View>
-          <Text style={styles.label}>GAMBIT</Text>
+          <Text style={styles.label}>CHECKKER</Text>
         </View>
       ))}
     </View>

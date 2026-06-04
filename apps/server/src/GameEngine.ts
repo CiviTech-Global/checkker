@@ -8,12 +8,16 @@ import {
   type PlayerState,
   type TimeControl,
   type GameResult,
+  type ScoredGame,
   TIME_CONTROL_SECONDS,
   createDeck,
   cardToPiece,
   cardId,
-} from "@gambit/shared";
-import { getLegalMovesForHand, getCaptureBonus } from "@gambit/chess";
+  scoreGame,
+} from "@checkker/shared";
+import { getLegalMovesForHand, getCaptureBonus } from "@checkker/chess";
+import { evaluateScorePile } from "@checkker/poker";
+import { getTopMoves, type MoveEvaluation, brain } from "./bot/evaluators";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -36,8 +40,22 @@ export class GameEngine {
   private moveHistory: MoveRecord[];
   private result: GameResult | null;
   private deckReshuffled: boolean;
+  private lastMoveTimestamp: number;
+  private timeoutInterval: ReturnType<typeof setInterval> | null;
+  private onTimeoutCallback: (() => void) | null;
+  private stateHistory: Array<{
+    chess: string;
+    turn: Color;
+    whiteHand: Card[];
+    blackHand: Card[];
+    whiteScorePile: Card[];
+    blackScorePile: Card[];
+    drawPile: Card[];
+    deadPile: Card[];
+    moveHistory: MoveRecord[];
+  }> = [];
 
-  constructor(whiteRating: number, blackRating: number, tc: TimeControl) {
+  constructor(whiteRating: number, blackRating: number, tc: TimeControl, deck?: Card[]) {
     this.id = uuid();
     this.chess = new Chess();
     this.timeControl = tc;
@@ -46,7 +64,7 @@ export class GameEngine {
     this.result = null;
     this.deckReshuffled = false;
 
-    const deck = shuffle(createDeck());
+    const actualDeck = deck ? [...deck] : shuffle(createDeck());
 
     this.white = {
       color: "white",
@@ -64,8 +82,11 @@ export class GameEngine {
       rating: blackRating,
     };
 
-    this.drawPile = deck;
+    this.drawPile = actualDeck;
     this.deadPile = [];
+    this.lastMoveTimestamp = Date.now();
+    this.timeoutInterval = null;
+    this.onTimeoutCallback = null;
 
     this.drawToFull("white");
     this.drawToFull("black");
@@ -131,6 +152,7 @@ export class GameEngine {
       id: state.id,
       fen: state.fen,
       turn: state.turn,
+      color,
       hand: player.hand,
       scorePile: player.scorePile,
       timeRemainingMs: player.timeRemainingMs,
@@ -153,6 +175,19 @@ export class GameEngine {
 
   playCard(cardIdStr: string, moveStr: string): { success: boolean; error?: string } {
     if (this.result) return { success: false, error: "Game already ended" };
+
+    // Save snapshot for undo before making changes
+    this.stateHistory.push({
+      chess: this.chess.fen(),
+      turn: this.turn,
+      whiteHand: [...this.white.hand],
+      blackHand: [...this.black.hand],
+      whiteScorePile: [...this.white.scorePile],
+      blackScorePile: [...this.black.scorePile],
+      drawPile: [...this.drawPile],
+      deadPile: [...this.deadPile],
+      moveHistory: [...this.moveHistory],
+    });
 
     const player = this.currentPlayer;
     const cardIdx = player.hand.findIndex((c) => cardId(c) === cardIdStr);
@@ -181,13 +216,14 @@ export class GameEngine {
     const isCheckMove = this.chess.isCheck();
     let bonusCards = 0;
 
-    if (wasCapture && card.rank !== "A") {
+    if (wasCapture) {
       player.scorePile.push(card);
-      bonusCards = getCaptureBonus(moveResult.captured!, isCheckMove);
-
-      if (bonusCards > 1) {
-        const drawn = this.drawCards(player, bonusCards - 1);
-        bonusCards = drawn.length + 1;
+      if (piece !== "wild") {
+        bonusCards = getCaptureBonus(moveResult.captured!, isCheckMove);
+        if (bonusCards > 1) {
+          const drawn = this.drawCards(player, bonusCards - 1);
+          bonusCards = drawn.length + 1;
+        }
       }
     } else {
       this.deadPile.push(card);
@@ -202,6 +238,17 @@ export class GameEngine {
         : undefined,
       bonusCards,
     });
+
+    const now = Date.now();
+    const elapsed = now - this.lastMoveTimestamp;
+    player.timeRemainingMs -= elapsed;
+    this.lastMoveTimestamp = now;
+
+    if (player.timeRemainingMs <= 0) {
+      player.timeRemainingMs = 0;
+      this.timeOut(this.turn);
+      return { success: true };
+    }
 
     this.checkGameEnd();
 
@@ -232,9 +279,20 @@ export class GameEngine {
       this.result = { type: "checkmate", winner: this.turn };
       return;
     }
-    if (this.chess.isDraw() || this.chess.isStalemate() ||
-        this.chess.isThreefoldRepetition() || this.chess.isInsufficientMaterial()) {
+    if (this.chess.isStalemate()) {
       this.result = { type: "draw", reason: "stalemate" };
+      return;
+    }
+    if (this.chess.isThreefoldRepetition()) {
+      this.result = { type: "draw", reason: "threefold" };
+      return;
+    }
+    if (this.chess.isInsufficientMaterial()) {
+      this.result = { type: "draw", reason: "insufficientMaterial" };
+      return;
+    }
+    if (this.chess.isDraw()) {
+      this.result = { type: "draw", reason: "fiftyMove" };
       return;
     }
   }
@@ -253,5 +311,60 @@ export class GameEngine {
 
   getResult(): GameResult | null {
     return this.result;
+  }
+
+  startTimeoutCheck(callback: () => void): void {
+    this.onTimeoutCallback = callback;
+    this.timeoutInterval = setInterval(() => {
+      if (this.result) return;
+      const elapsed = Date.now() - this.lastMoveTimestamp;
+      const remaining = this.currentPlayer.timeRemainingMs - elapsed;
+      if (remaining <= 0) {
+        this.currentPlayer.timeRemainingMs = 0;
+        this.timeOut(this.turn);
+        this.onTimeoutCallback?.();
+      }
+    }, 1000);
+  }
+
+  dispose(): void {
+    if (this.timeoutInterval) {
+      clearInterval(this.timeoutInterval);
+      this.timeoutInterval = null;
+    }
+    this.onTimeoutCallback = null;
+  }
+
+  undoLastMove(): boolean {
+    if (this.stateHistory.length === 0 || this.result) return false;
+    const prev = this.stateHistory.pop()!;
+    this.chess.load(prev.chess);
+    this.turn = prev.turn;
+    this.white.hand = prev.whiteHand;
+    this.black.hand = prev.blackHand;
+    this.white.scorePile = prev.whiteScorePile;
+    this.black.scorePile = prev.blackScorePile;
+    this.drawPile = prev.drawPile;
+    this.deadPile = prev.deadPile;
+    this.moveHistory = prev.moveHistory;
+    this.lastMoveTimestamp = Date.now();
+    return true;
+  }
+
+  async getBestMoves(topN: number = 3): Promise<{ white: MoveEvaluation[]; black: MoveEvaluation[] }> {
+    const fen = this.chess.fen();
+    const whiteLegal = getLegalMovesForHand(this.chess, this.white.hand);
+    const blackLegal = getLegalMovesForHand(this.chess, this.black.hand);
+    return {
+      white: await getTopMoves(fen, this.white.hand, whiteLegal, "white", topN, this.white.scorePile, this.drawPile.length),
+      black: await getTopMoves(fen, this.black.hand, blackLegal, "black", topN, this.black.scorePile, this.drawPile.length),
+    };
+  }
+
+  getScores(): ScoredGame | null {
+    if (!this.result) return null;
+    const whitePoker = evaluateScorePile(this.white.scorePile);
+    const blackPoker = evaluateScorePile(this.black.scorePile);
+    return scoreGame(this.result, whitePoker, blackPoker);
   }
 }
