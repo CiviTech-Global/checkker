@@ -1,0 +1,40 @@
+{
+  "name": "@checkker/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Checkker desktop app",
+  "author": "Checkker",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron .",
+    "build": "electron-builder --win --publish never",
+    "typecheck": "echo ok",
+    "lint": "echo ok",
+    "clean": "rm -rf dist"
+  },
+  "build": {
+    "appId": "com.checkker.desktop",
+    "productName": "Checkker",
+    "files": [
+      "main.js",
+      "preload.js"
+    ],
+    "extraResources": [
+      {
+        "from": "../mobile/dist",
+        "to": "web",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "Checkker-${version}-portable.exe"
+    }
+  },
+  "devDependencies": {
+    "electron": "42.3.2",
+    "electron-builder": "^26"
+  }
+}
