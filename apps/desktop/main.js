@@ -44,6 +44,25 @@ function startLocalServer(webDir) {
           res.end("Not found");
           return;
         }
+
+        // Inject reanimated fix into HTML.
+        // Reanimated's web entering animations set visibility:hidden on
+        // Animated.View wrappers via cssText. On conditionally rendered
+        // elements the CSS animation's onanimationstart callback sometimes
+        // never fires, leaving wrappers stuck with visibility:hidden.
+        // The CSS rule below forces interactive elements (tabindex=0) to
+        // remain visible regardless of their parent's visibility. React
+        // Navigation hides inactive screens via display:none (not
+        // visibility), so this override is safe.
+        if (contentType === "text/html") {
+          let html = data.toString();
+          const fix = `<style>[tabindex="0"]{visibility:visible!important}</style>`;
+          html = html.replace("<head>", "<head>" + fix);
+          res.writeHead(200, { "Content-Type": contentType });
+          res.end(html);
+          return;
+        }
+
         res.writeHead(200, { "Content-Type": contentType });
         res.end(data);
       });
@@ -79,51 +98,7 @@ async function createWindow() {
 
   win.loadURL(url);
 
-  // Fix react-native-reanimated entering animations on web.
-  // Reanimated sets visibility:hidden on mount and relies on Web Animations API
-  // to transition to visible. In some cases (conditionally rendered elements),
-  // the animation callback never fires and elements stay invisible.
-  // This observer detects stuck hidden elements and forces them visible.
-  win.webContents.on("did-finish-load", () => {
-    win.webContents.executeJavaScript(`
-      (function() {
-        var observer = new MutationObserver(function(mutations) {
-          mutations.forEach(function(m) {
-            if (m.type === 'attributes' && m.attributeName === 'style') {
-              var el = m.target;
-              if (el.style.visibility === 'hidden' && el.getAttribute('data-reanimated')) {
-                setTimeout(function() {
-                  if (el.style.visibility === 'hidden') el.style.visibility = 'visible';
-                }, 500);
-              }
-            }
-            // Also catch newly added nodes with visibility:hidden
-            m.addedNodes.forEach(function(node) {
-              if (node.nodeType === 1) {
-                var hidden = node.querySelectorAll ? node.querySelectorAll('[style*="visibility"]') : [];
-                hidden.forEach(function(h) {
-                  setTimeout(function() {
-                    if (h.style.visibility === 'hidden') h.style.visibility = 'visible';
-                  }, 600);
-                });
-                if (node.style && node.style.visibility === 'hidden') {
-                  setTimeout(function() {
-                    if (node.style.visibility === 'hidden') node.style.visibility = 'visible';
-                  }, 600);
-                }
-              }
-            });
-          });
-        });
-        observer.observe(document.getElementById('root'), {
-          attributes: true,
-          attributeFilter: ['style'],
-          childList: true,
-          subtree: true
-        });
-      })();
-    `);
-  });
+  // No post-load patches needed — reanimated fix is injected via server HTML.
 
   win.on("page-title-updated", (e) => {
     e.preventDefault();

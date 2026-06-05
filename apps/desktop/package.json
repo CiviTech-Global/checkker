@@ -26,6 +26,7 @@
         "filter": ["**/*"]
       }
     ],
+    "electronDist": "../../node_modules/electron/dist",
     "win": {
       "target": "portable"
     },
