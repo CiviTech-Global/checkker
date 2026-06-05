@@ -29,6 +29,9 @@ jobs:
       - name: Export Expo web
         run: npm run export:web -w apps/mobile
 
+      - name: Bundle game server
+        run: npm run bundle -w apps/server
+
       - name: Build Electron portable
         run: npm run build -w apps/desktop
         env:

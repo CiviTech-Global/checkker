@@ -24,6 +24,10 @@
         "from": "../mobile/dist",
         "to": "web",
         "filter": ["**/*"]
+      },
+      {
+        "from": "../server/dist/server.bundle.js",
+        "to": "server.bundle.js"
       }
     ],
     "electronDist": "../../node_modules/electron/dist",

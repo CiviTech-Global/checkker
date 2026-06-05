@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
   View,
   Text,
@@ -42,6 +42,16 @@ import PromotionPicker from "../../src/components/PromotionPicker";
 import CoachingTipBanner from "../../src/components/CoachingTipBanner";
 import SpectatorBanner from "../../src/components/SpectatorBanner";
 import { useSocket } from "../../src/hooks/useSocket";
+import {
+  playMoveSound,
+  playCaptureSound,
+  playCheckSound,
+  playCheckmateSound,
+  playCastleSound,
+  playPromotionSound,
+  playGameStartSound,
+  playGameOverSound,
+} from "../../src/utils/sounds";
 import { colors, spacing, glassStyle } from "../../src/theme/tokens";
 
 /* ── Bot Thinking Indicator ──────────────────────────────────────────── */
@@ -151,6 +161,43 @@ export default function GameScreen() {
   const myBestMoves = bestMoves[color] ?? [];
   const opponentColor: Color = color === "white" ? "black" : "white";
   const opponentBestMoves = bestMoves[opponentColor] ?? [];
+
+  /* ── Sound effects ───────────────────────────────────────────────── */
+
+  const prevMoveCount = useRef(0);
+  const gameStartedRef = useRef(false);
+
+  // Move sounds — watch moveHistory length for new entries
+  useEffect(() => {
+    if (moveHistory.length <= prevMoveCount.current) {
+      prevMoveCount.current = moveHistory.length;
+      return;
+    }
+    prevMoveCount.current = moveHistory.length;
+    const latest = moveHistory[moveHistory.length - 1];
+    if (!latest) return;
+    const san: string = latest.san ?? latest.move ?? "";
+
+    if (san.includes("#")) playCheckmateSound();
+    else if (san.includes("+")) playCheckSound();
+    else if (san.startsWith("O-O")) playCastleSound();
+    else if (san.includes("=")) playPromotionSound();
+    else if (san.includes("x")) playCaptureSound();
+    else playMoveSound();
+  }, [moveHistory.length]);
+
+  // Game start sound
+  useEffect(() => {
+    if (gs?.fen && !gameStartedRef.current) {
+      gameStartedRef.current = true;
+      playGameStartSound();
+    }
+  }, [gs?.fen]);
+
+  // Game over sound
+  useEffect(() => {
+    if (result !== null) playGameOverSound();
+  }, [result]);
 
   const legalMovesMap = useMemo(() => {
     try {

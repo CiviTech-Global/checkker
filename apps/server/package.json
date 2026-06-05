@@ -10,7 +10,8 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "echo lint ok",
-    "clean": "rm -rf .turbo dist"
+    "clean": "rm -rf .turbo dist",
+    "bundle": "esbuild src/index.ts --bundle --platform=node --target=node18 --outfile=dist/server.bundle.js --external:stockfish"
   },
   "dependencies": {
     "@checkker/chess": "*",
@@ -26,6 +27,7 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/uuid": "^10.0.0",
+    "esbuild": "^0.25.12",
     "jest": "^29.7.0",
     "ts-jest": "^29.4.11",
     "tsx": "^4.19.0",

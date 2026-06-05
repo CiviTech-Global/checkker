@@ -2,10 +2,13 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const http = require("http");
+const { spawn } = require("child_process");
 
 const isDev = !app.isPackaged;
 
 let server;
+let gameServerProcess = null;
+let gameServerUrl = null;
 
 function startLocalServer(webDir) {
   const mime = {
@@ -57,7 +60,10 @@ function startLocalServer(webDir) {
         if (contentType === "text/html") {
           let html = data.toString();
           const fix = `<style>[tabindex="0"]{visibility:visible!important}</style>`;
-          html = html.replace("<head>", "<head>" + fix);
+          const serverInject = gameServerUrl
+            ? `<script>window.__CHECKKER_SERVER_URL__="${gameServerUrl}";</script>`
+            : "";
+          html = html.replace("<head>", "<head>" + fix + serverInject);
           res.writeHead(200, { "Content-Type": contentType });
           res.end(html);
           return;
@@ -74,12 +80,70 @@ function startLocalServer(webDir) {
   });
 }
 
+function startGameServer() {
+  return new Promise((resolve, reject) => {
+    const bundlePath = path.join(process.resourcesPath, "server.bundle.js");
+    if (!fs.existsSync(bundlePath)) {
+      console.warn("Server bundle not found at", bundlePath);
+      resolve(null);
+      return;
+    }
+
+    // Use Electron's own Node runtime via ELECTRON_RUN_AS_NODE
+    gameServerProcess = spawn(process.execPath, [bundlePath], {
+      env: { ...process.env, PORT: "0", ELECTRON_RUN_AS_NODE: "1" },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+
+    let resolved = false;
+    const timeout = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        resolve(null);
+      }
+    }, 10000);
+
+    gameServerProcess.stdout.on("data", (data) => {
+      const output = data.toString();
+      console.log("[game-server]", output.trim());
+      const match = output.match(/__CHECKKER_PORT__=(\d+)/);
+      if (match && !resolved) {
+        resolved = true;
+        clearTimeout(timeout);
+        gameServerUrl = `http://127.0.0.1:${match[1]}`;
+        resolve(gameServerUrl);
+      }
+    });
+
+    gameServerProcess.stderr.on("data", (data) => {
+      console.error("[game-server]", data.toString().trim());
+    });
+
+    gameServerProcess.on("error", (err) => {
+      console.error("[game-server] spawn error:", err.message);
+      if (!resolved) {
+        resolved = true;
+        clearTimeout(timeout);
+        resolve(null);
+      }
+    });
+
+    gameServerProcess.on("exit", (code) => {
+      console.log("[game-server] exited with code", code);
+      gameServerProcess = null;
+    });
+  });
+}
+
 async function createWindow() {
   let url;
 
   if (isDev) {
     url = "http://localhost:8081";
   } else {
+    // Start the embedded game server first
+    await startGameServer();
+
     const webDir = path.join(process.resourcesPath, "web");
     const port = await startLocalServer(webDir);
     url = `http://127.0.0.1:${port}`;
@@ -109,6 +173,10 @@ app.whenReady().then(createWindow);
 
 app.on("window-all-closed", () => {
   if (server) server.close();
+  if (gameServerProcess) {
+    gameServerProcess.kill();
+    gameServerProcess = null;
+  }
   if (process.platform !== "darwin") {
     app.quit();
   }

@@ -22,9 +22,11 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-const PORT = process.env.PORT ?? 3001;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 httpServer.listen(PORT, () => {
-  console.log(`Checkker server running on port ${PORT}`);
+  const actualPort = (httpServer.address() as any)?.port ?? PORT;
+  console.log(`__CHECKKER_PORT__=${actualPort}`);
+  console.log(`Checkker server running on port ${actualPort}`);
   console.log(`[AIBrain] Set STOCKFISH_PATH to enable Stockfish engine`);
   console.log(`[AIBrain] Set AI_COACH_PROVIDER + AI_COACH_API_KEY to enable LLM Coach`);
   console.log(`[AIBrain] Set AI_BRAIN_PERSISTENCE=true to persist player models (dir: ${process.env.AI_BRAIN_STORAGE ?? "./data/player-models"})`);

@@ -3,9 +3,21 @@ import { io, type Socket } from "socket.io-client";
 import type { ChatMessage, Card, Color, GameResult, ScoredGame, GameOdds, PlayerProfile, BotDifficulty } from "@checkker/shared";
 import type { GameClientState, GameStartPayload, GameUpdatePayload, MoveErrorPayload, GameOverPayload } from "../types/game";
 
-const SERVER_URL = "http://localhost:3001";
+/* ── Lazy socket singleton ──────────────────────────────────────────── */
 
-const socket: Socket = io(SERVER_URL, { autoConnect: true });
+let socket: Socket | null = null;
+let listenersAttached = false;
+
+function getSocket(): Socket {
+  if (!socket) {
+    const url =
+      (typeof window !== "undefined" && (window as any).__CHECKKER_SERVER_URL__) ||
+      "http://localhost:3001";
+    socket = io(url, { autoConnect: true });
+    attachListeners(socket);
+  }
+  return socket;
+}
 
 let singletonConnected = false;
 const connectedListeners = new Set<(v: boolean) => void>();
@@ -61,127 +73,134 @@ let _spectateMoves: SpectateMove[] = [];
 const spectateStateListeners = new Set<(v: SpectateGameState | null) => void>();
 const spectateMovesListeners = new Set<(v: SpectateMove[]) => void>();
 
-socket.on("connect", () => {
-  singletonConnected = true;
-  connectedListeners.forEach((fn) => fn(true));
-});
+/* ── Attach all socket event listeners (called once) ────────────────── */
 
-socket.on("disconnect", () => {
-  singletonConnected = false;
-  connectedListeners.forEach((fn) => fn(false));
-});
+function attachListeners(s: Socket) {
+  if (listenersAttached) return;
+  listenersAttached = true;
 
-socket.on("game_start", (data: GameStartPayload) => {
-  _gameId = data.gameId;
-  _gameState = data;
-  _chatMessages = [];
-  gameStateListeners.forEach((fn) => fn(_gameState));
-  chatListeners.forEach((fn) => fn(_chatMessages));
-});
+  s.on("connect", () => {
+    singletonConnected = true;
+    connectedListeners.forEach((fn) => fn(true));
+  });
 
-socket.on("game_update", (data: GameUpdatePayload) => {
-  _gameState = data;
-  gameStateListeners.forEach((fn) => fn(_gameState));
-});
+  s.on("disconnect", () => {
+    singletonConnected = false;
+    connectedListeners.forEach((fn) => fn(false));
+  });
 
-socket.on("game_over", (data: GameOverPayload) => {
-  if (_gameState) {
-    _gameState = { ..._gameState, result: data.result };
+  s.on("game_start", (data: GameStartPayload) => {
+    _gameId = data.gameId;
+    _gameState = data;
+    _chatMessages = [];
     gameStateListeners.forEach((fn) => fn(_gameState));
-  }
-  _scores = data.scores ?? null;
-  scoresListeners.forEach((fn) => fn(_scores));
-});
+    chatListeners.forEach((fn) => fn(_chatMessages));
+  });
 
-socket.on("move_error", (data: MoveErrorPayload) => {
-  _moveErrorCallback?.(data.error);
-});
+  s.on("game_update", (data: GameUpdatePayload) => {
+    _gameState = data;
+    gameStateListeners.forEach((fn) => fn(_gameState));
+  });
 
-socket.on("bot_fallback_offer", (data: { tc: string }) => {
-  _botFallbackCallback?.(data);
-});
+  s.on("game_over", (data: GameOverPayload) => {
+    if (_gameState) {
+      _gameState = { ..._gameState, result: data.result };
+      gameStateListeners.forEach((fn) => fn(_gameState));
+    }
+    _scores = data.scores ?? null;
+    scoresListeners.forEach((fn) => fn(_scores));
+  });
 
-socket.on("chat_message", (msg: ChatMessage) => {
-  _chatMessages = [..._chatMessages, msg];
-  chatListeners.forEach((fn) => fn(_chatMessages));
-});
+  s.on("move_error", (data: MoveErrorPayload) => {
+    _moveErrorCallback?.(data.error);
+  });
 
-socket.on("coaching_tip", (tip: any) => {
-  const text = typeof tip === "string" ? tip : tip?.text ?? "";
-  if (text) _coachingTipCallback?.(text);
-});
+  s.on("bot_fallback_offer", (data: { tc: string }) => {
+    _botFallbackCallback?.(data);
+  });
 
-socket.on("spectator_comment", (data: { text: string }) => {
-  if (data?.text) _spectatorCommentCallback?.(data.text);
-});
+  s.on("chat_message", (msg: ChatMessage) => {
+    _chatMessages = [..._chatMessages, msg];
+    chatListeners.forEach((fn) => fn(_chatMessages));
+  });
 
-/* ── Spectate listeners ───────────────────────────────────────────── */
+  s.on("coaching_tip", (tip: any) => {
+    const text = typeof tip === "string" ? tip : tip?.text ?? "";
+    if (text) _coachingTipCallback?.(text);
+  });
 
-socket.on("spectate_game_start", (data: any) => {
-  _spectateState = {
-    gameId: data.gameId,
-    fen: data.fen,
-    turn: data.turn,
-    whiteHand: data.whiteHand,
-    blackHand: data.blackHand,
-    whiteScorePile: data.whiteScorePile ?? [],
-    blackScorePile: data.blackScorePile ?? [],
-    whiteProfile: data.whiteProfile,
-    blackProfile: data.blackProfile,
-    odds: data.odds,
-    whiteDifficulty: data.whiteDifficulty,
-    blackDifficulty: data.blackDifficulty,
-    result: null,
-    scores: null,
-  };
-  _spectateMoves = [];
-  spectateStateListeners.forEach((fn) => fn(_spectateState));
-  spectateMovesListeners.forEach((fn) => fn(_spectateMoves));
-});
+  s.on("spectator_comment", (data: { text: string }) => {
+    if (data?.text) _spectatorCommentCallback?.(data.text);
+  });
 
-socket.on("spectate_move", (data: SpectateMove) => {
-  _spectateMoves = [..._spectateMoves, data];
-  if (_spectateState) {
+  /* ── Spectate listeners ───────────────────────────────────────────── */
+
+  s.on("spectate_game_start", (data: any) => {
     _spectateState = {
-      ..._spectateState,
+      gameId: data.gameId,
       fen: data.fen,
       turn: data.turn,
       whiteHand: data.whiteHand,
       blackHand: data.blackHand,
-      whiteScorePile: data.whiteScorePile,
-      blackScorePile: data.blackScorePile,
-      odds: data.odds ?? _spectateState.odds,
+      whiteScorePile: data.whiteScorePile ?? [],
+      blackScorePile: data.blackScorePile ?? [],
+      whiteProfile: data.whiteProfile,
+      blackProfile: data.blackProfile,
+      odds: data.odds,
+      whiteDifficulty: data.whiteDifficulty,
+      blackDifficulty: data.blackDifficulty,
+      result: null,
+      scores: null,
     };
+    _spectateMoves = [];
     spectateStateListeners.forEach((fn) => fn(_spectateState));
-  }
-  spectateMovesListeners.forEach((fn) => fn(_spectateMoves));
-});
+    spectateMovesListeners.forEach((fn) => fn(_spectateMoves));
+  });
 
-socket.on("spectate_game_over", (data: { result: GameResult; scores?: ScoredGame }) => {
-  if (_spectateState) {
-    _spectateState = {
-      ..._spectateState,
-      result: data.result,
-      scores: data.scores ?? null,
-    };
-    spectateStateListeners.forEach((fn) => fn(_spectateState));
-  }
-});
+  s.on("spectate_move", (data: SpectateMove) => {
+    _spectateMoves = [..._spectateMoves, data];
+    if (_spectateState) {
+      _spectateState = {
+        ..._spectateState,
+        fen: data.fen,
+        turn: data.turn,
+        whiteHand: data.whiteHand,
+        blackHand: data.blackHand,
+        whiteScorePile: data.whiteScorePile,
+        blackScorePile: data.blackScorePile,
+        odds: data.odds ?? _spectateState.odds,
+      };
+      spectateStateListeners.forEach((fn) => fn(_spectateState));
+    }
+    spectateMovesListeners.forEach((fn) => fn(_spectateMoves));
+  });
 
-socket.on("spectate_position", (data: any) => {
-  if (_spectateState) {
-    _spectateState = {
-      ..._spectateState,
-      fen: data.fen,
-      turn: data.turn,
-      whiteHand: data.whiteHand,
-      blackHand: data.blackHand,
-      whiteScorePile: data.whiteScorePile,
-      blackScorePile: data.blackScorePile,
-    };
-    spectateStateListeners.forEach((fn) => fn(_spectateState));
-  }
-});
+  s.on("spectate_game_over", (data: { result: GameResult; scores?: ScoredGame }) => {
+    if (_spectateState) {
+      _spectateState = {
+        ..._spectateState,
+        result: data.result,
+        scores: data.scores ?? null,
+      };
+      spectateStateListeners.forEach((fn) => fn(_spectateState));
+    }
+  });
+
+  s.on("spectate_position", (data: any) => {
+    if (_spectateState) {
+      _spectateState = {
+        ..._spectateState,
+        fen: data.fen,
+        turn: data.turn,
+        whiteHand: data.whiteHand,
+        blackHand: data.blackHand,
+        whiteScorePile: data.whiteScorePile,
+        blackScorePile: data.blackScorePile,
+      };
+      spectateStateListeners.forEach((fn) => fn(_spectateState));
+    }
+  });
+}
 
 export function useSocket() {
   const [connected, setConnected] = useState(singletonConnected);
@@ -194,6 +213,9 @@ export function useSocket() {
   const spectatorCommentCbRef = useRef<((comment: string) => void) | null>(null);
 
   useEffect(() => {
+    // Initialize socket lazily on first hook mount
+    getSocket();
+
     const onConnected = (v: boolean) => setConnected(v);
     const onGameState = (v: GameClientState | null) => setGameState(v);
     const onScores = (v: GameOverPayload["scores"] | null) => setScores(v);
@@ -220,25 +242,25 @@ export function useSocket() {
   }, []);
 
   const joinQueue = useCallback((rating: number, tc: string) => {
-    socket.emit("join_queue", { rating, tc });
+    getSocket().emit("join_queue", { rating, tc });
   }, []);
 
   const joinCasual = useCallback((rating: number, tc: string) => {
-    socket.emit("join_casual", { tc });
+    getSocket().emit("join_casual", { tc });
   }, []);
 
   const playMove = useCallback((card: string, move: string) => {
     if (!_gameId) return;
-    socket.emit("play_move", { gameId: _gameId, card, move });
+    getSocket().emit("play_move", { gameId: _gameId, card, move });
   }, []);
 
   const resign = useCallback(() => {
     if (!_gameId) return;
-    socket.emit("resign", { gameId: _gameId });
+    getSocket().emit("resign", { gameId: _gameId });
   }, []);
 
   const startBotGame = useCallback((difficulty: string, tc: string) => {
-    socket.emit("start_bot_game", { difficulty, tc });
+    getSocket().emit("start_bot_game", { difficulty, tc });
   }, []);
 
   const onMoveError = useCallback((fn: (error: string) => void) => {
@@ -250,22 +272,22 @@ export function useSocket() {
   }, []);
 
   const requestBot = useCallback((difficulty: string, tc: string) => {
-    socket.emit("request_bot", { difficulty, tc });
+    getSocket().emit("request_bot", { difficulty, tc });
   }, []);
 
   const requestRematch = useCallback(() => {
     if (!_gameId) return;
-    socket.emit("rematch_request", { gameId: _gameId });
+    getSocket().emit("rematch_request", { gameId: _gameId });
   }, []);
 
   const sendChat = useCallback((text: string) => {
     if (!_gameId) return;
-    socket.emit("chat_message", { gameId: _gameId, text });
+    getSocket().emit("chat_message", { gameId: _gameId, text });
   }, []);
 
   const undoMove = useCallback(() => {
     if (!_gameId) return;
-    socket.emit("undo_move", { gameId: _gameId });
+    getSocket().emit("undo_move", { gameId: _gameId });
   }, []);
 
   const onCoachingTip = useCallback((fn: (tip: string) => void) => {
@@ -293,27 +315,27 @@ export function useSocket() {
   }, []);
 
   const startSpectateGame = useCallback((whiteDifficulty: string, blackDifficulty: string) => {
-    socket.emit("start_spectate_bot_game", { whiteDifficulty, blackDifficulty });
+    getSocket().emit("start_spectate_bot_game", { whiteDifficulty, blackDifficulty });
   }, []);
 
   const spectatePause = useCallback((gameId: string) => {
-    socket.emit("spectate_pause", { gameId });
+    getSocket().emit("spectate_pause", { gameId });
   }, []);
 
   const spectateResume = useCallback((gameId: string) => {
-    socket.emit("spectate_resume", { gameId });
+    getSocket().emit("spectate_resume", { gameId });
   }, []);
 
   const spectateStepForward = useCallback((gameId: string) => {
-    socket.emit("spectate_step_forward", { gameId });
+    getSocket().emit("spectate_step_forward", { gameId });
   }, []);
 
   const spectateStepBackward = useCallback((gameId: string, currentIndex: number) => {
-    socket.emit("spectate_step_backward", { gameId, currentIndex });
+    getSocket().emit("spectate_step_backward", { gameId, currentIndex });
   }, []);
 
   const spectateLeave = useCallback((gameId: string) => {
-    socket.emit("spectate_leave", { gameId });
+    getSocket().emit("spectate_leave", { gameId });
     _spectateState = null;
     _spectateMoves = [];
     spectateStateListeners.forEach((fn) => fn(null));
