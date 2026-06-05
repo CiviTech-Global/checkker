@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid()) @db.Uuid
+  walletAddress String   @unique @map("wallet_address") @db.VarChar(42)
+  username      String   @unique @db.VarChar(32)
+  avatarId      String   @default("king_white") @map("avatar_id") @db.VarChar(32)
+  rating        Int      @default(1000)
+  gamesPlayed   Int      @default(0) @map("games_played")
+  wins          Int      @default(0)
+  losses        Int      @default(0)
+  draws         Int      @default(0)
+  currentStreak Int      @default(0) @map("current_streak")
+  bestStreak    Int      @default(0) @map("best_streak")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  whiteGames Game[] @relation("WhitePlayer")
+  blackGames Game[] @relation("BlackPlayer")
+  wonGames   Game[] @relation("Winner")
+  bets       Bet[]
+
+  @@index([rating(sort: Desc)])
+  @@map("users")
+}
+
+model Game {
+  id                String    @id @default(uuid()) @db.Uuid
+  whiteUserId       String    @map("white_user_id") @db.Uuid
+  blackUserId       String    @map("black_user_id") @db.Uuid
+  mode              String    @db.VarChar(10) // ranked | casual
+  difficulty        String    @db.VarChar(16) // beginner | intermediate | advanced | master
+  timeControl       String    @map("time_control") @db.VarChar(16)
+  resultType        String?   @map("result_type") @db.VarChar(20)
+  winnerColor       String?   @map("winner_color") @db.VarChar(5)
+  winnerUserId      String?   @map("winner_user_id") @db.Uuid
+  whiteRatingBefore Int?      @map("white_rating_before")
+  blackRatingBefore Int?      @map("black_rating_before")
+  whiteRatingAfter  Int?      @map("white_rating_after")
+  blackRatingAfter  Int?      @map("black_rating_after")
+  moveCount         Int       @default(0) @map("move_count")
+  startedAt         DateTime  @default(now()) @map("started_at") @db.Timestamptz()
+  endedAt           DateTime? @map("ended_at") @db.Timestamptz()
+
+  whitePlayer User  @relation("WhitePlayer", fields: [whiteUserId], references: [id])
+  blackPlayer User  @relation("BlackPlayer", fields: [blackUserId], references: [id])
+  winner      User? @relation("Winner", fields: [winnerUserId], references: [id])
+  bets        Bet[]
+
+  @@index([whiteUserId])
+  @@index([blackUserId])
+  @@index([endedAt(sort: Desc)])
+  @@map("games")
+}
+
+model Bet {
+  id            String   @id @default(uuid()) @db.Uuid
+  gameId        String   @map("game_id") @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  amountWei     String   @map("amount_wei") // stored as string for BigInt precision
+  amountUsd     Decimal  @map("amount_usd") @db.Decimal(10, 2)
+  depositTxHash String   @map("deposit_tx_hash") @db.VarChar(66)
+  payoutTxHash  String?  @map("payout_tx_hash") @db.VarChar(66)
+  payoutAmountWei String? @map("payout_amount_wei")
+  status        String   @default("pending") @db.VarChar(16) // pending | confirmed | paid_out | refunded | cancelled
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  game Game @relation(fields: [gameId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([gameId])
+  @@index([userId])
+  @@map("bets")
+}
+
+model TransactionLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  gameId      String?  @map("game_id") @db.Uuid
+  userId      String?  @map("user_id") @db.Uuid
+  txType      String   @map("tx_type") @db.VarChar(16) // deposit | payout | refund | house_cut | donation
+  txHash      String   @map("tx_hash") @db.VarChar(66)
+  amountWei   String   @map("amount_wei")
+  chainId     Int      @default(97) @map("chain_id") // 97=BSC testnet, 56=mainnet
+  blockNumber BigInt?  @map("block_number")
+  status      String   @default("pending") @db.VarChar(16) // pending | confirmed | failed
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("transactions_log")
+}

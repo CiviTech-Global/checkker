@@ -84,6 +84,8 @@ export interface PlayerProfile {
   draws: number;
   currentStreak: number; // positive=wins, negative=losses
   bestStreak: number;
+  walletAddress?: string; // 0x-prefixed, absent for bots
+  avatarId?: string; // predefined avatar key
 }
 
 export interface ChatMessage {

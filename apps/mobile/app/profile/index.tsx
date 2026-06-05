@@ -12,6 +12,8 @@ import {
   shadows,
 } from "../../src/theme/tokens";
 import { staggerDelay } from "../../src/utils/animations";
+import { useSocket } from "../../src/hooks/useSocket";
+import { getAvatar, AVATARS } from "@checkker/shared";
 
 interface SkillData {
   opening: number;
@@ -76,7 +78,37 @@ function StatCard({
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { connected, getProfile, onProfileData, authState } = useSocket();
   const [skills] = useState<SkillData>(DEFAULT_SKILLS);
+  const [profileData, setProfileData] = useState<{
+    profile: any;
+    recentGames: any[];
+    rank?: number;
+    user?: any;
+  } | null>(null);
+
+  useEffect(() => {
+    onProfileData((data) => setProfileData(data));
+  }, [onProfileData]);
+
+  useEffect(() => {
+    if (connected) getProfile();
+  }, [connected, getProfile]);
+
+  const profile = profileData?.profile;
+  const user = profileData?.user;
+  const displayName = profile?.displayName ?? user?.username ?? "Player";
+  const rating = profile?.rating ?? user?.rating ?? 1200;
+  const gamesPlayed = profile?.gamesPlayed ?? user?.gamesPlayed ?? 0;
+  const wins = profile?.wins ?? user?.wins ?? 0;
+  const losses = profile?.losses ?? user?.losses ?? 0;
+  const draws = profile?.draws ?? user?.draws ?? 0;
+  const currentStreak = profile?.currentStreak ?? user?.currentStreak ?? 0;
+  const avatarId = profile?.avatarId ?? user?.avatarId ?? "king_white";
+  const avatar = getAvatar(avatarId);
+  const winRate = gamesPlayed > 0 ? `${Math.round((wins / gamesPlayed) * 100)}%` : "--";
+  const rank = profileData?.rank;
+  const walletAddress = authState?.walletAddress ?? profile?.walletAddress;
 
   return (
     <ScrollView
@@ -106,21 +138,50 @@ export default function ProfileScreen() {
           style={styles.avatarRing}
         >
           <View style={styles.avatarInner}>
-            <Text style={styles.avatarText}>{"\u265A"}</Text>
+            <Text style={styles.avatarText}>{avatar?.symbol ?? "\u265A"}</Text>
           </View>
         </LinearGradient>
-        <Text style={styles.playerName}>Player</Text>
-        <Text style={styles.ratingBadge}>1200 ELO</Text>
-        <Text style={styles.styleBadge}>Balanced</Text>
+        <Text style={styles.playerName}>{displayName}</Text>
+        <Text style={styles.ratingBadge}>{rating} ELO</Text>
+        {rank != null && (
+          <Text style={styles.rankBadge}>Rank #{rank}</Text>
+        )}
+        {walletAddress && (
+          <Text style={styles.walletText}>
+            {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+          </Text>
+        )}
       </Animated.View>
 
       {/* Stats Row */}
       <View style={styles.statsRow}>
-        <StatCard label="Games" value={0} index={0} />
-        <StatCard label="Wins" value={0} index={1} />
-        <StatCard label="Win Rate" value="--" index={2} />
-        <StatCard label="Streak" value={0} index={3} />
+        <StatCard label="Games" value={gamesPlayed} index={0} />
+        <StatCard label="Wins" value={wins} index={1} />
+        <StatCard label="Win Rate" value={winRate} index={2} />
+        <StatCard label="Streak" value={currentStreak} index={3} />
       </View>
+
+      {/* W/L/D Breakdown */}
+      <Animated.View
+        entering={FadeIn.duration(300).delay(250)}
+        style={[styles.section, glassStyle]}
+      >
+        <Text style={styles.sectionTitle}>Record</Text>
+        <View style={styles.recordRow}>
+          <View style={styles.recordItem}>
+            <Text style={[styles.recordValue, { color: colors.accent.green }]}>{wins}</Text>
+            <Text style={styles.recordLabel}>Wins</Text>
+          </View>
+          <View style={styles.recordItem}>
+            <Text style={[styles.recordValue, { color: colors.accent.red }]}>{losses}</Text>
+            <Text style={styles.recordLabel}>Losses</Text>
+          </View>
+          <View style={styles.recordItem}>
+            <Text style={[styles.recordValue, { color: colors.text.muted }]}>{draws}</Text>
+            <Text style={styles.recordLabel}>Draws</Text>
+          </View>
+        </View>
+      </Animated.View>
 
       {/* Skill Radar */}
       <Animated.View
@@ -135,18 +196,34 @@ export default function ProfileScreen() {
         <SkillBar label="Poker" value={skills.poker} color={colors.accent.red} index={4} />
       </Animated.View>
 
-      {/* Weaknesses */}
-      <Animated.View
-        entering={FadeIn.duration(300).delay(500)}
-        style={[styles.section, glassStyle]}
-      >
-        <Text style={styles.sectionTitle}>Areas to Improve</Text>
-        <Text style={styles.weaknessText}>{"\u2022"} Play more games to generate analysis</Text>
-      </Animated.View>
+      {/* Recent Games */}
+      {profileData?.recentGames && profileData.recentGames.length > 0 && (
+        <Animated.View
+          entering={FadeIn.duration(300).delay(400)}
+          style={[styles.section, glassStyle]}
+        >
+          <Text style={styles.sectionTitle}>Recent Games</Text>
+          {profileData.recentGames.map((game: any, i: number) => (
+            <View key={game.id ?? i} style={styles.gameRow}>
+              <Text style={[
+                styles.gameResult,
+                { color: game.winnerUserId === authState?.walletAddress ? colors.accent.green : game.resultType === "draw" ? colors.text.muted : colors.accent.red },
+              ]}>
+                {game.winnerUserId === authState?.walletAddress ? "W" : game.resultType === "draw" ? "D" : "L"}
+              </Text>
+              <Text style={styles.gameMode}>{game.mode}</Text>
+              <Text style={styles.gameDifficulty}>{game.difficulty}</Text>
+              <Text style={styles.gameDate}>
+                {game.endedAt ? new Date(game.endedAt).toLocaleDateString() : ""}
+              </Text>
+            </View>
+          ))}
+        </Animated.View>
+      )}
 
       {/* Recommended Puzzles */}
       <Animated.View
-        entering={FadeIn.duration(300).delay(600)}
+        entering={FadeIn.duration(300).delay(500)}
         style={[styles.section, glassStyle]}
       >
         <Text style={styles.sectionTitle}>Recommended Puzzles</Text>
@@ -228,10 +305,15 @@ const styles = StyleSheet.create({
     borderColor: colors.border.gold,
     overflow: "hidden",
   },
-  styleBadge: {
+  rankBadge: {
+    fontSize: 13,
+    color: colors.accent.gold,
+    fontWeight: "600",
+  },
+  walletText: {
     fontSize: 12,
-    color: colors.accent.primary,
-    fontWeight: "500",
+    color: colors.text.muted,
+    fontFamily: "monospace",
   },
   statsRow: {
     flexDirection: "row",
@@ -271,6 +353,22 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginBottom: spacing.xxs,
   },
+  recordRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  recordItem: {
+    alignItems: "center",
+    gap: 2,
+  },
+  recordValue: {
+    fontSize: 24,
+    fontWeight: "700",
+  },
+  recordLabel: {
+    fontSize: 12,
+    color: colors.text.muted,
+  },
   skillRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -299,10 +397,33 @@ const styles = StyleSheet.create({
     width: 28,
     textAlign: "right",
   },
-  weaknessText: {
+  gameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingVertical: spacing.xxs,
+  },
+  gameResult: {
+    fontSize: 16,
+    fontWeight: "700",
+    width: 24,
+    textAlign: "center",
+  },
+  gameMode: {
     fontSize: 13,
     color: colors.text.secondary,
-    lineHeight: 20,
+    textTransform: "capitalize",
+    width: 60,
+  },
+  gameDifficulty: {
+    fontSize: 13,
+    color: colors.text.muted,
+    textTransform: "capitalize",
+    flex: 1,
+  },
+  gameDate: {
+    fontSize: 12,
+    color: colors.text.muted,
   },
   puzzleBtn: {
     backgroundColor: colors.accent.primary,

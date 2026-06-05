@@ -31,6 +31,57 @@ let _moveErrorCallback: ((error: string) => void) | null = null;
 let _botFallbackCallback: ((data: { tc: string }) => void) | null = null;
 let _coachingTipCallback: ((tip: string) => void) | null = null;
 let _spectatorCommentCallback: ((comment: string) => void) | null = null;
+
+/* ── Auth & Betting state ──────────────────────────────────────────── */
+
+export interface AuthState {
+  profile: PlayerProfile | null;
+  isNewUser: boolean;
+  walletAddress?: string;
+}
+
+export interface DepositStatus {
+  gameId: string;
+  betAmountWei: string;
+  betAmountUsd: number;
+  contractAddress: string;
+  myDeposit: boolean;
+  opponentDeposit: boolean;
+}
+
+export interface BetSettledPayload {
+  escrowGameId: string;
+  txHash: string;
+  betAmountUsd: number;
+  result: string;
+  outcome: "win" | "loss" | "draw";
+}
+
+let _authState: AuthState | null = null;
+let _authErrorCallback: ((error: string) => void) | null = null;
+let _authChallengeCallback: ((data: { nonce: string; message: string }) => void) | null = null;
+let _depositStatus: DepositStatus | null = null;
+let _betSettledCallback: ((data: BetSettledPayload) => void) | null = null;
+let _betCancelledCallback: ((data: { gameId: string; reason: string }) => void) | null = null;
+let _queueJoinedCallback: ((data: { mode: string; difficulty: string; tc: string; betAmountUsd: number }) => void) | null = null;
+let _usernameCheckCallback: ((data: { username: string; available: boolean }) => void) | null = null;
+const authStateListeners = new Set<(v: AuthState | null) => void>();
+const depositStatusListeners = new Set<(v: DepositStatus | null) => void>();
+
+export interface LeaderboardData {
+  entries: any[];
+  myRank: number | null;
+}
+
+export interface ProfileData {
+  profile: PlayerProfile | null;
+  recentGames: any[];
+  rank?: number;
+  user?: any;
+}
+
+let _leaderboardCallback: ((data: LeaderboardData) => void) | null = null;
+let _profileDataCallback: ((data: ProfileData) => void) | null = null;
 const scoresListeners = new Set<(v: GameOverPayload["scores"] | null) => void>();
 const chatListeners = new Set<(v: ChatMessage[]) => void>();
 
@@ -131,6 +182,60 @@ function attachListeners(s: Socket) {
 
   s.on("spectator_comment", (data: { text: string }) => {
     if (data?.text) _spectatorCommentCallback?.(data.text);
+  });
+
+  /* ── Auth & Betting listeners ─────────────────────────────────────── */
+
+  s.on("auth_challenge", (data: { nonce: string; message: string }) => {
+    _authChallengeCallback?.(data);
+  });
+
+  s.on("auth_success", (data: { profile: PlayerProfile | null; isNewUser: boolean; walletAddress?: string }) => {
+    _authState = data;
+    authStateListeners.forEach((fn) => fn(_authState));
+  });
+
+  s.on("auth_error", (data: { error: string }) => {
+    _authErrorCallback?.(data.error);
+  });
+
+  s.on("username_check", (data: { username: string; available: boolean }) => {
+    _usernameCheckCallback?.(data);
+  });
+
+  s.on("awaiting_deposits", (data: { gameId: string; betAmountWei: string; betAmountUsd: number; contractAddress: string }) => {
+    _depositStatus = { ...data, myDeposit: false, opponentDeposit: false };
+    depositStatusListeners.forEach((fn) => fn(_depositStatus));
+  });
+
+  s.on("deposit_confirmed", (data: { player: "self" | "opponent" }) => {
+    if (_depositStatus) {
+      if (data.player === "self") _depositStatus = { ..._depositStatus, myDeposit: true };
+      else _depositStatus = { ..._depositStatus, opponentDeposit: true };
+      depositStatusListeners.forEach((fn) => fn(_depositStatus));
+    }
+  });
+
+  s.on("bet_settled", (data: BetSettledPayload) => {
+    _betSettledCallback?.(data);
+  });
+
+  s.on("bet_cancelled", (data: { gameId: string; reason: string }) => {
+    _depositStatus = null;
+    depositStatusListeners.forEach((fn) => fn(null));
+    _betCancelledCallback?.(data);
+  });
+
+  s.on("queue_joined", (data: { mode: string; difficulty: string; tc: string; betAmountUsd: number }) => {
+    _queueJoinedCallback?.(data);
+  });
+
+  s.on("leaderboard", (data: LeaderboardData) => {
+    _leaderboardCallback?.(data);
+  });
+
+  s.on("profile_data", (data: ProfileData) => {
+    _profileDataCallback?.(data);
   });
 
   /* ── Spectate listeners ───────────────────────────────────────────── */
@@ -300,6 +405,115 @@ export function useSocket() {
 
   /* ── Spectate ─────────────────────────────────────────────────────── */
 
+  /* ── Auth & Betting ─────────────────────────────────────────────────── */
+
+  const [authState, setAuthState] = useState<AuthState | null>(_authState);
+  const [depositStatus, setDepositStatus] = useState<DepositStatus | null>(_depositStatus);
+  const authErrorCbRef = useRef<((error: string) => void) | null>(null);
+  const authChallengeCbRef = useRef<((data: { nonce: string; message: string }) => void) | null>(null);
+  const betSettledCbRef = useRef<((data: BetSettledPayload) => void) | null>(null);
+  const betCancelledCbRef = useRef<((data: { gameId: string; reason: string }) => void) | null>(null);
+  const queueJoinedCbRef = useRef<((data: { mode: string; difficulty: string; tc: string; betAmountUsd: number }) => void) | null>(null);
+  const usernameCheckCbRef = useRef<((data: { username: string; available: boolean }) => void) | null>(null);
+
+  useEffect(() => {
+    const onAuth = (v: AuthState | null) => setAuthState(v);
+    const onDeposit = (v: DepositStatus | null) => setDepositStatus(v);
+    authStateListeners.add(onAuth);
+    depositStatusListeners.add(onDeposit);
+    return () => {
+      authStateListeners.delete(onAuth);
+      depositStatusListeners.delete(onDeposit);
+    };
+  }, []);
+
+  useEffect(() => {
+    _authErrorCallback = (error: string) => authErrorCbRef.current?.(error);
+    _authChallengeCallback = (data) => authChallengeCbRef.current?.(data);
+    _betSettledCallback = (data) => betSettledCbRef.current?.(data);
+    _betCancelledCallback = (data) => betCancelledCbRef.current?.(data);
+    _queueJoinedCallback = (data) => queueJoinedCbRef.current?.(data);
+    _usernameCheckCallback = (data) => usernameCheckCbRef.current?.(data);
+  }, []);
+
+  const authRequest = useCallback((walletAddress: string) => {
+    getSocket().emit("auth_request", { walletAddress });
+  }, []);
+
+  const authVerify = useCallback((walletAddress: string, signature: string) => {
+    getSocket().emit("auth_verify", { walletAddress, signature });
+  }, []);
+
+  const setUsername = useCallback((walletAddress: string, username: string, avatarId?: string) => {
+    getSocket().emit("set_username", { walletAddress, username, avatarId });
+  }, []);
+
+  const checkUsername = useCallback((username: string) => {
+    getSocket().emit("check_username", { username });
+  }, []);
+
+  const updateAvatar = useCallback((avatarId: string) => {
+    getSocket().emit("update_avatar", { avatarId });
+  }, []);
+
+  const joinRanked = useCallback((difficulty: string, tc: string) => {
+    getSocket().emit("join_ranked", { difficulty, tc });
+  }, []);
+
+  const joinCasualDifficulty = useCallback((difficulty: string, tc: string) => {
+    getSocket().emit("join_casual_difficulty", { difficulty, tc });
+  }, []);
+
+  const getLeaderboard = useCallback(() => {
+    getSocket().emit("get_leaderboard");
+  }, []);
+
+  const getProfile = useCallback(() => {
+    getSocket().emit("get_profile");
+  }, []);
+
+  const onAuthError = useCallback((fn: (error: string) => void) => {
+    authErrorCbRef.current = fn;
+  }, []);
+
+  const onAuthChallenge = useCallback((fn: (data: { nonce: string; message: string }) => void) => {
+    authChallengeCbRef.current = fn;
+  }, []);
+
+  const onBetSettled = useCallback((fn: (data: BetSettledPayload) => void) => {
+    betSettledCbRef.current = fn;
+  }, []);
+
+  const onBetCancelled = useCallback((fn: (data: { gameId: string; reason: string }) => void) => {
+    betCancelledCbRef.current = fn;
+  }, []);
+
+  const onQueueJoined = useCallback((fn: (data: { mode: string; difficulty: string; tc: string; betAmountUsd: number }) => void) => {
+    queueJoinedCbRef.current = fn;
+  }, []);
+
+  const onUsernameCheck = useCallback((fn: (data: { username: string; available: boolean }) => void) => {
+    usernameCheckCbRef.current = fn;
+  }, []);
+
+  const leaderboardCbRef = useRef<((data: LeaderboardData) => void) | null>(null);
+  const profileDataCbRef = useRef<((data: ProfileData) => void) | null>(null);
+
+  useEffect(() => {
+    _leaderboardCallback = (data) => leaderboardCbRef.current?.(data);
+    _profileDataCallback = (data) => profileDataCbRef.current?.(data);
+  }, []);
+
+  const onLeaderboard = useCallback((fn: (data: LeaderboardData) => void) => {
+    leaderboardCbRef.current = fn;
+  }, []);
+
+  const onProfileData = useCallback((fn: (data: ProfileData) => void) => {
+    profileDataCbRef.current = fn;
+  }, []);
+
+  /* ── Spectate ─────────────────────────────────────────────────────── */
+
   const [spectateState, setSpectateState] = useState<SpectateGameState | null>(_spectateState);
   const [spectateMoves, setSpectateMoves] = useState<SpectateMove[]>(_spectateMoves);
 
@@ -360,6 +574,28 @@ export function useSocket() {
     undoMove,
     onCoachingTip,
     onSpectatorComment,
+    // Auth
+    authState,
+    authRequest,
+    authVerify,
+    setUsername,
+    checkUsername,
+    updateAvatar,
+    onAuthError,
+    onAuthChallenge,
+    onUsernameCheck,
+    // Betting / Matchmaking
+    depositStatus,
+    joinRanked,
+    joinCasualDifficulty,
+    onBetSettled,
+    onBetCancelled,
+    onQueueJoined,
+    getLeaderboard,
+    getProfile,
+    onLeaderboard,
+    onProfileData,
+    // Spectate
     spectateState,
     spectateMoves,
     startSpectateGame,

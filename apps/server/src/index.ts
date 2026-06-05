@@ -3,9 +3,17 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import { GameServer } from "./GameServer";
+import { initPlayerStoreDb } from "./PlayerStore";
 
 const app = express();
 app.use(cors());
+
+// Initialize database if DATABASE_URL is set
+if (process.env.DATABASE_URL) {
+  initPlayerStoreDb().catch((err) => {
+    console.error("[DB] Failed to initialize database:", err);
+  });
+}
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {

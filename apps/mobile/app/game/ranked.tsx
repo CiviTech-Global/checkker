@@ -17,22 +17,21 @@ import {
 import { useSocket } from "../../src/hooks/useSocket";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
 import type { BotDifficulty } from "@checkker/shared";
-import { BET_AMOUNTS_USD, isFreeGame } from "@checkker/shared";
+import { BET_AMOUNTS_USD } from "@checkker/shared";
 
 type DifficultyTier = {
   id: BotDifficulty;
   label: string;
   betUsd: number;
-  isFree: boolean;
   stars: number;
   color: string;
 };
 
 const TIERS: DifficultyTier[] = [
-  { id: "beginner", label: "Beginner", betUsd: 0, isFree: true, stars: 1, color: colors.accent.green },
-  { id: "intermediate", label: "Intermediate", betUsd: BET_AMOUNTS_USD.intermediate, isFree: false, stars: 2, color: colors.accent.gold },
-  { id: "advanced", label: "Advanced", betUsd: BET_AMOUNTS_USD.advanced, isFree: false, stars: 3, color: colors.accent.bronze },
-  { id: "master", label: "Master", betUsd: BET_AMOUNTS_USD.master, isFree: false, stars: 4, color: colors.accent.red },
+  { id: "beginner", label: "Beginner", betUsd: BET_AMOUNTS_USD.beginner, stars: 1, color: colors.accent.green },
+  { id: "intermediate", label: "Intermediate", betUsd: BET_AMOUNTS_USD.intermediate, stars: 2, color: colors.accent.gold },
+  { id: "advanced", label: "Advanced", betUsd: BET_AMOUNTS_USD.advanced, stars: 3, color: colors.accent.bronze },
+  { id: "master", label: "Master", betUsd: BET_AMOUNTS_USD.master, stars: 4, color: colors.accent.red },
 ];
 
 function TierCard({
@@ -73,14 +72,10 @@ function TierCard({
               </View>
             </View>
             <Text style={styles.cardTitle}>{tier.label}</Text>
-            <Text style={styles.betText}>
-              {tier.isFree ? "Play Free" : `Bet: $${tier.betUsd}`}
-            </Text>
+            <Text style={styles.betText}>Bet: ${tier.betUsd}</Text>
           </View>
           <View style={styles.betBadge}>
-            <Text style={[styles.betBadgeText, tier.isFree && { color: colors.accent.green }]}>
-              {tier.isFree ? "FREE" : `$${tier.betUsd}`}
-            </Text>
+            <Text style={styles.betBadgeText}>${tier.betUsd}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -88,20 +83,20 @@ function TierCard({
   );
 }
 
-export default function CasualScreen() {
+export default function RankedScreen() {
   const router = useRouter();
   const {
     connected,
     gameState,
-    joinCasual,
-    joinCasualDifficulty,
-    requestBot,
-    onBotFallbackOffer,
+    depositStatus,
+    joinRanked,
     onBetCancelled,
+    onQueueJoined,
   } = useSocket();
   const [searching, setSearching] = useState(false);
   const [selectedTier, setSelectedTier] = useState<DifficultyTier | null>(null);
-  const [botOffer, setBotOffer] = useState<{ tc: string } | null>(null);
+  const [queueInfo, setQueueInfo] = useState<{ betAmountUsd: number } | null>(null);
+  const [cancelReason, setCancelReason] = useState<string | null>(null);
 
   useEffect(() => {
     if (gameState && "gameId" in gameState) {
@@ -110,62 +105,67 @@ export default function CasualScreen() {
   }, [gameState]);
 
   useEffect(() => {
-    onBotFallbackOffer((data) => setBotOffer(data));
-    onBetCancelled(() => {
+    onQueueJoined((data) => setQueueInfo({ betAmountUsd: data.betAmountUsd }));
+    onBetCancelled((data) => {
+      setCancelReason(data.reason);
       setSearching(false);
-      setSelectedTier(null);
     });
-  }, [onBotFallbackOffer, onBetCancelled]);
+  }, [onQueueJoined, onBetCancelled]);
 
   const handleSelectTier = (tier: DifficultyTier) => {
     if (!connected) return;
     setSelectedTier(tier);
     setSearching(true);
-    joinCasualDifficulty(tier.id, "blitz");
+    setCancelReason(null);
+    joinRanked(tier.id, "blitz");
   };
+
+  // Deposit waiting screen
+  if (depositStatus) {
+    return (
+      <View style={styles.container}>
+        <Animated.View entering={FadeIn.duration(300)} style={styles.depositSection}>
+          <Text style={styles.title}>Confirm Bet</Text>
+          <Text style={styles.depositAmount}>${depositStatus.betAmountUsd}</Text>
+          <Text style={styles.depositWei}>{depositStatus.betAmountWei} wei</Text>
+
+          <View style={styles.depositChecks}>
+            <View style={styles.depositRow}>
+              <Text style={styles.depositIcon}>{depositStatus.myDeposit ? "\u2705" : "\u23F3"}</Text>
+              <Text style={styles.depositLabel}>Your deposit</Text>
+            </View>
+            <View style={styles.depositRow}>
+              <Text style={styles.depositIcon}>{depositStatus.opponentDeposit ? "\u2705" : "\u23F3"}</Text>
+              <Text style={styles.depositLabel}>Opponent deposit</Text>
+            </View>
+          </View>
+
+          {!depositStatus.myDeposit && (
+            <Text style={styles.depositHint}>
+              Send {depositStatus.betAmountWei} wei to the contract to confirm your bet.
+            </Text>
+          )}
+        </Animated.View>
+      </View>
+    );
+  }
 
   // Searching screen
   if (searching) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Checkker</Text>
-        <Text style={styles.subtitle}>Casual Match</Text>
+        <Text style={styles.subtitle}>Ranked Match</Text>
 
         <View style={styles.searchingSection}>
           <ActivityIndicator size="large" color={colors.accent.primary} />
           <Text style={styles.searchText}>Searching for opponent...</Text>
           {selectedTier && (
             <Text style={styles.modeText}>
-              Casual {selectedTier.label} {"\u2022"}{" "}
-              {selectedTier.isFree ? "Free" : `$${selectedTier.betUsd}`} {"\u2022"} Blitz
+              Ranked {selectedTier.label} {"\u2022"} Bet ${selectedTier.betUsd} {"\u2022"} Blitz
             </Text>
           )}
         </View>
-
-        {botOffer && (
-          <Animated.View entering={FadeIn.duration(200)} style={styles.botModal}>
-            <Text style={styles.modalTitle}>No opponent found</Text>
-            <Text style={styles.modalText}>Would you like to play against a bot instead?</Text>
-            <TouchableOpacity
-              style={styles.acceptBtn}
-              onPress={() => {
-                requestBot(selectedTier?.id ?? "intermediate", botOffer.tc);
-                setBotOffer(null);
-              }}
-            >
-              <Text style={styles.acceptText}>Play vs Bot</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.keepSearchingBtn}
-              onPress={() => {
-                joinCasualDifficulty(selectedTier?.id ?? "beginner", botOffer.tc);
-                setBotOffer(null);
-              }}
-            >
-              <Text style={styles.keepSearchingText}>Keep Searching</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        )}
 
         <TouchableOpacity
           style={styles.cancelBtn}
@@ -180,9 +180,9 @@ export default function CasualScreen() {
     );
   }
 
-  // Difficulty selection screen
   return (
     <View style={styles.container}>
+      {/* Header */}
       <Animated.View entering={FadeIn.duration(300)} style={styles.header}>
         <TouchableOpacity
           onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
@@ -190,13 +190,19 @@ export default function CasualScreen() {
         >
           <Text style={styles.backArrow}>{"\u2190"}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Casual Play</Text>
+        <Text style={styles.headerTitle}>Ranked Play</Text>
         <View style={{ width: 40 }} />
       </Animated.View>
 
       <Animated.Text entering={FadeIn.duration(300).delay(100)} style={styles.sectionLabel}>
-        Choose Difficulty
+        Choose Your Tier
       </Animated.Text>
+
+      {cancelReason && (
+        <Animated.View entering={FadeIn.duration(200)} style={styles.cancelNotice}>
+          <Text style={styles.cancelNoticeText}>{cancelReason}</Text>
+        </Animated.View>
+      )}
 
       <View style={styles.content}>
         {TIERS.map((tier, index) => (
@@ -248,12 +254,15 @@ const styles = StyleSheet.create({
   modeText: { fontSize: 14, color: colors.text.muted },
   cancelBtn: { paddingHorizontal: spacing.xl, paddingVertical: spacing.sm, borderRadius: radius.md, backgroundColor: colors.bg.secondary, marginTop: spacing.xl },
   cancelText: { color: colors.text.primary, fontSize: 16, fontWeight: "600" },
-  // Bot modal
-  botModal: { position: "absolute", top: "40%", left: spacing.lg, right: spacing.lg, backgroundColor: colors.bg.secondary, borderRadius: radius.lg, padding: spacing.xl, alignItems: "center", gap: spacing.md, zIndex: 100 },
-  modalTitle: { fontSize: 20, fontWeight: "700", color: colors.text.primary },
-  modalText: { fontSize: 14, color: colors.text.secondary, textAlign: "center" },
-  acceptBtn: { paddingHorizontal: spacing.xl, paddingVertical: spacing.sm, borderRadius: radius.md, backgroundColor: colors.accent.primary, width: "100%", alignItems: "center" },
-  acceptText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  keepSearchingBtn: { paddingHorizontal: spacing.xl, paddingVertical: spacing.sm, borderRadius: radius.md, borderWidth: 1, borderColor: colors.text.muted, width: "100%", alignItems: "center" },
-  keepSearchingText: { color: colors.text.primary, fontSize: 14 },
+  cancelNotice: { backgroundColor: "rgba(255,100,100,0.15)", borderRadius: radius.md, padding: spacing.sm, marginHorizontal: spacing.md, marginBottom: spacing.sm },
+  cancelNoticeText: { color: colors.accent.red, fontSize: 14, textAlign: "center" },
+  // Deposit
+  depositSection: { alignItems: "center", gap: spacing.md, padding: spacing.xl },
+  depositAmount: { fontSize: 48, fontWeight: "800", color: colors.accent.gold },
+  depositWei: { fontSize: 14, color: colors.text.muted },
+  depositChecks: { gap: spacing.sm, marginTop: spacing.md },
+  depositRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  depositIcon: { fontSize: 20 },
+  depositLabel: { fontSize: 16, color: colors.text.primary },
+  depositHint: { fontSize: 13, color: colors.text.secondary, textAlign: "center", marginTop: spacing.md },
 });

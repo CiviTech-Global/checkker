@@ -169,15 +169,13 @@ export default function HomeScreen() {
             label="Play ranked"
             symbol={"\u2694"}
             index={0}
-            onPress={() => router.push("/game/queue?mode=ranked")}
-            disabled
+            onPress={() => router.push("/game/ranked")}
           />
           <GridButton
             label="Play casual"
             symbol={"\u265F"}
             index={1}
             onPress={() => router.push("/game/casual")}
-            disabled
           />
           <GridButton
             label="Play vs. Bot"
@@ -203,13 +201,19 @@ export default function HomeScreen() {
             index={5}
             onPress={() => router.push("/puzzles")}
           />
+          <GridButton
+            label="Leaderboard"
+            symbol={"\u2655"}
+            index={6}
+            onPress={() => router.push("/leaderboard")}
+          />
         </View>
 
         {/* Full-width Watch Bot vs Bot button */}
         <WideButton
           label="Watch Bot vs. Bot"
           symbol={"\uD83D\uDC41"}
-          index={6}
+          index={7}
           onPress={() => router.push("/spectate")}
         />
       </ScrollView>
