@@ -232,6 +232,21 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
       </Animated.View>
+
+      {/* Donate button — bottom-right */}
+      <Animated.View
+        entering={FadeIn.duration(400).delay(700)}
+        style={[styles.profileCircle, { bottom: insets.bottom + spacing.md, right: spacing.md }]}
+      >
+        <TouchableOpacity
+          onPress={() => router.push("/donate")}
+          activeOpacity={0.8}
+        >
+          <View style={[styles.profileInner, styles.donateInner]}>
+            <Text style={styles.donateIcon}>{"\u2665"}</Text>
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
     </LinearGradient>
   );
 }
@@ -378,5 +393,12 @@ const styles = StyleSheet.create({
   profileIcon: {
     fontSize: 24,
     color: colors.accent.goldBright,
+  },
+  donateInner: {
+    borderColor: colors.accent.red,
+  },
+  donateIcon: {
+    fontSize: 22,
+    color: colors.accent.red,
   },
 });

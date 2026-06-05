@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "turbo dev",
+    "dev:desktop": "npm run start -w apps/desktop",
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",

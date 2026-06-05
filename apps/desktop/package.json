@@ -6,7 +6,7 @@
   "author": "Checkker",
   "main": "main.js",
   "scripts": {
-    "dev": "electron .",
+    "start": "electron .",
     "build": "electron-builder --win --publish never",
     "typecheck": "echo ok",
     "lint": "echo ok",
@@ -30,7 +30,6 @@
         "to": "server.bundle.js"
       }
     ],
-    "electronDist": "../../node_modules/electron/dist",
     "win": {
       "target": "portable"
     },

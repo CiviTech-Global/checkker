@@ -26,6 +26,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Ensure Electron binary
+        run: npx electron-builder install-app-deps
+        working-directory: apps/desktop
+
       - name: Export Expo web
         run: npm run export:web -w apps/mobile
 
