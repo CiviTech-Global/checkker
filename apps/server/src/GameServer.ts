@@ -14,6 +14,7 @@ import { createChallenge, verifyChallenge, cleanupExpiredChallenges } from "./au
 import { BetManager } from "./betting/BetManager";
 import type { BetSetup } from "./betting/BetManager";
 import { CONTRACT_ADDRESS, BLOCKCHAIN_ENABLED } from "./blockchain/config";
+import { ContractService } from "./blockchain/ContractService";
 
 interface Player {
   id: string; // socket ID (or user UUID when authenticated)
@@ -534,7 +535,8 @@ export class GameServer {
     if (!free && BLOCKCHAIN_ENABLED && p1.walletAddress && p2.walletAddress) {
       const gameId = uuid();
       const betSetup = await BetManager.initiateBet(
-        gameId, mode, difficulty, p1.walletAddress, p2.walletAddress
+        gameId, mode, difficulty, p1.walletAddress, p2.walletAddress,
+        p1.userId, p2.userId
       );
 
       if (betSetup && !betSetup.isFree) {
@@ -560,14 +562,33 @@ export class GameServer {
         p1.socket.emit("awaiting_deposits", depositPayload);
         p2.socket.emit("awaiting_deposits", depositPayload);
 
-        // Wait for both deposits with timeout
-        const depositsOk = await BetManager.waitForDeposits(
-          gameId, p1.walletAddress, p2.walletAddress
-        );
+        // Listen for each player's deposit independently and emit per-player events
+        const whiteDepositPromise = ContractService.listenForDeposit(gameId, p1.walletAddress!).then((ok) => {
+          if (ok && this.pendingBets.has(gameId)) {
+            const p = this.pendingBets.get(gameId)!;
+            p.whiteDeposited = true;
+            p1.socket.emit("deposit_confirmed", { player: "self" });
+            p2.socket.emit("deposit_confirmed", { player: "opponent" });
+            BetManager.confirmDeposit(gameId, p1.userId ?? "").catch(() => {});
+          }
+          return ok;
+        });
 
+        const blackDepositPromise = ContractService.listenForDeposit(gameId, p2.walletAddress!).then((ok) => {
+          if (ok && this.pendingBets.has(gameId)) {
+            const p = this.pendingBets.get(gameId)!;
+            p.blackDeposited = true;
+            p2.socket.emit("deposit_confirmed", { player: "self" });
+            p1.socket.emit("deposit_confirmed", { player: "opponent" });
+            BetManager.confirmDeposit(gameId, p2.userId ?? "").catch(() => {});
+          }
+          return ok;
+        });
+
+        const [whiteOk, blackOk] = await Promise.all([whiteDepositPromise, blackDepositPromise]);
         this.pendingBets.delete(gameId);
 
-        if (!depositsOk) {
+        if (!whiteOk || !blackOk) {
           // Timeout or failure — cancel the bet and refund
           await BetManager.cancelBet(gameId);
           p1.socket.emit("bet_cancelled", { gameId, reason: "Deposit timeout" });
@@ -715,8 +736,13 @@ export class GameServer {
         blackOutcome === "win" ? black.walletAddress :
         null;
 
+      const whiteAuth = authenticatedSockets.get(white.id);
+      const blackAuth = authenticatedSockets.get(black.id);
+      const winnerUserId = whiteOutcome === "win" ? whiteAuth?.userId : blackOutcome === "win" ? blackAuth?.userId : undefined;
+      const loserUserId = whiteOutcome === "loss" ? whiteAuth?.userId : blackOutcome === "loss" ? blackAuth?.userId : undefined;
+
       try {
-        const txHash = await BetManager.settleBet(betSetup.gameId, result, winnerAddress ?? null);
+        const txHash = await BetManager.settleBet(betSetup.gameId, result, winnerAddress ?? null, winnerUserId, loserUserId);
         if (txHash) {
           // Notify players of settlement
           const settlementPayload = {

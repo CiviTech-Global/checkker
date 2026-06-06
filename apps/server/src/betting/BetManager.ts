@@ -10,6 +10,16 @@ export interface BetSetup {
   isFree: boolean;
 }
 
+/** Try to import BetRepository — may not be available if DB is not configured */
+async function getBetRepository() {
+  try {
+    const { BetRepository } = await import("@checkker/database");
+    return BetRepository;
+  } catch {
+    return null;
+  }
+}
+
 export const BetManager = {
   /**
    * Initialize a bet for a game. Creates the escrow on-chain if betting is required.
@@ -20,7 +30,9 @@ export const BetManager = {
     mode: GameMode,
     difficulty: BotDifficulty,
     whiteAddress: string,
-    blackAddress: string
+    blackAddress: string,
+    whiteUserId?: string,
+    blackUserId?: string
   ): Promise<BetSetup | null> {
     if (isFreeGame(mode, difficulty)) {
       return { gameId, betAmountWei: "0", betAmountUsd: 0, isFree: true };
@@ -37,10 +49,53 @@ export const BetManager = {
     try {
       await ContractService.createGame(gameId, whiteAddress, blackAddress, wei);
       console.log(`[BetManager] Created escrow for game ${gameId}: $${usd} (${wei} wei)`);
+
+      // Persist bet records in the database for each player
+      const repo = await getBetRepository();
+      if (repo) {
+        if (whiteUserId) {
+          await repo.create({
+            gameId,
+            userId: whiteUserId,
+            amountWei: wei,
+            amountUsd: usd,
+            depositTxHash: "",
+          }).catch((err: any) => console.error("[BetManager] Failed to create white bet record:", err));
+        }
+        if (blackUserId) {
+          await repo.create({
+            gameId,
+            userId: blackUserId,
+            amountWei: wei,
+            amountUsd: usd,
+            depositTxHash: "",
+          }).catch((err: any) => console.error("[BetManager] Failed to create black bet record:", err));
+        }
+      }
+
       return { gameId, betAmountWei: wei, betAmountUsd: usd, isFree: false };
     } catch (err) {
       console.error("[BetManager] Failed to create escrow:", err);
       return null;
+    }
+  },
+
+  /**
+   * Confirm a player's deposit in the database.
+   */
+  async confirmDeposit(gameId: string, userId: string, depositTxHash: string): Promise<void> {
+    const repo = await getBetRepository();
+    if (!repo) return;
+
+    try {
+      const bets = await repo.findByGame(gameId);
+      const bet = bets.find((b: any) => b.userId === userId);
+      if (bet) {
+        // Update the depositTxHash and confirm
+        await repo.confirmDeposit(bet.id);
+      }
+    } catch (err) {
+      console.error("[BetManager] Failed to confirm deposit:", err);
     }
   },
 
@@ -67,25 +122,55 @@ export const BetManager = {
    * Settle the bet after a game ends.
    * @param result The game result
    * @param winnerAddress The winner's wallet address (null for draw)
+   * @param winnerUserId The winner's DB user ID (for bet record updates)
+   * @param loserUserId The loser's DB user ID
    * @returns Transaction hash, or null if no settlement needed
    */
   async settleBet(
     gameId: string,
     result: GameResult,
-    winnerAddress: string | null
+    winnerAddress: string | null,
+    winnerUserId?: string,
+    loserUserId?: string
   ): Promise<string | null> {
     if (!ContractService.enabled) return null;
 
     try {
+      let txHash: string | null = null;
+
       if (result.type === "draw" || result.type === "deckExhausted") {
-        const txHash = await ContractService.reportDraw(gameId);
+        txHash = await ContractService.reportDraw(gameId);
         console.log(`[BetManager] Draw settled for game ${gameId}: ${txHash}`);
+
+        // Mark both bets as refunded
+        const repo = await getBetRepository();
+        if (repo && txHash) {
+          const bets = await repo.findByGame(gameId);
+          for (const bet of bets) {
+            await repo.markRefunded(bet.id, txHash).catch(() => {});
+          }
+        }
+
         return txHash;
       }
 
       if (winnerAddress) {
-        const txHash = await ContractService.reportWinner(gameId, winnerAddress);
+        txHash = await ContractService.reportWinner(gameId, winnerAddress);
         console.log(`[BetManager] Winner settled for game ${gameId}: ${txHash}`);
+
+        // Update bet records
+        const repo = await getBetRepository();
+        if (repo && txHash) {
+          const bets = await repo.findByGame(gameId);
+          for (const bet of bets) {
+            if (bet.userId === winnerUserId) {
+              await repo.markPaidOut(bet.id, txHash, "").catch(() => {});
+            } else {
+              // Loser's bet stays as confirmed (they lost their deposit)
+            }
+          }
+        }
+
         return txHash;
       }
 
@@ -105,6 +190,16 @@ export const BetManager = {
     try {
       const txHash = await ContractService.cancelGame(gameId);
       console.log(`[BetManager] Cancelled bet for game ${gameId}: ${txHash}`);
+
+      // Mark all bet records as cancelled
+      const repo = await getBetRepository();
+      if (repo) {
+        const bets = await repo.findByGame(gameId);
+        for (const bet of bets) {
+          await repo.cancel(bet.id).catch(() => {});
+        }
+      }
+
       return txHash;
     } catch (err) {
       console.error("[BetManager] Cancel failed:", err);

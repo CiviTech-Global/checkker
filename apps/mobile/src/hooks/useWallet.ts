@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
+import { BSC_TESTNET_CONFIG, ESCROW_DEPOSIT_ABI } from "@checkker/shared";
 
 /**
  * Wallet connection hook.
@@ -96,6 +97,15 @@ export function useWallet() {
           error: null,
         });
       }
+
+      // Auto-switch to BSC Testnet if on wrong chain
+      if (chainId !== BSC_TESTNET_CONFIG.chainId) {
+        try {
+          await switchToBscTestnet();
+        } catch {
+          // Non-fatal: user can switch manually
+        }
+      }
     } catch (err: any) {
       if (mountedRef.current) {
         setState((s) => ({
@@ -143,11 +153,80 @@ export function useWallet() {
     }
   }, []);
 
+  /**
+   * Deposit BNB to the escrow contract for a specific game.
+   * Encodes the deposit(bytes32) call and sends the transaction.
+   * @returns Transaction hash, or null on failure
+   */
+  const depositToEscrow = useCallback(async (
+    contractAddress: string,
+    gameId: string,
+    amountWei: string
+  ): Promise<string | null> => {
+    try {
+      const { Interface } = await import("ethers");
+      const iface = new Interface(ESCROW_DEPOSIT_ABI);
+
+      // Convert gameId (UUID) to bytes32: remove hyphens, pad to 64 hex chars
+      const gameIdHex = "0x" + gameId.replace(/-/g, "").padEnd(64, "0");
+      const data = iface.encodeFunctionData("deposit", [gameIdHex]);
+
+      return await sendTransaction({
+        to: contractAddress,
+        value: amountWei,
+        data,
+      });
+    } catch (err: any) {
+      setState((s) => ({ ...s, error: err?.message ?? "Deposit failed" }));
+      return null;
+    }
+  }, [sendTransaction]);
+
   return {
     ...state,
     connect,
     disconnect,
     sign,
     sendTransaction,
+    depositToEscrow,
+    switchToBscTestnet,
   };
+}
+
+/**
+ * Switch the wallet to BSC Testnet (chain ID 97).
+ * Falls back to adding the chain if it's not configured.
+ */
+async function switchToBscTestnet(): Promise<void> {
+  const win = typeof window !== "undefined" ? (window as any) : null;
+  if (!win?.ethereum) return;
+
+  try {
+    await win.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: BSC_TESTNET_CONFIG.chainIdHex }],
+    });
+  } catch (switchError: any) {
+    // Error code 4902 = chain not added yet
+    if (switchError?.code === 4902) {
+      await win.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: BSC_TESTNET_CONFIG.chainIdHex,
+            chainName: BSC_TESTNET_CONFIG.name,
+            nativeCurrency: BSC_TESTNET_CONFIG.nativeCurrency,
+            rpcUrls: [BSC_TESTNET_CONFIG.rpcUrl],
+            blockExplorerUrls: [BSC_TESTNET_CONFIG.blockExplorerUrl],
+          },
+        ],
+      });
+    } else {
+      throw switchError;
+    }
+  }
+
+  // Reset provider after chain switch so it re-initializes
+  _provider = null;
+  _signer = null;
 }

@@ -15,6 +15,7 @@ import {
   glassStyle,
 } from "../../src/theme/tokens";
 import { useSocket } from "../../src/hooks/useSocket";
+import { useWallet } from "../../src/hooks/useWallet";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
 import type { BotDifficulty } from "@checkker/shared";
 import { BET_AMOUNTS_USD } from "@checkker/shared";
@@ -97,6 +98,9 @@ export default function RankedScreen() {
   const [selectedTier, setSelectedTier] = useState<DifficultyTier | null>(null);
   const [queueInfo, setQueueInfo] = useState<{ betAmountUsd: number } | null>(null);
   const [cancelReason, setCancelReason] = useState<string | null>(null);
+  const [depositTxPending, setDepositTxPending] = useState(false);
+  const [depositTxSent, setDepositTxSent] = useState(false);
+  const wallet = useWallet();
 
   useEffect(() => {
     if (gameState && "gameId" in gameState) {
@@ -120,14 +124,38 @@ export default function RankedScreen() {
     joinRanked(tier.id, "blitz");
   };
 
+  const handleDeposit = async () => {
+    if (!depositStatus || depositTxPending || depositTxSent) return;
+    setDepositTxPending(true);
+    try {
+      const txHash = await wallet.depositToEscrow(
+        depositStatus.contractAddress,
+        depositStatus.gameId,
+        depositStatus.betAmountWei
+      );
+      if (txHash) {
+        setDepositTxSent(true);
+      }
+    } catch {
+      // error is set on wallet.error
+    }
+    setDepositTxPending(false);
+  };
+
   // Deposit waiting screen
   if (depositStatus) {
+    const { formatEther } = require("ethers");
+    const displayAmount = (() => {
+      try { return parseFloat(formatEther(depositStatus.betAmountWei)).toFixed(4); }
+      catch { return depositStatus.betAmountWei; }
+    })();
+
     return (
       <View style={styles.container}>
         <Animated.View entering={FadeIn.duration(300)} style={styles.depositSection}>
           <Text style={styles.title}>Confirm Bet</Text>
           <Text style={styles.depositAmount}>${depositStatus.betAmountUsd}</Text>
-          <Text style={styles.depositWei}>{depositStatus.betAmountWei} wei</Text>
+          <Text style={styles.depositWei}>{displayAmount} BNB</Text>
 
           <View style={styles.depositChecks}>
             <View style={styles.depositRow}>
@@ -140,10 +168,29 @@ export default function RankedScreen() {
             </View>
           </View>
 
-          {!depositStatus.myDeposit && (
-            <Text style={styles.depositHint}>
-              Send {depositStatus.betAmountWei} wei to the contract to confirm your bet.
-            </Text>
+          {!depositStatus.myDeposit && !depositTxSent && (
+            <TouchableOpacity
+              style={[styles.depositBtn, depositTxPending && styles.createBtnDisabled]}
+              onPress={handleDeposit}
+              disabled={depositTxPending}
+            >
+              {depositTxPending ? (
+                <ActivityIndicator color={colors.text.primary} />
+              ) : (
+                <Text style={styles.depositBtnText}>Deposit {displayAmount} BNB</Text>
+              )}
+            </TouchableOpacity>
+          )}
+
+          {depositTxSent && !depositStatus.myDeposit && (
+            <View style={styles.confirmingRow}>
+              <ActivityIndicator size="small" color={colors.accent.gold} />
+              <Text style={styles.confirmingText}>Confirming on-chain...</Text>
+            </View>
+          )}
+
+          {wallet.error && (
+            <Text style={styles.depositError}>{wallet.error}</Text>
           )}
         </Animated.View>
       </View>
@@ -264,5 +311,18 @@ const styles = StyleSheet.create({
   depositRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   depositIcon: { fontSize: 20 },
   depositLabel: { fontSize: 16, color: colors.text.primary },
-  depositHint: { fontSize: 13, color: colors.text.secondary, textAlign: "center", marginTop: spacing.md },
+  depositBtn: {
+    backgroundColor: colors.accent.gold,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    marginTop: spacing.md,
+    minWidth: 200,
+    alignItems: "center",
+  },
+  depositBtnText: { color: colors.bg.primary, fontSize: 18, fontWeight: "800", letterSpacing: 1 },
+  confirmingRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.md },
+  confirmingText: { fontSize: 14, color: colors.accent.gold },
+  depositError: { fontSize: 13, color: colors.accent.red, textAlign: "center", marginTop: spacing.sm },
+  createBtnDisabled: { opacity: 0.5 },
 });

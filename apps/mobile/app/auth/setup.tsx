@@ -13,56 +13,77 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { AVATARS, getAvatar } from "@checkker/shared";
 import { colors, spacing, radius, gradients, glassStyle, shadows } from "../../src/theme/tokens";
+import { useSocket } from "../../src/hooks/useSocket";
 
 export default function SetupProfileScreen() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const {
+    authState,
+    checkUsername,
+    setUsername,
+    updateAvatar,
+    onUsernameCheck,
+  } = useSocket();
+  const [usernameInput, setUsernameInput] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState("king_white");
   const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastCheckedRef = useRef<string>("");
 
-  // Debounced username check
+  // Listen for username check responses from server
+  useEffect(() => {
+    onUsernameCheck((data) => {
+      if (data.username === lastCheckedRef.current) {
+        setUsernameStatus(data.available ? "available" : "taken");
+      }
+    });
+  }, [onUsernameCheck]);
+
+  // Debounced username check via socket
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
-    if (!username || username.length < 3) {
-      setUsernameStatus(username.length > 0 ? "invalid" : "idle");
+    if (!usernameInput || usernameInput.length < 3) {
+      setUsernameStatus(usernameInput.length > 0 ? "invalid" : "idle");
       return;
     }
-    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    if (!/^[a-zA-Z0-9_]+$/.test(usernameInput)) {
       setUsernameStatus("invalid");
       return;
     }
 
     setUsernameStatus("checking");
-    debounceRef.current = setTimeout(async () => {
-      try {
-        // In production, this would call the socket check_username event
-        // For now, simulate the check
-        setUsernameStatus("available");
-      } catch {
-        setUsernameStatus("idle");
-      }
+    debounceRef.current = setTimeout(() => {
+      lastCheckedRef.current = usernameInput;
+      checkUsername(usernameInput);
     }, 500);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [username]);
+  }, [usernameInput, checkUsername]);
 
   const handleCreate = useCallback(async () => {
-    if (usernameStatus !== "available" || username.length < 3) return;
+    if (usernameStatus !== "available" || usernameInput.length < 3) return;
     setIsSubmitting(true);
 
     try {
-      // In production: emit set_username event via socket
-      // For now, navigate to home
-      router.replace("/");
+      const walletAddress = authState?.walletAddress ?? "";
+      setUsername(walletAddress, usernameInput, selectedAvatar);
+
+      // Also update avatar separately in case setUsername doesn't handle it
+      updateAvatar(selectedAvatar);
+
+      // Navigate after a short delay to let the server process
+      // The auth_success event will update authState automatically
+      setTimeout(() => {
+        router.replace("/");
+      }, 500);
     } catch {
       setIsSubmitting(false);
     }
-  }, [username, selectedAvatar, usernameStatus, router]);
+  }, [usernameInput, selectedAvatar, usernameStatus, router, authState, setUsername, updateAvatar]);
 
   const usernameHint = {
     idle: "",
@@ -93,8 +114,8 @@ export default function SetupProfileScreen() {
           <Text style={styles.sectionTitle}>Username</Text>
           <TextInput
             style={styles.input}
-            value={username}
-            onChangeText={setUsername}
+            value={usernameInput}
+            onChangeText={setUsernameInput}
             placeholder="Enter username..."
             placeholderTextColor={colors.text.muted}
             maxLength={32}
@@ -135,7 +156,7 @@ export default function SetupProfileScreen() {
               <Text style={styles.previewAvatar}>{getAvatar(selectedAvatar).symbol}</Text>
             </View>
           </LinearGradient>
-          <Text style={styles.previewName}>{username || "YourName"}</Text>
+          <Text style={styles.previewName}>{usernameInput || "YourName"}</Text>
           <Text style={styles.previewRating}>1000 ELO</Text>
         </Animated.View>
 

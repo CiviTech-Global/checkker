@@ -15,6 +15,7 @@ import {
   glassStyle,
 } from "../../src/theme/tokens";
 import { useSocket } from "../../src/hooks/useSocket";
+import { useWallet } from "../../src/hooks/useWallet";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
 import type { BotDifficulty } from "@checkker/shared";
 import { BET_AMOUNTS_USD, isFreeGame } from "@checkker/shared";
@@ -93,6 +94,7 @@ export default function CasualScreen() {
   const {
     connected,
     gameState,
+    depositStatus,
     joinCasual,
     joinCasualDifficulty,
     requestBot,
@@ -102,6 +104,9 @@ export default function CasualScreen() {
   const [searching, setSearching] = useState(false);
   const [selectedTier, setSelectedTier] = useState<DifficultyTier | null>(null);
   const [botOffer, setBotOffer] = useState<{ tc: string } | null>(null);
+  const [depositTxPending, setDepositTxPending] = useState(false);
+  const [depositTxSent, setDepositTxSent] = useState(false);
+  const wallet = useWallet();
 
   useEffect(() => {
     if (gameState && "gameId" in gameState) {
@@ -123,6 +128,79 @@ export default function CasualScreen() {
     setSearching(true);
     joinCasualDifficulty(tier.id, "blitz");
   };
+
+  const handleDeposit = async () => {
+    if (!depositStatus || depositTxPending || depositTxSent) return;
+    setDepositTxPending(true);
+    try {
+      const txHash = await wallet.depositToEscrow(
+        depositStatus.contractAddress,
+        depositStatus.gameId,
+        depositStatus.betAmountWei
+      );
+      if (txHash) {
+        setDepositTxSent(true);
+      }
+    } catch {
+      // error is set on wallet.error
+    }
+    setDepositTxPending(false);
+  };
+
+  // Deposit waiting screen for paid casual tiers
+  if (depositStatus && selectedTier && !selectedTier.isFree) {
+    const { formatEther } = require("ethers");
+    const displayAmount = (() => {
+      try { return parseFloat(formatEther(depositStatus.betAmountWei)).toFixed(4); }
+      catch { return depositStatus.betAmountWei; }
+    })();
+
+    return (
+      <View style={styles.container}>
+        <Animated.View entering={FadeIn.duration(300)} style={styles.depositSection}>
+          <Text style={styles.title}>Confirm Bet</Text>
+          <Text style={styles.depositAmount}>${depositStatus.betAmountUsd}</Text>
+          <Text style={styles.depositWei}>{displayAmount} BNB</Text>
+
+          <View style={styles.depositChecks}>
+            <View style={styles.depositRow}>
+              <Text style={styles.depositIcon}>{depositStatus.myDeposit ? "\u2705" : "\u23F3"}</Text>
+              <Text style={styles.depositLabel}>Your deposit</Text>
+            </View>
+            <View style={styles.depositRow}>
+              <Text style={styles.depositIcon}>{depositStatus.opponentDeposit ? "\u2705" : "\u23F3"}</Text>
+              <Text style={styles.depositLabel}>Opponent deposit</Text>
+            </View>
+          </View>
+
+          {!depositStatus.myDeposit && !depositTxSent && (
+            <TouchableOpacity
+              style={[styles.depositBtn, depositTxPending && styles.depositBtnDisabled]}
+              onPress={handleDeposit}
+              disabled={depositTxPending}
+            >
+              {depositTxPending ? (
+                <ActivityIndicator color={colors.text.primary} />
+              ) : (
+                <Text style={styles.depositBtnText}>Deposit {displayAmount} BNB</Text>
+              )}
+            </TouchableOpacity>
+          )}
+
+          {depositTxSent && !depositStatus.myDeposit && (
+            <View style={styles.confirmingRow}>
+              <ActivityIndicator size="small" color={colors.accent.gold} />
+              <Text style={styles.confirmingText}>Confirming on-chain...</Text>
+            </View>
+          )}
+
+          {wallet.error && (
+            <Text style={styles.depositError}>{wallet.error}</Text>
+          )}
+        </Animated.View>
+      </View>
+    );
+  }
 
   // Searching screen
   if (searching) {
@@ -256,4 +334,26 @@ const styles = StyleSheet.create({
   acceptText: { color: "#fff", fontSize: 16, fontWeight: "600" },
   keepSearchingBtn: { paddingHorizontal: spacing.xl, paddingVertical: spacing.sm, borderRadius: radius.md, borderWidth: 1, borderColor: colors.text.muted, width: "100%", alignItems: "center" },
   keepSearchingText: { color: colors.text.primary, fontSize: 14 },
+  // Deposit
+  depositSection: { alignItems: "center", gap: spacing.md, padding: spacing.xl },
+  depositAmount: { fontSize: 48, fontWeight: "800", color: colors.accent.gold },
+  depositWei: { fontSize: 14, color: colors.text.muted },
+  depositChecks: { gap: spacing.sm, marginTop: spacing.md },
+  depositRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  depositIcon: { fontSize: 20 },
+  depositLabel: { fontSize: 16, color: colors.text.primary },
+  depositBtn: {
+    backgroundColor: colors.accent.gold,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    marginTop: spacing.md,
+    minWidth: 200,
+    alignItems: "center",
+  },
+  depositBtnDisabled: { opacity: 0.5 },
+  depositBtnText: { color: colors.bg.primary, fontSize: 18, fontWeight: "800", letterSpacing: 1 },
+  confirmingRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.md },
+  confirmingText: { fontSize: 14, color: colors.accent.gold },
+  depositError: { fontSize: 13, color: colors.accent.red, textAlign: "center", marginTop: spacing.sm },
 });
