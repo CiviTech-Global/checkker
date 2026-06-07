@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { colors, radius, spacing, glassStyle } from "../../src/theme/tokens";
 import { useSocket } from "../../src/hooks/useSocket";
+import Icon from "../../src/components/Icon";
 
 type LanMode = "select" | "host" | "join";
 
@@ -76,7 +77,7 @@ export default function LanScreen() {
         {mode === "select" && (
           <View style={styles.optionGroup}>
             <TouchableOpacity style={styles.optionBtn} onPress={handleHost}>
-              <Text style={styles.optionEmoji}>{"\uD83C\uDFE0"}</Text>
+              <Icon name="host" size={28} color={colors.accent.gold} />
               <View style={styles.optionTextGroup}>
                 <Text style={styles.optionTitle}>Host Game</Text>
                 <Text style={styles.optionDesc}>
@@ -86,7 +87,7 @@ export default function LanScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.optionBtn} onPress={handleJoin}>
-              <Text style={styles.optionEmoji}>{"\uD83D\uDD17"}</Text>
+              <Icon name="join" size={28} color={colors.accent.gold} />
               <View style={styles.optionTextGroup}>
                 <Text style={styles.optionTitle}>Join Game</Text>
                 <Text style={styles.optionDesc}>
@@ -153,7 +154,10 @@ export default function LanScreen() {
         style={[styles.backBtn, { bottom: Math.max(insets.bottom, spacing.md) }]}
         onPress={() => router.replace("/")}
       >
-        <Text style={styles.backText}>{"\u2190"} Home</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+          <Icon name="arrow-back" size={16} color={colors.text.secondary} />
+          <Text style={styles.backText}>Home</Text>
+        </View>
       </TouchableOpacity>
     </View>
   );

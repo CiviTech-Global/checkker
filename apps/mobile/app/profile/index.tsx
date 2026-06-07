@@ -1,5 +1,12 @@
-import { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import { useEffect, useState, useRef } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+} from "react-native";
 import Animated, { FadeIn, SlideInUp } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -13,48 +20,12 @@ import {
 } from "../../src/theme/tokens";
 import { staggerDelay } from "../../src/utils/animations";
 import { useSocket } from "../../src/hooks/useSocket";
+import { useWallet } from "../../src/hooks/useWallet";
+import { useLocalProfile, type SimpleStats } from "../../src/context/LocalProfileContext";
+import Icon from "../../src/components/Icon";
 import { getAvatar, AVATARS } from "@checkker/shared";
 
-interface SkillData {
-  opening: number;
-  middlegame: number;
-  endgame: number;
-  cards: number;
-  poker: number;
-}
-
-const DEFAULT_SKILLS: SkillData = {
-  opening: 45,
-  middlegame: 50,
-  endgame: 35,
-  cards: 60,
-  poker: 40,
-};
-
-function SkillBar({
-  label,
-  value,
-  color,
-  index,
-}: {
-  label: string;
-  value: number;
-  color: string;
-  index: number;
-}) {
-  return (
-    <Animated.View
-      entering={FadeIn.duration(300).delay(staggerDelay(index, 80))}
-      style={styles.skillRow}
-    >
-      <Text style={styles.skillLabel}>{label}</Text>
-      <View style={styles.skillTrack}>
-        <View style={[styles.skillFill, { width: `${value}%`, backgroundColor: color }]} />
-      </View>
-      <Text style={styles.skillValue}>{value}</Text>
-    </Animated.View>
-  );
-}
+type StatsTab = "all" | "offline" | "online";
 
 function StatCard({
   label,
@@ -76,39 +47,116 @@ function StatCard({
   );
 }
 
+function combineStats(a: SimpleStats, b: SimpleStats): SimpleStats {
+  return {
+    gamesPlayed: a.gamesPlayed + b.gamesPlayed,
+    wins: a.wins + b.wins,
+    losses: a.losses + b.losses,
+    draws: a.draws + b.draws,
+    currentStreak: a.currentStreak + b.currentStreak,
+    bestStreak: Math.max(a.bestStreak, b.bestStreak),
+    rating: Math.max(a.rating, b.rating),
+  };
+}
+
 export default function ProfileScreen() {
   const router = useRouter();
   const { connected, getProfile, onProfileData, authState } = useSocket();
-  const [skills] = useState<SkillData>(DEFAULT_SKILLS);
-  const [profileData, setProfileData] = useState<{
-    profile: any;
-    recentGames: any[];
-    rank?: number;
-    user?: any;
-  } | null>(null);
+  const wallet = useWallet();
+  const {
+    localProfile,
+    offlineStats,
+    onlineStats,
+    displayName,
+    updateOfflineName,
+    updateAvatar,
+    cacheWalletAddress,
+    syncFromServer,
+    getHistory,
+  } = useLocalProfile();
 
+  const [activeTab, setActiveTab] = useState<StatsTab>("all");
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState(localProfile.offlineName);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const nameInputRef = useRef<TextInput>(null);
+
+  // Sync online stats when server data arrives
   useEffect(() => {
-    onProfileData((data) => setProfileData(data));
-  }, [onProfileData]);
+    onProfileData((data) => {
+      const profile = data.profile ?? data.user;
+      if (profile) {
+        syncFromServer({
+          gamesPlayed: profile.gamesPlayed,
+          wins: profile.wins,
+          losses: profile.losses,
+          draws: profile.draws,
+          currentStreak: profile.currentStreak,
+          bestStreak: profile.bestStreak,
+          rating: profile.rating,
+        });
+      }
+    });
+  }, [onProfileData, syncFromServer]);
 
+  // Fetch server profile if connected
   useEffect(() => {
     if (connected) getProfile();
   }, [connected, getProfile]);
 
-  const profile = profileData?.profile;
-  const user = profileData?.user;
-  const displayName = profile?.displayName ?? user?.username ?? "Player";
-  const rating = profile?.rating ?? user?.rating ?? 1200;
-  const gamesPlayed = profile?.gamesPlayed ?? user?.gamesPlayed ?? 0;
-  const wins = profile?.wins ?? user?.wins ?? 0;
-  const losses = profile?.losses ?? user?.losses ?? 0;
-  const draws = profile?.draws ?? user?.draws ?? 0;
-  const currentStreak = profile?.currentStreak ?? user?.currentStreak ?? 0;
-  const avatarId = profile?.avatarId ?? user?.avatarId ?? "king_white";
-  const avatar = getAvatar(avatarId);
-  const winRate = gamesPlayed > 0 ? `${Math.round((wins / gamesPlayed) * 100)}%` : "--";
-  const rank = profileData?.rank;
-  const walletAddress = authState?.walletAddress ?? profile?.walletAddress;
+  // Get stats for current tab
+  const currentStats: SimpleStats =
+    activeTab === "all"
+      ? combineStats(offlineStats, onlineStats)
+      : activeTab === "offline"
+      ? offlineStats
+      : onlineStats;
+
+  const winRate =
+    currentStats.gamesPlayed > 0
+      ? `${Math.round((currentStats.wins / currentStats.gamesPlayed) * 100)}%`
+      : "--";
+
+  // Game history filtered by tab
+  const historyFilter =
+    activeTab === "offline"
+      ? { mode: ["bot", "lan"] as any }
+      : activeTab === "online"
+      ? { mode: ["ranked", "casual"] as any }
+      : undefined;
+  const gameHistory = getHistory(historyFilter, 10);
+
+  const avatar = getAvatar(localProfile.avatarId);
+  const walletAddress = localProfile.walletAddress ?? wallet.address;
+
+  const handleSaveName = () => {
+    const trimmed = nameInput.trim();
+    if (trimmed.length >= 1) {
+      updateOfflineName(trimmed);
+    } else {
+      setNameInput(localProfile.offlineName);
+    }
+    setEditingName(false);
+  };
+
+  const handleConnectWallet = async () => {
+    await wallet.connect();
+    if (wallet.address) {
+      cacheWalletAddress(wallet.address);
+    }
+  };
+
+  // Update cached wallet when wallet connects
+  useEffect(() => {
+    if (wallet.address && wallet.isConnected) {
+      cacheWalletAddress(wallet.address);
+    }
+  }, [wallet.address, wallet.isConnected, cacheWalletAddress]);
+
+  const handleSelectAvatar = (id: string) => {
+    updateAvatar(id);
+    setShowAvatarPicker(false);
+  };
 
   return (
     <ScrollView
@@ -122,7 +170,7 @@ export default function ProfileScreen() {
           onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
           style={styles.backBtn}
         >
-          <Text style={styles.backArrow}>{"\u2190"}</Text>
+          <Icon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Profile</Text>
         <View style={{ width: 40 }} />
@@ -133,19 +181,44 @@ export default function ProfileScreen() {
         entering={FadeIn.duration(400).delay(100)}
         style={styles.avatarSection}
       >
-        <LinearGradient
-          colors={gradients.goldToBronze}
-          style={styles.avatarRing}
-        >
-          <View style={styles.avatarInner}>
-            <Text style={styles.avatarText}>{avatar?.symbol ?? "\u265A"}</Text>
+        <TouchableOpacity onPress={() => setShowAvatarPicker(!showAvatarPicker)}>
+          <LinearGradient
+            colors={gradients.goldToBronze}
+            style={styles.avatarRing}
+          >
+            <View style={styles.avatarInner}>
+              <Text style={styles.avatarText}>{avatar?.symbol ?? "\u265A"}</Text>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* Editable name */}
+        {editingName ? (
+          <View style={styles.nameEditRow}>
+            <TextInput
+              ref={nameInputRef}
+              style={styles.nameInput}
+              value={nameInput}
+              onChangeText={setNameInput}
+              onBlur={handleSaveName}
+              onSubmitEditing={handleSaveName}
+              maxLength={32}
+              autoFocus
+              selectTextOnFocus
+            />
           </View>
-        </LinearGradient>
-        <Text style={styles.playerName}>{displayName}</Text>
-        <Text style={styles.ratingBadge}>{rating} ELO</Text>
-        {rank != null && (
-          <Text style={styles.rankBadge}>Rank #{rank}</Text>
+        ) : (
+          <TouchableOpacity onPress={() => { setNameInput(localProfile.offlineName); setEditingName(true); }}>
+            <Text style={styles.playerName}>{displayName}</Text>
+          </TouchableOpacity>
         )}
+
+        {localProfile.onlineName && (
+          <Text style={styles.offlineNameHint}>Offline: {localProfile.offlineName}</Text>
+        )}
+
+        <Text style={styles.ratingBadge}>{currentStats.rating} ELO</Text>
+
         {walletAddress && (
           <Text style={styles.walletText}>
             {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
@@ -153,12 +226,48 @@ export default function ProfileScreen() {
         )}
       </Animated.View>
 
+      {/* Avatar Picker */}
+      {showAvatarPicker && (
+        <Animated.View entering={FadeIn.duration(200)} style={[styles.section, glassStyle]}>
+          <Text style={styles.sectionTitle}>Choose Avatar</Text>
+          <View style={styles.avatarGrid}>
+            {AVATARS.map((av) => (
+              <TouchableOpacity
+                key={av.id}
+                style={[
+                  styles.avatarCell,
+                  localProfile.avatarId === av.id && styles.avatarSelected,
+                ]}
+                onPress={() => handleSelectAvatar(av.id)}
+              >
+                <Text style={styles.avatarSymbol}>{av.symbol}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Animated.View>
+      )}
+
+      {/* Stats Tab Selector */}
+      <Animated.View entering={FadeIn.duration(300).delay(150)} style={styles.tabRow}>
+        {(["all", "offline", "online"] as StatsTab[]).map((tab) => (
+          <TouchableOpacity
+            key={tab}
+            style={[styles.tabBtn, activeTab === tab && styles.tabBtnActive]}
+            onPress={() => setActiveTab(tab)}
+          >
+            <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </Animated.View>
+
       {/* Stats Row */}
       <View style={styles.statsRow}>
-        <StatCard label="Games" value={gamesPlayed} index={0} />
-        <StatCard label="Wins" value={wins} index={1} />
+        <StatCard label="Games" value={currentStats.gamesPlayed} index={0} />
+        <StatCard label="Wins" value={currentStats.wins} index={1} />
         <StatCard label="Win Rate" value={winRate} index={2} />
-        <StatCard label="Streak" value={currentStreak} index={3} />
+        <StatCard label="Streak" value={currentStats.currentStreak} index={3} />
       </View>
 
       {/* W/L/D Breakdown */}
@@ -169,55 +278,70 @@ export default function ProfileScreen() {
         <Text style={styles.sectionTitle}>Record</Text>
         <View style={styles.recordRow}>
           <View style={styles.recordItem}>
-            <Text style={[styles.recordValue, { color: colors.accent.green }]}>{wins}</Text>
+            <Text style={[styles.recordValue, { color: colors.accent.green }]}>{currentStats.wins}</Text>
             <Text style={styles.recordLabel}>Wins</Text>
           </View>
           <View style={styles.recordItem}>
-            <Text style={[styles.recordValue, { color: colors.accent.red }]}>{losses}</Text>
+            <Text style={[styles.recordValue, { color: colors.accent.red }]}>{currentStats.losses}</Text>
             <Text style={styles.recordLabel}>Losses</Text>
           </View>
           <View style={styles.recordItem}>
-            <Text style={[styles.recordValue, { color: colors.text.muted }]}>{draws}</Text>
+            <Text style={[styles.recordValue, { color: colors.text.muted }]}>{currentStats.draws}</Text>
             <Text style={styles.recordLabel}>Draws</Text>
           </View>
         </View>
       </Animated.View>
 
-      {/* Skill Radar */}
+      {/* Wallet Section */}
       <Animated.View
         entering={FadeIn.duration(300).delay(300)}
         style={[styles.section, glassStyle]}
       >
-        <Text style={styles.sectionTitle}>Skill Breakdown</Text>
-        <SkillBar label="Opening" value={skills.opening} color={colors.accent.green} index={0} />
-        <SkillBar label="Middlegame" value={skills.middlegame} color={colors.accent.blue} index={1} />
-        <SkillBar label="Endgame" value={skills.endgame} color={colors.accent.gold} index={2} />
-        <SkillBar label="Card Play" value={skills.cards} color={colors.accent.primary} index={3} />
-        <SkillBar label="Poker" value={skills.poker} color={colors.accent.red} index={4} />
+        <Text style={styles.sectionTitle}>Wallet</Text>
+        {walletAddress ? (
+          <View style={styles.walletConnected}>
+            <Text style={styles.walletAddr}>
+              {walletAddress.slice(0, 10)}...{walletAddress.slice(-8)}
+            </Text>
+            <View style={styles.connectedBadge}>
+              <Text style={styles.connectedBadgeText}>Connected</Text>
+            </View>
+          </View>
+        ) : (
+          <TouchableOpacity style={styles.connectBtn} onPress={handleConnectWallet}>
+            <Text style={styles.connectBtnText}>Connect Wallet</Text>
+          </TouchableOpacity>
+        )}
       </Animated.View>
 
-      {/* Recent Games */}
-      {profileData?.recentGames && profileData.recentGames.length > 0 && (
+      {/* Game History */}
+      {gameHistory.length > 0 && (
         <Animated.View
           entering={FadeIn.duration(300).delay(400)}
           style={[styles.section, glassStyle]}
         >
           <Text style={styles.sectionTitle}>Recent Games</Text>
-          {profileData.recentGames.map((game: any, i: number) => (
-            <View key={game.id ?? i} style={styles.gameRow}>
-              <Text style={[
-                styles.gameResult,
-                { color: game.winnerUserId === authState?.walletAddress ? colors.accent.green : game.resultType === "draw" ? colors.text.muted : colors.accent.red },
-              ]}>
-                {game.winnerUserId === authState?.walletAddress ? "W" : game.resultType === "draw" ? "D" : "L"}
-              </Text>
-              <Text style={styles.gameMode}>{game.mode}</Text>
-              <Text style={styles.gameDifficulty}>{game.difficulty}</Text>
-              <Text style={styles.gameDate}>
-                {game.endedAt ? new Date(game.endedAt).toLocaleDateString() : ""}
-              </Text>
-            </View>
-          ))}
+          {gameHistory.map((game, i) => {
+            const resultColor =
+              game.result === "win"
+                ? colors.accent.green
+                : game.result === "loss"
+                ? colors.accent.red
+                : colors.text.muted;
+            return (
+              <View key={game.id} style={styles.gameRow}>
+                <Text style={[styles.gameResult, { color: resultColor }]}>
+                  {game.result === "win" ? "W" : game.result === "loss" ? "L" : "D"}
+                </Text>
+                <Text style={styles.gameMode}>{game.mode}</Text>
+                <Text style={styles.gameDifficulty}>{game.difficulty ?? "--"}</Text>
+                <Text style={styles.gameOpponent}>{game.opponentName ?? "--"}</Text>
+                <Text style={styles.gameDate}>
+                  {new Date(game.playedAt).toLocaleDateString()}
+                </Text>
+              </View>
+            );
+          })}
         </Animated.View>
       )}
 
@@ -231,7 +355,10 @@ export default function ProfileScreen() {
           style={styles.puzzleBtn}
           onPress={() => router.push("/puzzles")}
         >
-          <Text style={styles.puzzleBtnText}>{"\u2666"} Start Training</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            <Icon name="puzzles" size={16} color={colors.text.primary} />
+            <Text style={styles.puzzleBtnText}>Start Training</Text>
+          </View>
         </TouchableOpacity>
       </Animated.View>
     </ScrollView>
@@ -293,6 +420,26 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.text.primary,
   },
+  offlineNameHint: {
+    fontSize: 12,
+    color: colors.text.muted,
+  },
+  nameEditRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+  },
+  nameInput: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: colors.text.primary,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.accent.gold,
+    paddingVertical: 2,
+    paddingHorizontal: spacing.sm,
+    minWidth: 150,
+    textAlign: "center",
+  },
   ratingBadge: {
     fontSize: 14,
     color: colors.accent.bronze,
@@ -305,16 +452,40 @@ const styles = StyleSheet.create({
     borderColor: colors.border.gold,
     overflow: "hidden",
   },
-  rankBadge: {
-    fontSize: 13,
-    color: colors.accent.gold,
-    fontWeight: "600",
-  },
   walletText: {
     fontSize: 12,
     color: colors.text.muted,
     fontFamily: "monospace",
   },
+
+  /* Tab selector */
+  tabRow: {
+    flexDirection: "row",
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: "rgba(255,255,255,0.05)",
+    padding: 3,
+  },
+  tabBtn: {
+    flex: 1,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.md - 2,
+    alignItems: "center",
+  },
+  tabBtnActive: {
+    backgroundColor: "rgba(205,175,100,0.2)",
+  },
+  tabText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.text.muted,
+    textTransform: "capitalize",
+  },
+  tabTextActive: {
+    color: colors.accent.gold,
+  },
+
   statsRow: {
     flexDirection: "row",
     paddingHorizontal: spacing.md,
@@ -369,34 +540,69 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.text.muted,
   },
-  skillRow: {
+
+  /* Avatar picker */
+  avatarGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.xs,
+    justifyContent: "center",
+  },
+  avatarCell: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "rgba(255,255,255,0.05)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "transparent",
+  },
+  avatarSelected: {
+    borderColor: colors.accent.gold,
+    backgroundColor: "rgba(205,175,100,0.15)",
+  },
+  avatarSymbol: { fontSize: 28 },
+
+  /* Wallet */
+  walletConnected: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.xs,
+    justifyContent: "space-between",
   },
-  skillLabel: {
-    fontSize: 12,
+  walletAddr: {
+    fontSize: 13,
     color: colors.text.secondary,
-    width: 80,
+    fontFamily: "monospace",
   },
-  skillTrack: {
-    flex: 1,
-    height: 8,
-    backgroundColor: colors.border.subtle,
-    borderRadius: 4,
-    overflow: "hidden",
+  connectedBadge: {
+    backgroundColor: "rgba(100,200,100,0.15)",
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: colors.accent.green,
   },
-  skillFill: {
-    height: "100%",
-    borderRadius: 4,
-  },
-  skillValue: {
-    fontSize: 12,
+  connectedBadgeText: {
+    fontSize: 11,
     fontWeight: "600",
-    color: colors.text.primary,
-    width: 28,
-    textAlign: "right",
+    color: colors.accent.green,
   },
+  connectBtn: {
+    backgroundColor: colors.accent.primary,
+    borderRadius: radius.md,
+    paddingVertical: spacing.sm,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: colors.border.gold,
+  },
+  connectBtnText: {
+    color: colors.text.primary,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+
+  /* Game history */
   gameRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -413,12 +619,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.text.secondary,
     textTransform: "capitalize",
-    width: 60,
+    width: 50,
   },
   gameDifficulty: {
     fontSize: 13,
     color: colors.text.muted,
     textTransform: "capitalize",
+    width: 60,
+  },
+  gameOpponent: {
+    fontSize: 13,
+    color: colors.text.muted,
     flex: 1,
   },
   gameDate: {

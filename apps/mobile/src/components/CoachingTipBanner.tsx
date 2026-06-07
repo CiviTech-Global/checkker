@@ -9,6 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { colors, spacing, radius, shadows } from "../theme/tokens";
+import Icon from "./Icon";
 
 interface CoachingTipBannerProps {
   tip: string | null;
@@ -40,10 +41,10 @@ export default function CoachingTipBanner({ tip, onDismiss }: CoachingTipBannerP
       style={styles.container}
     >
       <View style={styles.header}>
-        <Text style={styles.icon}>{"\u265A"}</Text>
+        <Icon name="coach" size={16} color={colors.accent.gold} />
         <Text style={styles.label}>Coach</Text>
         <TouchableOpacity onPress={onDismiss} hitSlop={8}>
-          <Text style={styles.dismiss}>{"\u2715"}</Text>
+          <Icon name="close" size={14} color={colors.text.muted} />
         </TouchableOpacity>
       </View>
       <Text style={styles.tipText}>{tip}</Text>

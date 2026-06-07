@@ -16,7 +16,9 @@ import {
 } from "../../src/theme/tokens";
 import { useSocket } from "../../src/hooks/useSocket";
 import { useWallet } from "../../src/hooks/useWallet";
+import { useLocalProfile } from "../../src/context/LocalProfileContext";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
+import Icon from "../../src/components/Icon";
 import type { BotDifficulty } from "@checkker/shared";
 import { BET_AMOUNTS_USD } from "@checkker/shared";
 
@@ -90,6 +92,8 @@ export default function RankedScreen() {
     connected,
     gameState,
     depositStatus,
+    authState,
+    authRequest,
     joinRanked,
     onBetCancelled,
     onQueueJoined,
@@ -100,7 +104,9 @@ export default function RankedScreen() {
   const [cancelReason, setCancelReason] = useState<string | null>(null);
   const [depositTxPending, setDepositTxPending] = useState(false);
   const [depositTxSent, setDepositTxSent] = useState(false);
+  const [authPending, setAuthPending] = useState(false);
   const wallet = useWallet();
+  const { cacheWalletAddress } = useLocalProfile();
 
   useEffect(() => {
     if (gameState && "gameId" in gameState) {
@@ -116,8 +122,28 @@ export default function RankedScreen() {
     });
   }, [onQueueJoined, onBetCancelled]);
 
-  const handleSelectTier = (tier: DifficultyTier) => {
+  const handleSelectTier = async (tier: DifficultyTier) => {
     if (!connected) return;
+
+    // Auth gate: require wallet connection
+    if (!wallet.isConnected) {
+      setAuthPending(true);
+      await wallet.connect();
+      setAuthPending(false);
+      if (!wallet.address) return; // user cancelled
+      cacheWalletAddress(wallet.address);
+    }
+
+    // Auto-trigger server auth if wallet connected but not authenticated
+    if (wallet.isConnected && !authState) {
+      setAuthPending(true);
+      authRequest(wallet.address!);
+      // Auth flow completes asynchronously via socket events
+      // Wait briefly then proceed — auth_success will set authState
+      await new Promise((r) => setTimeout(r, 1500));
+      setAuthPending(false);
+    }
+
     setSelectedTier(tier);
     setSearching(true);
     setCancelReason(null);
@@ -141,6 +167,16 @@ export default function RankedScreen() {
     }
     setDepositTxPending(false);
   };
+
+  // Auth pending screen
+  if (authPending) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={colors.accent.gold} />
+        <Text style={styles.searchText}>Connecting wallet...</Text>
+      </View>
+    );
+  }
 
   // Deposit waiting screen
   if (depositStatus) {
@@ -235,7 +271,7 @@ export default function RankedScreen() {
           onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
           style={styles.backBtn}
         >
-          <Text style={styles.backArrow}>{"\u2190"}</Text>
+          <Icon name="arrow-back" size={22} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Ranked Play</Text>
         <View style={{ width: 40 }} />

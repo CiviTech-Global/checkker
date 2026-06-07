@@ -31,6 +31,7 @@ let _moveErrorCallback: ((error: string) => void) | null = null;
 let _botFallbackCallback: ((data: { tc: string }) => void) | null = null;
 let _coachingTipCallback: ((tip: string) => void) | null = null;
 let _spectatorCommentCallback: ((comment: string) => void) | null = null;
+let _gameOverLocalCallback: ((data: GameOverPayload) => void) | null = null;
 
 /* ── Auth & Betting state ──────────────────────────────────────────── */
 
@@ -160,6 +161,7 @@ function attachListeners(s: Socket) {
     }
     _scores = data.scores ?? null;
     scoresListeners.forEach((fn) => fn(_scores));
+    _gameOverLocalCallback?.(data);
   });
 
   s.on("move_error", (data: MoveErrorPayload) => {
@@ -403,6 +405,16 @@ export function useSocket() {
     spectatorCommentCbRef.current = fn;
   }, []);
 
+  const gameOverLocalCbRef = useRef<((data: GameOverPayload) => void) | null>(null);
+
+  useEffect(() => {
+    _gameOverLocalCallback = (data) => gameOverLocalCbRef.current?.(data);
+  }, []);
+
+  const onGameOverLocal = useCallback((fn: (data: GameOverPayload) => void) => {
+    gameOverLocalCbRef.current = fn;
+  }, []);
+
   /* ── Spectate ─────────────────────────────────────────────────────── */
 
   /* ── Auth & Betting ─────────────────────────────────────────────────── */
@@ -574,6 +586,7 @@ export function useSocket() {
     undoMove,
     onCoachingTip,
     onSpectatorComment,
+    onGameOverLocal,
     // Auth
     authState,
     authRequest,

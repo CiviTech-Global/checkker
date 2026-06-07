@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet, Alert } from "react-native";
 import { colors, spacing, glassStyle, radius } from "../theme/tokens";
+import Icon from "./Icon";
 
 interface GameMenuButtonProps {
   onGoHome: () => void;
@@ -27,7 +28,7 @@ export default function GameMenuButton({ onGoHome, onUndo, isBotGame }: GameMenu
   return (
     <>
       <TouchableOpacity style={styles.menuBtn} onPress={() => setVisible(true)}>
-        <Text style={styles.menuIcon}>{"\u2630"}</Text>
+        <Icon name="menu" size={18} color={colors.text.primary} />
       </TouchableOpacity>
 
       <Modal visible={visible} transparent animationType="fade" onRequestClose={() => setVisible(false)}>

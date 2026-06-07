@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
-import { Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Animated, {
   FadeIn,
   FadeOut,
   SlideInUp,
 } from "react-native-reanimated";
 import { colors, spacing, radius } from "../theme/tokens";
+import Icon from "./Icon";
 
 interface SpectatorBannerProps {
   comment: string | null;
@@ -28,7 +29,10 @@ export default function SpectatorBanner({ comment, onDismiss }: SpectatorBannerP
       exiting={FadeOut.duration(200)}
       style={styles.container}
     >
-      <Text style={styles.prefix}>{"\uD83C\uDFB0"} Announcer:</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+        <Icon name="spectate" size={12} color={colors.accent.goldBright} />
+        <Text style={styles.prefix}>Announcer:</Text>
+      </View>
       <Text style={styles.commentText}>{comment}</Text>
     </Animated.View>
   );

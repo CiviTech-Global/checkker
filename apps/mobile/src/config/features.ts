@@ -23,4 +23,7 @@ export const features = {
 
   /** Enable bot personality selection */
   botPersonality: true,
+
+  /** Dev-only tools (demo data, etc.) — auto-enabled in dev builds */
+  devMode: __DEV__,
 } as const;

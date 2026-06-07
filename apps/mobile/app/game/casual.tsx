@@ -16,7 +16,9 @@ import {
 } from "../../src/theme/tokens";
 import { useSocket } from "../../src/hooks/useSocket";
 import { useWallet } from "../../src/hooks/useWallet";
+import { useLocalProfile } from "../../src/context/LocalProfileContext";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
+import Icon from "../../src/components/Icon";
 import type { BotDifficulty } from "@checkker/shared";
 import { BET_AMOUNTS_USD, isFreeGame } from "@checkker/shared";
 
@@ -95,6 +97,8 @@ export default function CasualScreen() {
     connected,
     gameState,
     depositStatus,
+    authState,
+    authRequest,
     joinCasual,
     joinCasualDifficulty,
     requestBot,
@@ -106,7 +110,9 @@ export default function CasualScreen() {
   const [botOffer, setBotOffer] = useState<{ tc: string } | null>(null);
   const [depositTxPending, setDepositTxPending] = useState(false);
   const [depositTxSent, setDepositTxSent] = useState(false);
+  const [authPending, setAuthPending] = useState(false);
   const wallet = useWallet();
+  const { cacheWalletAddress } = useLocalProfile();
 
   useEffect(() => {
     if (gameState && "gameId" in gameState) {
@@ -122,8 +128,27 @@ export default function CasualScreen() {
     });
   }, [onBotFallbackOffer, onBetCancelled]);
 
-  const handleSelectTier = (tier: DifficultyTier) => {
+  const handleSelectTier = async (tier: DifficultyTier) => {
     if (!connected) return;
+
+    // Auth gate for paid tiers — beginner is always free
+    if (!tier.isFree) {
+      if (!wallet.isConnected) {
+        setAuthPending(true);
+        await wallet.connect();
+        setAuthPending(false);
+        if (!wallet.address) return;
+        cacheWalletAddress(wallet.address);
+      }
+
+      if (wallet.isConnected && !authState) {
+        setAuthPending(true);
+        authRequest(wallet.address!);
+        await new Promise((r) => setTimeout(r, 1500));
+        setAuthPending(false);
+      }
+    }
+
     setSelectedTier(tier);
     setSearching(true);
     joinCasualDifficulty(tier.id, "blitz");
@@ -146,6 +171,16 @@ export default function CasualScreen() {
     }
     setDepositTxPending(false);
   };
+
+  // Auth pending screen
+  if (authPending) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={colors.accent.gold} />
+        <Text style={styles.searchText}>Connecting wallet...</Text>
+      </View>
+    );
+  }
 
   // Deposit waiting screen for paid casual tiers
   if (depositStatus && selectedTier && !selectedTier.isFree) {
@@ -266,7 +301,7 @@ export default function CasualScreen() {
           onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
           style={styles.backBtn}
         >
-          <Text style={styles.backArrow}>{"\u2190"}</Text>
+          <Icon name="arrow-back" size={22} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Casual Play</Text>
         <View style={{ width: 40 }} />

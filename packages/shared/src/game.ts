@@ -86,6 +86,7 @@ export interface PlayerProfile {
   bestStreak: number;
   walletAddress?: string; // 0x-prefixed, absent for bots
   avatarId?: string; // predefined avatar key
+  onlineName?: string; // server-assigned username, absent until first online session
 }
 
 export interface ChatMessage {

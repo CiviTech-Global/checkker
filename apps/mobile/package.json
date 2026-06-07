@@ -22,6 +22,7 @@
     "expo-gl": "~15.0.5",
     "expo-linear-gradient": "~14.0.2",
     "expo-router": "~4.0.0",
+    "expo-sqlite": "~14.0.0",
     "expo-status-bar": "~2.0.0",
     "expo-three": "^8.0.0",
     "react": "18.3.1",

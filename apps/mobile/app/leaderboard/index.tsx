@@ -18,6 +18,8 @@ import {
 } from "../../src/theme/tokens";
 import { useSocket } from "../../src/hooks/useSocket";
 import { getAvatar } from "@checkker/shared";
+import { useLocalProfile } from "../../src/context/LocalProfileContext";
+import Icon from "../../src/components/Icon";
 
 interface LeaderboardEntry {
   id: string;
@@ -78,28 +80,38 @@ function LeaderboardRow({
 export default function LeaderboardScreen() {
   const router = useRouter();
   const { connected, getLeaderboard, onLeaderboard } = useSocket();
+  const { demoLeaderboard } = useLocalProfile();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [myRank, setMyRank] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  const usingDemo = demoLeaderboard !== null;
+
   useEffect(() => {
+    if (usingDemo) {
+      setEntries(demoLeaderboard);
+      setMyRank(null);
+      setLoading(false);
+      return;
+    }
     onLeaderboard((data) => {
       setEntries(data.entries ?? []);
       setMyRank(data.myRank);
       setLoading(false);
       setRefreshing(false);
     });
-  }, [onLeaderboard]);
+  }, [onLeaderboard, usingDemo, demoLeaderboard]);
 
   useEffect(() => {
-    if (connected) getLeaderboard();
-  }, [connected, getLeaderboard]);
+    if (!usingDemo && connected) getLeaderboard();
+  }, [connected, getLeaderboard, usingDemo]);
 
   const onRefresh = useCallback(() => {
+    if (usingDemo) return;
     setRefreshing(true);
     getLeaderboard();
-  }, [getLeaderboard]);
+  }, [getLeaderboard, usingDemo]);
 
   return (
     <View style={styles.container}>
@@ -109,10 +121,16 @@ export default function LeaderboardScreen() {
           onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
           style={styles.backBtn}
         >
-          <Text style={styles.backArrow}>{"\u2190"}</Text>
+          <Icon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Leaderboard</Text>
-        <View style={{ width: 40 }} />
+        {usingDemo ? (
+          <View style={styles.demoBadge}>
+            <Text style={styles.demoBadgeText}>DEMO</Text>
+          </View>
+        ) : (
+          <View style={{ width: 40 }} />
+        )}
       </Animated.View>
 
       {/* My Rank */}
@@ -231,4 +249,18 @@ const styles = StyleSheet.create({
   loadingText: { fontSize: 14, color: colors.text.muted },
   emptyText: { fontSize: 18, fontWeight: "600", color: colors.text.secondary },
   emptySubtext: { fontSize: 14, color: colors.text.muted },
+  demoBadge: {
+    backgroundColor: colors.accent.gold,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 2,
+    minWidth: 40,
+    alignItems: "center",
+  },
+  demoBadgeText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: colors.bg.primary,
+    letterSpacing: 1,
+  },
 });

@@ -31,6 +31,7 @@ import {
   springConfig,
 } from "../../src/theme/tokens";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
+import Icon from "../../src/components/Icon";
 
 /* ── Lesson Card ────────────────────────────────────────────────────── */
 
@@ -49,14 +50,12 @@ function LessonCard({
 }) {
   const { onPressIn, onPressOut, animatedStyle } = useSpringPress();
 
-  let icon: string;
-  if (completed) {
-    icon = "\u2705";
-  } else if (unlocked) {
-    icon = "\u25B6\uFE0F";
-  } else {
-    icon = "\uD83D\uDD12";
-  }
+  const iconName = completed ? "completed" : unlocked ? "play" : "locked";
+  const iconColor = completed
+    ? colors.accent.green
+    : unlocked
+      ? colors.accent.gold
+      : colors.text.muted;
 
   return (
     <Animated.View
@@ -71,7 +70,9 @@ function LessonCard({
       >
         <View style={[styles.lessonCard, glassStyle]}>
           <View style={styles.lessonRow}>
-            <Text style={styles.lessonIcon}>{icon}</Text>
+            <View style={styles.lessonIcon}>
+              <Icon name={iconName} size={22} color={iconColor} />
+            </View>
             <View style={styles.lessonInfo}>
               <Text
                 style={[
@@ -99,12 +100,11 @@ function LessonCard({
               </Text>
             </View>
             {completed && (
-              <Animated.Text
+              <Animated.View
                 entering={FadeIn.duration(300).springify().damping(10)}
-                style={styles.completedBadge}
               >
-                {"\u2705"}
-              </Animated.Text>
+                <Icon name="completed" size={18} color={colors.accent.green} />
+              </Animated.View>
             )}
           </View>
         </View>
@@ -239,15 +239,42 @@ export default function TutorialListScreen() {
           onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
           style={styles.backBtn}
         >
-          <Text style={styles.backText}>{"\u2190"} Back</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Icon name="arrow-back" size={18} color={colors.accent.blue} />
+            <Text style={styles.backText}>Back</Text>
+          </View>
         </TouchableOpacity>
         <Animated.Text
           entering={FadeIn.duration(400).delay(100)}
           style={styles.headerTitle}
         >
-          Tutorial
+          Tutorials & Training
         </Animated.Text>
         <View style={styles.headerSpacer} />
+      </Animated.View>
+
+      {/* Book Entry */}
+      <Animated.View entering={FadeIn.duration(300).delay(150)}>
+        <TouchableOpacity
+          onPress={() => router.push("/tutorial/book")}
+          activeOpacity={0.85}
+        >
+          <LinearGradient
+            colors={gradients.parchment}
+            style={styles.bookEntry}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <Icon name="book" size={28} color={colors.text.onParchment} />
+            <View style={styles.bookEntryInfo}>
+              <Text style={styles.bookEntryTitle}>The Cards of Checkker</Text>
+              <Text style={styles.bookEntryDesc}>
+                Illustrated guide to every card and piece
+              </Text>
+            </View>
+            <Icon name="chevron-right" size={20} color={colors.text.onParchment} style={{ opacity: 0.5 }} />
+          </LinearGradient>
+        </TouchableOpacity>
       </Animated.View>
 
       {/* Progress */}
@@ -339,9 +366,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   lessonIcon: {
-    fontSize: 24,
     width: 36,
-    textAlign: "center",
+    alignItems: "center",
+    justifyContent: "center",
   },
   lessonInfo: {
     flex: 1,
@@ -363,10 +390,43 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   lockedText: {
-    color: "#555555",
+    color: colors.text.muted,
   },
   completedBadge: {
     fontSize: 16,
+  },
+  bookEntry: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border.ornate,
+    gap: spacing.sm,
+  },
+  bookEntryIcon: {
+    fontSize: 28,
+  },
+  bookEntryInfo: {
+    flex: 1,
+  },
+  bookEntryTitle: {
+    color: colors.text.onParchment,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  bookEntryDesc: {
+    color: colors.text.onParchment,
+    fontSize: 13,
+    opacity: 0.7,
+    marginTop: 2,
+  },
+  bookEntryArrow: {
+    color: colors.text.onParchment,
+    fontSize: 20,
+    opacity: 0.5,
   },
   resetButton: {
     paddingVertical: spacing.md,
@@ -376,7 +436,7 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.md,
   },
   resetText: {
-    color: "#EF5350",
+    color: colors.accent.red,
     fontSize: 15,
     fontWeight: "500",
   },

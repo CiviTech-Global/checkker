@@ -12,6 +12,7 @@ import {
   shadows,
 } from "../../src/theme/tokens";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
+import Icon from "../../src/components/Icon";
 
 interface PuzzleCategory {
   id: string;
@@ -126,7 +127,7 @@ export default function PuzzlesScreen() {
           onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
           style={styles.backBtn}
         >
-          <Text style={styles.backArrow}>{"\u2190"}</Text>
+          <Icon name="arrow-back" size={22} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Puzzles</Text>
         <View style={{ width: 40 }} />

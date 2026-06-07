@@ -14,6 +14,10 @@ import {
   shadows,
 } from "../src/theme/tokens";
 import { useSpringPress, staggerDelay } from "../src/utils/animations";
+import { useLocalProfile } from "../src/context/LocalProfileContext";
+import { getAvatar } from "@checkker/shared";
+import { features } from "../src/config/features";
+import Icon, { type IconName } from "../src/components/Icon";
 
 /* ── Ornamental Divider ────────────────────────────────────────────── */
 
@@ -24,15 +28,15 @@ function OrnamentDivider({ delay = 0 }: { delay?: number }) {
       style={styles.dividerRow}
     >
       <View style={styles.dividerLine} />
-      <Text style={styles.dividerSymbol}>{"\u2666"}</Text>
+      <Icon name="ornament" size={14} color={colors.accent.gold} style={{ marginHorizontal: spacing.sm }} />
       <View style={styles.dividerLine} />
     </Animated.View>
   );
 }
 
-/* ── Grid Menu Button ──────────────────────────────────────────────── */
+/* ── Menu Button (vertical stack) ─────────────────────────────────── */
 
-function GridButton({
+function MenuButton({
   label,
   symbol,
   index,
@@ -40,7 +44,7 @@ function GridButton({
   disabled = false,
 }: {
   label: string;
-  symbol: string;
+  symbol: IconName;
   index: number;
   onPress: () => void;
   disabled?: boolean;
@@ -53,20 +57,22 @@ function GridButton({
         .delay(staggerDelay(index, 60) + 300)
         .springify()
         .damping(15)}
-      style={[styles.gridCell, animatedStyle, disabled && { opacity: 0.45 }]}
+      style={[styles.menuCell, animatedStyle, disabled && { opacity: 0.45 }]}
     >
       <TouchableOpacity
         onPress={disabled ? undefined : onPress}
         onPressIn={disabled ? undefined : onPressIn}
         onPressOut={disabled ? undefined : onPressOut}
         activeOpacity={disabled ? 1 : 0.9}
-        style={styles.gridButtonOuter}
+        style={styles.menuButtonOuter}
       >
-        <View style={styles.gridButton}>
-          <Text style={styles.gridSymbol}>{symbol}</Text>
-          <Text style={styles.gridLabel}>
+        <View style={styles.menuButton}>
+          <View style={styles.menuSymbolContainer}>
+            <Icon name={symbol} size={24} color={colors.text.dark} />
+          </View>
+          <Text style={styles.menuLabel}>
             {label}
-            {disabled ? "\nComing Soon" : ""}
+            {disabled ? " — Coming Soon" : ""}
           </Text>
         </View>
       </TouchableOpacity>
@@ -83,7 +89,7 @@ function WideButton({
   onPress,
 }: {
   label: string;
-  symbol: string;
+  symbol: IconName;
   index: number;
   onPress: () => void;
 }) {
@@ -110,7 +116,7 @@ function WideButton({
           end={{ x: 1, y: 0 }}
           style={styles.wideButtonGradient}
         >
-          <Text style={styles.wideSymbol}>{symbol}</Text>
+          <Icon name={symbol} size={22} color={colors.text.primary} />
           <Text style={styles.wideLabel}>{label}</Text>
         </LinearGradient>
       </TouchableOpacity>
@@ -123,6 +129,8 @@ function WideButton({
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { localProfile } = useLocalProfile();
+  const avatar = getAvatar(localProfile.avatarId);
 
   return (
     <LinearGradient
@@ -144,7 +152,7 @@ export default function HomeScreen() {
           style={styles.titleContainer}
         >
           <LinearGradient
-            colors={gradients.goldToBronze}
+            colors={gradients.ornateGold}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.titleGradientMask}
@@ -163,47 +171,47 @@ export default function HomeScreen() {
 
         <OrnamentDivider delay={250} />
 
-        {/* 2-Column Grid */}
-        <View style={styles.grid}>
-          <GridButton
+        {/* Vertical Menu Stack */}
+        <View style={styles.menuStack}>
+          <MenuButton
             label="Play ranked"
-            symbol={"\u2694"}
+            symbol="ranked"
             index={0}
             onPress={() => router.push("/game/ranked")}
           />
-          <GridButton
-            label="Play casual"
-            symbol={"\u265F"}
+          <MenuButton
+            label="Find an opponent"
+            symbol="casual"
             index={1}
             onPress={() => router.push("/game/casual")}
           />
-          <GridButton
-            label="Play vs. Bot"
-            symbol={"\u265E"}
+          <MenuButton
+            label="Play with AI and improve"
+            symbol="bot"
             index={2}
             onPress={() => router.push("/bot/difficulty")}
           />
-          <GridButton
-            label="Local network"
-            symbol={"\u2318"}
+          <MenuButton
+            label="Play on your network (LAN, Hotspot, etc.)"
+            symbol="lan"
             index={3}
             onPress={() => router.push("/lan")}
           />
-          <GridButton
-            label="Tutorials"
-            symbol={"\u2605"}
+          <MenuButton
+            label="Tutorials and trainings"
+            symbol="tutorials"
             index={4}
             onPress={() => router.push("/tutorial")}
           />
-          <GridButton
+          <MenuButton
             label="Puzzles"
-            symbol={"\u2666"}
+            symbol="puzzles"
             index={5}
             onPress={() => router.push("/puzzles")}
           />
-          <GridButton
-            label="Leaderboard"
-            symbol={"\u2655"}
+          <MenuButton
+            label="Live rankings and leaderboard"
+            symbol="leaderboard"
             index={6}
             onPress={() => router.push("/leaderboard")}
           />
@@ -212,7 +220,7 @@ export default function HomeScreen() {
         {/* Full-width Watch Bot vs Bot button */}
         <WideButton
           label="Watch Bot vs. Bot"
-          symbol={"\uD83D\uDC41"}
+          symbol="spectate"
           index={7}
           onPress={() => router.push("/spectate")}
         />
@@ -228,7 +236,11 @@ export default function HomeScreen() {
           activeOpacity={0.8}
         >
           <View style={styles.profileInner}>
-            <Text style={styles.profileIcon}>{"\u265A"}</Text>
+            {avatar?.symbol ? (
+              <Text style={styles.profileIcon}>{avatar.symbol}</Text>
+            ) : (
+              <Icon name="profile" size={24} color={colors.accent.goldBright} />
+            )}
           </View>
         </TouchableOpacity>
       </Animated.View>
@@ -243,15 +255,30 @@ export default function HomeScreen() {
           activeOpacity={0.8}
         >
           <View style={[styles.profileInner, styles.donateInner]}>
-            <Text style={styles.donateIcon}>{"\u2665"}</Text>
+            <Icon name="donate" size={22} color={colors.accent.red} />
           </View>
         </TouchableOpacity>
       </Animated.View>
+
+      {/* Dev tools button — top-left (dev only) */}
+      {features.devMode && (
+        <Animated.View
+          entering={FadeIn.duration(400).delay(800)}
+          style={[styles.profileCircle, { top: insets.top + spacing.xs, left: spacing.md }]}
+        >
+          <TouchableOpacity
+            onPress={() => router.push("/dev")}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.profileInner, styles.devInner]}>
+              <Icon name="dev-tools" size={22} color={colors.text.muted} />
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
     </LinearGradient>
   );
 }
-
-const GRID_GAP = spacing.sm;
 
 const styles = StyleSheet.create({
   scrollRoot: {
@@ -260,7 +287,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     gap: spacing.sm,
     paddingVertical: spacing.xl,
     paddingHorizontal: spacing.md,
@@ -306,49 +333,46 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.sm,
   },
 
-  /* ── Grid ───────────────────────────────────────────────────────── */
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: GRID_GAP,
+  /* ── Vertical Menu Stack ─────────────────────────────────────────── */
+  menuStack: {
     width: "100%",
-    maxWidth: 340,
+    maxWidth: 380,
+    gap: spacing.sm,
   },
-  gridCell: {
-    width: "47%",
+  menuCell: {
+    width: "100%",
   },
-  gridButtonOuter: {
+  menuButtonOuter: {
     borderRadius: radius.lg,
     borderWidth: 1.5,
     borderColor: colors.border.gold,
     overflow: "hidden",
   },
-  gridButton: {
+  menuButton: {
     backgroundColor: colors.cardFace,
     borderRadius: radius.lg - 1,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
     paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-    minHeight: 90,
+    paddingHorizontal: spacing.md,
+    minHeight: 60,
+    gap: spacing.sm,
   },
-  gridSymbol: {
-    fontSize: 28,
-    color: colors.text.dark,
-    marginBottom: spacing.xxs,
+  menuSymbolContainer: {
+    width: 36,
+    alignItems: "center",
   },
-  gridLabel: {
+  menuLabel: {
     color: colors.text.dark,
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "600",
-    textAlign: "center",
+    flex: 1,
   },
 
   /* ── Wide button ────────────────────────────────────────────────── */
   wideCell: {
     width: "100%",
-    maxWidth: 340,
+    maxWidth: 380,
     marginTop: spacing.xs,
   },
   wideButtonOuter: {
@@ -365,9 +389,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     borderRadius: radius.lg - 1,
   },
-  wideSymbol: {
-    fontSize: 22,
-  },
+  /* wideSymbol removed — now using Icon component */
   wideLabel: {
     color: colors.text.primary,
     fontSize: 16,
@@ -380,8 +402,8 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   profileInner: {
-    width: 52,
-    height: 52,
+    width: 56,
+    height: 56,
     borderRadius: 26,
     backgroundColor: colors.bg.secondary,
     borderWidth: 2,
@@ -400,5 +422,12 @@ const styles = StyleSheet.create({
   donateIcon: {
     fontSize: 22,
     color: colors.accent.red,
+  },
+  devInner: {
+    borderColor: colors.text.muted,
+  },
+  devIcon: {
+    fontSize: 22,
+    color: colors.text.muted,
   },
 });

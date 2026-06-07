@@ -20,6 +20,7 @@ import {
 } from "../../src/theme/tokens";
 import { staggerDelay } from "../../src/utils/animations";
 import { DONATION_WALLETS, type WalletInfo } from "@checkker/shared";
+import Icon from "../../src/components/Icon";
 
 function copyToClipboard(text: string) {
   if (Platform.OS === "web" && typeof navigator !== "undefined" && navigator.clipboard) {
@@ -92,7 +93,7 @@ export default function DonateScreen() {
           onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
           style={styles.backBtn}
         >
-          <Text style={styles.backArrow}>{"\u2190"}</Text>
+          <Icon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Support Checkker</Text>
         <View style={{ width: 40 }} />
@@ -107,7 +108,7 @@ export default function DonateScreen() {
           colors={gradients.goldToBronze}
           style={styles.heroGradient}
         >
-          <Text style={styles.heroIcon}>{"\u2665"}</Text>
+          <Icon name="donate" size={40} color={colors.bg.primary} />
           <Text style={styles.heroTitle}>Support the Developer</Text>
           <Text style={styles.heroSubtitle}>
             Checkker is built with passion. Your donation helps keep the servers running and new features coming.
@@ -138,7 +139,7 @@ export default function DonateScreen() {
         <Text style={styles.thankYouText}>
           Thank you for supporting Checkker!
         </Text>
-        <Text style={styles.thankYouHeart}>{"\u2665"}</Text>
+        <Icon name="donate" size={28} color={colors.accent.red} />
       </Animated.View>
     </ScrollView>
   );

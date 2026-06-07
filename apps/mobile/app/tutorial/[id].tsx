@@ -40,6 +40,7 @@ import {
   gradients,
 } from "../../src/theme/tokens";
 import { useSpringPress, useShake, staggerDelay } from "../../src/utils/animations";
+import Icon from "../../src/components/Icon";
 
 /* ── Step Progress Dots ─────────────────────────────────────────────── */
 
@@ -106,15 +107,21 @@ function FeedbackToast({
           correct ? styles.feedbackSuccess : styles.feedbackError,
         ]}
       >
-        <Text
-          style={[
-            styles.feedbackText,
-            correct ? styles.feedbackSuccessText : styles.feedbackErrorText,
-          ]}
-        >
-          {correct ? "\u2705 " : "\u274C "}
-          {message}
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          <Icon
+            name={correct ? "completed" : "incorrect"}
+            size={18}
+            color={correct ? colors.accent.green : colors.accent.red}
+          />
+          <Text
+            style={[
+              styles.feedbackText,
+              correct ? styles.feedbackSuccessText : styles.feedbackErrorText,
+            ]}
+          >
+            {message}
+          </Text>
+        </View>
       </View>
     </Animated.View>
   );
@@ -142,7 +149,10 @@ function NextButton({ onPress }: { onPress: () => void }) {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <Text style={styles.nextButtonText}>{"Next \u2192"}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Text style={styles.nextButtonText}>Next</Text>
+            <Icon name="arrow-forward" size={18} color={colors.text.primary} />
+          </View>
         </LinearGradient>
       </TouchableOpacity>
     </Animated.View>
@@ -392,7 +402,10 @@ export default function TutorialLessonScreen() {
           style={styles.backBtn}
           onPress={() => router.canGoBack() ? router.back() : router.replace("/tutorial")}
         >
-          <Text style={styles.backBtnText}>{"\u2190 Back"}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Icon name="arrow-back" size={16} color={colors.accent.blue} />
+            <Text style={styles.backBtnText}>Back</Text>
+          </View>
         </TouchableOpacity>
       </View>
     );
@@ -412,7 +425,10 @@ export default function TutorialLessonScreen() {
         {/* Header */}
         <Animated.View entering={FadeIn.duration(300)} style={styles.header}>
           <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/tutorial")}>
-            <Text style={styles.headerBack}>{"\u2190 Back"}</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+              <Icon name="arrow-back" size={16} color={colors.accent.blue} />
+              <Text style={styles.headerBack}>Back</Text>
+            </View>
           </TouchableOpacity>
           <Text style={styles.headerTitle} numberOfLines={1}>
             {lesson.title}
@@ -529,9 +545,10 @@ export default function TutorialLessonScreen() {
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                   >
-                    <Text style={styles.overlayPrimaryBtnText}>
-                      {"Next Lesson \u2192"}
-                    </Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                      <Text style={styles.overlayPrimaryBtnText}>Next Lesson</Text>
+                      <Icon name="arrow-forward" size={18} color={colors.text.primary} />
+                    </View>
                   </LinearGradient>
                 </TouchableOpacity>
               )}
@@ -629,22 +646,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   feedbackSuccess: {
-    backgroundColor: "rgba(76, 175, 80, 0.15)",
-    borderColor: "rgba(76, 175, 80, 0.3)",
+    backgroundColor: "rgba(52, 208, 88, 0.15)",
+    borderColor: "rgba(52, 208, 88, 0.3)",
   },
   feedbackError: {
-    backgroundColor: "rgba(239, 83, 80, 0.15)",
-    borderColor: "rgba(239, 83, 80, 0.3)",
+    backgroundColor: "rgba(224, 64, 64, 0.15)",
+    borderColor: "rgba(224, 64, 64, 0.3)",
   },
   feedbackText: {
     fontSize: typography.size.body,
     textAlign: "center",
   },
   feedbackSuccessText: {
-    color: "#8BC34A",
+    color: colors.accent.green,
   },
   feedbackErrorText: {
-    color: "#EF5350",
+    color: colors.accent.red,
   },
   nextButton: {
     paddingVertical: spacing.sm,
@@ -657,7 +674,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   errorText: {
-    color: "#EF5350",
+    color: colors.accent.red,
     fontSize: 18,
     fontWeight: "600",
   },

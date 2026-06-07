@@ -1,26 +1,31 @@
 export const colors = {
   bg: {
-    primary: "#0b1a12",       // deep casino green-black
-    secondary: "#142b1e",     // dark felt green
-    tertiary: "#1c3a28",      // mid felt green
-    felt: "#1a5c35",          // classic casino felt
+    primary: "#1a2e22",       // warmer, lighter dark green
+    secondary: "#243d2e",     // proportionally lighter
+    tertiary: "#2e4d38",      // warmer mid-green for card surfaces
+    felt: "#2a6b40",          // warmer felt
+    parchment: "#f0e6d0",     // warm ivory for book/light surfaces
+    parchmentDark: "#e0d4b8", // aged paper
   },
   text: {
-    primary: "#f2ede4",       // warm white (high contrast on dark green)
-    secondary: "#d4c9a8",     // light gold / parchment
-    muted: "#8a9b8e",         // sage grey-green (readable on dark)
-    dark: "#0b1a12",
+    primary: "#f5f0e8",       // slightly brighter warm white
+    secondary: "#e5d9bc",     // brighter gold — better readability
+    muted: "#b0bfaa",         // significantly brighter sage
+    dark: "#1a2e22",
+    onParchment: "#2a1a0e",   // dark brown for text on parchment
   },
   accent: {
-    primary: "#1a8a4a",       // rich casino green
-    secondary: "#0f6b35",     // darker casino green
+    primary: "#22944f",       // warmer/brighter green
+    secondary: "#18783e",     // proportionally lighter
     gold: "#d4a843",          // gold leaf
     goldBright: "#f5d680",    // bright gold
     green: "#34d058",         // bright emerald (for success/positive)
     red: "#e04040",           // bright crimson (high contrast)
-    burgundy: "#9e2a3a",      // deep burgundy
+    burgundy: "#8b1a2b",      // deep burgundy
     blue: "#4a9edd",          // bright sapphire (high contrast on dark)
     bronze: "#cd7f32",        // bronze
+    lapis: "#1a3a6b",         // deep Persian lapis blue
+    terraCotta: "#c46b2a",    // warm orange accent
   },
   board: {
     light: "#c8b078",         // warm tan (lighter for contrast)
@@ -33,10 +38,12 @@ export const colors = {
   },
   overlay: "rgba(0,0,0,0.82)",
   cardFace: "#faf5eb",        // ivory
-  cardBack: "#0f3d22",        // dark green
+  cardBack: "#18472a",        // warmer dark green
   border: {
-    gold: "rgba(212,168,67,0.45)",
-    subtle: "rgba(242,237,228,0.10)",
+    gold: "rgba(212,168,67,0.50)",
+    subtle: "rgba(242,237,228,0.14)",
+    lapis: "rgba(26,58,107,0.40)",
+    ornate: "rgba(212,168,67,0.70)",
   },
 } as const;
 
@@ -70,16 +77,20 @@ export const shadows = {
 export const motion = { fast: 150, normal: 250, slow: 350, pulse: 1000 } as const;
 
 export const gradients: Record<string, [string, string, ...string[]]> = {
-  glass: ["rgba(242,237,228,0.07)", "rgba(242,237,228,0.02)"],
-  accent: ["#1a8a4a", "#0f6b35"],
+  glass: ["rgba(245,240,232,0.09)", "rgba(245,240,232,0.03)"],
+  accent: ["#22944f", "#18783e"],
   gold: ["#d4a843", "#cd7f32"],
   goldToBronze: ["#f5d680", "#cd7f32"],
   success: ["#34d058", "#1a8a4a"],
   error: ["#e04040", "#9e2a3a"],
-  crimsonToBlack: ["#e04040", "#0b1a12"],
-  burgundy: ["#9e2a3a", "#4a1018"],
-  casinoGreen: ["#1a8a4a", "#0f3d22"],
-  velvet: ["#142b1e", "#1c3a28", "#0b1a12"],
+  crimsonToBlack: ["#e04040", "#1a2e22"],
+  burgundy: ["#8b1a2b", "#4a1018"],
+  casinoGreen: ["#22944f", "#18472a"],
+  velvet: ["#243d2e", "#2e4d38", "#1a2e22"],
+  parchment: ["#f0e6d0", "#e0d4b8"],
+  persian: ["#1a3a6b", "#2a5494"],
+  ornateGold: ["#f5d680", "#d4a843", "#cd7f32"],
+  burgundyDeep: ["#8b1a2b", "#5a1018"],
 };
 
 export const springConfig = {
@@ -90,9 +101,9 @@ export const springConfig = {
 } as const;
 
 export const glassStyle = {
-  backgroundColor: "rgba(242,237,228,0.06)",
+  backgroundColor: "rgba(245,240,232,0.08)",
   borderWidth: 1,
-  borderColor: "rgba(212,168,67,0.25)",
+  borderColor: "rgba(212,168,67,0.30)",
 } as const;
 
 export const PIECE_UNICODE: Record<string, { white: string; black: string }> = {

@@ -28,6 +28,7 @@ import {
 import { useSocket } from "../../src/hooks/useSocket";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
 import type { BotDifficulty, BotPersonality } from "@checkker/shared";
+import Icon from "../../src/components/Icon";
 
 type DifficultyInfo = {
   id: BotDifficulty;
@@ -226,7 +227,7 @@ export default function BotDifficultyScreen() {
           onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
           style={styles.backBtn}
         >
-          <Text style={styles.backArrow}>{"\u2190"}</Text>
+          <Icon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Animated.Text
           entering={FadeIn.duration(400).delay(100)}
@@ -278,7 +279,10 @@ export default function BotDifficultyScreen() {
               </Animated.View>
             ))}
             <TouchableOpacity onPress={() => setSelectedDifficulty(null)} style={{ marginTop: spacing.sm }}>
-              <Text style={{ color: colors.text.muted, fontSize: 14, textAlign: "center" }}>{"\u2190 Change Difficulty"}</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                <Icon name="arrow-back" size={14} color={colors.text.muted} />
+                <Text style={{ color: colors.text.muted, fontSize: 14 }}>Change Difficulty</Text>
+              </View>
             </TouchableOpacity>
           </>
         )}

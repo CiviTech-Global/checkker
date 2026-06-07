@@ -6,6 +6,7 @@ import { useWallet } from "../../src/hooks/useWallet";
 import { useSocket } from "../../src/hooks/useSocket";
 import { useEffect, useState, useRef } from "react";
 import { colors, spacing, radius, gradients, shadows, glassStyle } from "../../src/theme/tokens";
+import Icon from "../../src/components/Icon";
 
 export default function ConnectWalletScreen() {
   const router = useRouter();
@@ -124,7 +125,10 @@ export default function ConnectWalletScreen() {
         )}
 
         <TouchableOpacity onPress={() => router.back()} style={styles.backLink}>
-          <Text style={styles.backLinkText}>{"\u2190"} Back to Home</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Icon name="arrow-back" size={16} color={colors.accent.blue} />
+            <Text style={styles.backLinkText}>Back to Home</Text>
+          </View>
         </TouchableOpacity>
       </Animated.View>
     </LinearGradient>
