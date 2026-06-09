@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/feature_flags_provider.dart';
 import '../../providers/profile_provider.dart';
 import '../../services/local_database.dart';
+import '../../services/sound_service.dart';
 import '../../theme/tokens.dart';
 
 class DevScreen extends ConsumerWidget {
@@ -51,6 +52,13 @@ class DevScreen extends ConsumerWidget {
                 );
               }
             },
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          _DevButton(
+            icon: Icons.volume_up,
+            label: 'Test All Sounds',
+            description: 'Play each synthesized sound effect in sequence.',
+            onTap: () => SoundService().testAllSounds(),
           ),
           const SizedBox(height: AppSpacing.sm),
           _DevButton(

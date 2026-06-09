@@ -11,6 +11,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await WalletService().load();
   await SettingsService().load();
+  await SoundService().init();
   SoundService().enabled = SettingsService().settings.soundEnabled;
   runApp(const ProviderScope(child: CheckkerApp()));
 }
