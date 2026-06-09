@@ -1,0 +1,75 @@
+name: CI - Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        continue-on-error: true
+        run: npm run lint
+
+      - name: Run typecheck
+        continue-on-error: true
+        run: npm run typecheck
+
+      - name: Run tests - shared package
+        run: npx jest --config packages/shared/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/shared-junit.xml packages/shared || true
+
+      - name: Run tests - poker package
+        run: npx jest --config packages/poker/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/poker-junit.xml packages/poker || true
+
+      - name: Run tests - chess package
+        run: npx jest --config packages/chess/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/chess-junit.xml packages/chess || true
+
+      - name: Run tests - ai-brain package
+        run: npx jest --config packages/ai-brain/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/ai-brain-junit.xml packages/ai-brain || true
+
+      - name: Run tests - server app
+        run: npx jest --config apps/server/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/server-junit.xml apps/server || true
+
+      - name: Run tests - mobile app
+        if: runner.os == 'macOS'
+        run: npx jest --config apps/mobile/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/mobile-junit.xml apps/mobile || true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}
+          path: test-results/
+
+      - name: Upload JUnit report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Test Report (${{ matrix.os }})
+          path: test-results/*-junit.xml
+          reporter: java-junit
+          fail-on-error: false

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -7,23 +7,27 @@ import {
   ActivityIndicator,
   TextInput,
   ScrollView,
-  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { colors, radius, spacing, glassStyle } from "../../src/theme/tokens";
-import { useSocket } from "../../src/hooks/useSocket";
+import { useSocket, connectToServer, reconnectToDefault } from "../../src/hooks/useSocket";
 import Icon from "../../src/components/Icon";
 
 type LanMode = "select" | "host" | "join";
 
+const CONNECTION_TIMEOUT_MS = 10000;
+
 export default function LanScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { connected, gameState, startBotGame } = useSocket();
+  const { connected, gameState } = useSocket();
   const [mode, setMode] = useState<LanMode>("select");
   const [serverAddress, setServerAddress] = useState("");
-  const [hosting, setHosting] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const connectingRef = useRef(false);
 
   useEffect(() => {
     if (gameState && "gameId" in gameState) {
@@ -31,30 +35,69 @@ export default function LanScreen() {
     }
   }, [gameState]);
 
+  useEffect(() => {
+    if (connectingRef.current && connected) {
+      connectingRef.current = false;
+      setConnecting(false);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    }
+  }, [connected]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleHost = useCallback(() => {
     setMode("host");
-    setHosting(true);
-    // In a full implementation this would start a local socket.io server
-    // and advertise via mDNS/Bonjour. For now, show the hosting UI.
   }, []);
 
   const handleJoin = useCallback(() => {
     setMode("join");
+    setError(null);
   }, []);
 
   const handleConnect = useCallback(() => {
     const addr = serverAddress.trim();
     if (!addr) {
-      Alert.alert("Enter Address", "Please enter the host's IP address or code.");
+      setError("Please enter the host's IP address.");
       return;
     }
-    // In a full implementation this would connect to the given address.
-    // For now, show a placeholder message.
-    Alert.alert(
-      "Connecting...",
-      `Attempting to connect to ${addr}. LAN play networking will be implemented in a future update.`,
-    );
+    const fullAddress = addr.startsWith("http://") || addr.startsWith("https://")
+      ? addr
+      : `http://${addr}:3001`;
+    connectingRef.current = true;
+    setConnecting(true);
+    setError(null);
+    connectToServer(fullAddress);
+    timeoutRef.current = setTimeout(() => {
+      if (connectingRef.current) {
+        connectingRef.current = false;
+        setConnecting(false);
+        setError(
+          "Could not connect to the host. Check the IP address and make sure the server is running.",
+        );
+      }
+    }, CONNECTION_TIMEOUT_MS);
   }, [serverAddress]);
+
+  const handleDisconnect = useCallback(() => {
+    reconnectToDefault();
+    setMode("select");
+    setConnecting(false);
+    setError(null);
+    connectingRef.current = false;
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
 
   const safeStyle = {
     paddingTop: insets.top,
@@ -104,7 +147,8 @@ export default function LanScreen() {
               <ActivityIndicator size="large" color={colors.accent.gold} />
               <Text style={styles.hostStatus}>Waiting for opponent...</Text>
               <Text style={styles.hostHint}>
-                Share this device's IP address with the other player so they can join.
+                Share this device's IP address with the other player so they can
+                join. The server must be running on your machine at port 3001.
               </Text>
               <View style={styles.codeBox}>
                 <Text style={styles.codeLabel}>Your Address</Text>
@@ -113,9 +157,17 @@ export default function LanScreen() {
             </View>
             <TouchableOpacity
               style={styles.secondaryBtn}
-              onPress={() => { setMode("select"); setHosting(false); }}
+              onPress={() => { setMode("select"); setError(null); }}
             >
               <Text style={styles.secondaryBtnText}>Cancel Hosting</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.disconnectBtn}
+              onPress={handleDisconnect}
+            >
+              <Text style={styles.disconnectBtnText}>
+                Disconnect & return to online
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -135,16 +187,60 @@ export default function LanScreen() {
                 keyboardType="url"
                 returnKeyType="go"
                 onSubmitEditing={handleConnect}
+                editable={!connecting}
               />
-              <TouchableOpacity style={styles.connectBtn} onPress={handleConnect}>
-                <Text style={styles.connectBtnText}>Connect</Text>
-              </TouchableOpacity>
+
+              {connecting ? (
+                <View style={styles.connectingRow}>
+                  <ActivityIndicator size="small" color={colors.accent.gold} />
+                  <Text style={styles.connectingText}>
+                    Connecting to {serverAddress.trim()}...
+                  </Text>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.connectBtn}
+                  onPress={handleConnect}
+                >
+                  <Text style={styles.connectBtnText}>Connect</Text>
+                </TouchableOpacity>
+              )}
+
+              {error && (
+                <View style={styles.errorBox}>
+                  <Icon
+                    name="close"
+                    size={14}
+                    color={colors.accent.red}
+                  />
+                  <Text style={styles.errorText}>{error}</Text>
+                </View>
+              )}
             </View>
             <TouchableOpacity
               style={styles.secondaryBtn}
-              onPress={() => setMode("select")}
+              onPress={() => {
+                if (connecting) {
+                  connectingRef.current = false;
+                  setConnecting(false);
+                  if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                    timeoutRef.current = null;
+                  }
+                }
+                setMode("select");
+                setError(null);
+              }}
             >
               <Text style={styles.secondaryBtnText}>Back</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.disconnectBtn}
+              onPress={handleDisconnect}
+            >
+              <Text style={styles.disconnectBtnText}>
+                Disconnect & return to online
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -152,7 +248,10 @@ export default function LanScreen() {
 
       <TouchableOpacity
         style={[styles.backBtn, { bottom: Math.max(insets.bottom, spacing.md) }]}
-        onPress={() => router.replace("/")}
+        onPress={() => {
+          reconnectToDefault();
+          router.replace("/");
+        }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
           <Icon name="arrow-back" size={16} color={colors.text.secondary} />
@@ -200,9 +299,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
-  },
-  optionEmoji: {
-    fontSize: 32,
   },
   optionTextGroup: {
     flex: 1,
@@ -296,6 +392,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
+  connectingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  connectingText: {
+    color: colors.text.secondary,
+    fontSize: 14,
+  },
+  errorBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    backgroundColor: "rgba(224,64,64,0.12)",
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  errorText: {
+    color: colors.accent.red,
+    fontSize: 12,
+    flex: 1,
+  },
   secondaryBtn: {
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.sm,
@@ -305,6 +426,18 @@ const styles = StyleSheet.create({
   secondaryBtnText: {
     color: colors.text.primary,
     fontSize: 14,
+    fontWeight: "600",
+  },
+  disconnectBtn: {
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.accent.red,
+  },
+  disconnectBtnText: {
+    color: colors.accent.red,
+    fontSize: 13,
     fontWeight: "600",
   },
   backBtn: {

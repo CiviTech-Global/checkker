@@ -63,9 +63,13 @@ class _DifficultyScreenState extends ConsumerState<DifficultyScreen> {
           children: [
             Text('Difficulty', style: TextStyle(color: AppColors.accent.gold, fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 1)),
             const SizedBox(height: AppSpacing.sm),
-            ...List.generate(_difficulties.length, (i) {
-              final d = _difficulties[i];
-              final selected = _selectedDifficulty == d.id;
+            RadioGroup<String>(
+              groupValue: _selectedDifficulty,
+              onChanged: (v) => setState(() => _selectedDifficulty = v!),
+              child: Column(
+                children: List.generate(_difficulties.length, (i) {
+                  final d = _difficulties[i];
+                  final selected = _selectedDifficulty == d.id;
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                 child: Container(
@@ -85,8 +89,6 @@ class _DifficultyScreenState extends ConsumerState<DifficultyScreen> {
                           children: [
                             Radio<String>(
                               value: d.id,
-                              groupValue: _selectedDifficulty,
-                              onChanged: (v) => setState(() => _selectedDifficulty = v!),
                               activeColor: AppColors.accent.gold,
                             ),
                             const SizedBox(width: AppSpacing.xs),
@@ -107,8 +109,10 @@ class _DifficultyScreenState extends ConsumerState<DifficultyScreen> {
                 ),
               );
             }),
-            const SizedBox(height: AppSpacing.lg),
-            Text('Time Control', style: TextStyle(color: AppColors.accent.gold, fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 1)),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        Text('Time Control', style: TextStyle(color: AppColors.accent.gold, fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 1)),
             const SizedBox(height: AppSpacing.sm),
             Row(
               children: _timeControls.map((tc) {

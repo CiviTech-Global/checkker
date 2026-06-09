@@ -21,13 +21,14 @@ import 'screens/auth/connect_screen.dart';
 import 'screens/auth/setup_screen.dart';
 import 'screens/donate/donate_screen.dart';
 import 'screens/dev/dev_screen.dart';
+import 'screens/shop/shop_screen.dart';
 
 final goRouter = GoRouter(
   initialLocation: '/',
   routes: [
-    GoRoute(path: '/', builder: (_, __) => const HomeScreen()),
-    GoRoute(path: '/game/casual', builder: (_, __) => const CasualScreen()),
-    GoRoute(path: '/game/ranked', builder: (_, __) => const RankedScreen()),
+    GoRoute(path: '/', builder: (_, _) => const HomeScreen()),
+    GoRoute(path: '/game/casual', builder: (_, _) => const CasualScreen()),
+    GoRoute(path: '/game/ranked', builder: (_, _) => const RankedScreen()),
     GoRoute(
       path: '/game/queue',
       builder: (_, state) => QueueScreen(
@@ -37,23 +38,24 @@ final goRouter = GoRouter(
       ),
     ),
     GoRoute(path: '/game/:id', builder: (_, state) => GameScreen(id: state.pathParameters['id']!)),
-    GoRoute(path: '/bot/difficulty', builder: (_, __) => const DifficultyScreen()),
-    GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
-    GoRoute(path: '/leaderboard', builder: (_, __) => const LeaderboardScreen()),
-    GoRoute(path: '/tutorial', builder: (_, __) => const TutorialHubScreen()),
-    GoRoute(path: '/tutorial/book', builder: (_, __) => const TutorialBookScreen()),
+    GoRoute(path: '/bot/difficulty', builder: (_, _) => const DifficultyScreen()),
+    GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
+    GoRoute(path: '/leaderboard', builder: (_, _) => const LeaderboardScreen()),
+    GoRoute(path: '/tutorial', builder: (_, _) => const TutorialHubScreen()),
+    GoRoute(path: '/tutorial/book', builder: (_, _) => const TutorialBookScreen()),
     GoRoute(path: '/tutorial/lesson/:id', builder: (_, state) => TutorialLessonScreen(id: state.pathParameters['id']!)),
-    GoRoute(path: '/puzzles', builder: (_, __) => const PuzzlesScreen()),
+    GoRoute(path: '/shop', builder: (_, _) => const ShopScreen()),
+    GoRoute(path: '/puzzles', builder: (_, _) => const PuzzlesScreen()),
     GoRoute(path: '/puzzles/play/:category', builder: (_, state) => PuzzlePlayScreen(category: state.pathParameters['category']!)),
     GoRoute(path: '/replay/:gameId', builder: (_, state) => ReplayScreen(gameId: state.pathParameters['gameId']!)),
-    GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
-    GoRoute(path: '/spectate', builder: (_, __) => const SpectateBrowseScreen()),
-    GoRoute(path: '/spectate/watch', builder: (_, __) => const SpectateWatchScreen()),
+    GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+    GoRoute(path: '/spectate', builder: (_, _) => const SpectateBrowseScreen()),
+    GoRoute(path: '/spectate/watch', builder: (_, _) => const SpectateWatchScreen()),
     GoRoute(path: '/spectate/:id', builder: (_, state) => SpectateWatchScreen(id: state.pathParameters['id'])),
-    GoRoute(path: '/lan', builder: (_, __) => const LanScreen()),
-    GoRoute(path: '/auth/connect', builder: (_, __) => const ConnectScreen()),
-    GoRoute(path: '/auth/setup', builder: (_, __) => const SetupScreen()),
-    GoRoute(path: '/donate', builder: (_, __) => const DonateScreen()),
-    GoRoute(path: '/dev', builder: (_, __) => const DevScreen()),
+    GoRoute(path: '/lan', builder: (_, _) => const LanScreen()),
+    GoRoute(path: '/auth/connect', builder: (_, _) => const ConnectScreen()),
+    GoRoute(path: '/auth/setup', builder: (_, _) => const SetupScreen()),
+    GoRoute(path: '/donate', builder: (_, _) => const DonateScreen()),
+    GoRoute(path: '/dev', builder: (_, _) => const DevScreen()),
   ],
 );

@@ -165,9 +165,7 @@ export default function PuzzlesScreen() {
             key={cat.id}
             category={cat}
             index={index}
-            onPress={() => {
-              // Puzzle solving flow would go here
-            }}
+            onPress={() => router.push(`/puzzles/play/${cat.id}`)}
           />
         ))}
       </View>

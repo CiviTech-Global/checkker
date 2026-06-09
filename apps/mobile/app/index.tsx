@@ -217,15 +217,21 @@ export default function HomeScreen() {
             onPress={() => router.push("/tutorial")}
           />
           <MenuButton
+            label="Cosmetics Shop"
+            symbol="shop"
+            index={5}
+            onPress={() => router.push("/shop")}
+          />
+          <MenuButton
             label="Puzzles"
             symbol="puzzles"
-            index={5}
+            index={6}
             onPress={() => router.push("/puzzles")}
           />
           <MenuButton
             label="Live rankings and leaderboard"
             symbol="leaderboard"
-            index={6}
+            index={7}
             onPress={() => router.push("/leaderboard")}
           />
         </View>
@@ -234,7 +240,7 @@ export default function HomeScreen() {
         <WideButton
           label="Watch Bot vs. Bot"
           symbol="spectate"
-          index={7}
+          index={8}
           onPress={() => router.push("/spectate")}
         />
       </ScrollView>
@@ -269,6 +275,21 @@ export default function HomeScreen() {
         >
           <View style={[styles.profileInner, styles.donateInner]}>
             <Icon name="donate" size={22} color={colors.accent.red} />
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Settings button — top-right */}
+      <Animated.View
+        entering={FadeIn.duration(400).delay(800)}
+        style={[styles.settingsCircle, { top: insets.top + spacing.xs, right: spacing.md }]}
+      >
+        <TouchableOpacity
+          onPress={() => router.push("/settings")}
+          activeOpacity={0.8}
+        >
+          <View style={[styles.profileInner, styles.settingsInner]}>
+            <Icon name="settings" size={22} color={colors.text.secondary} />
           </View>
         </TouchableOpacity>
       </Animated.View>
@@ -438,6 +459,12 @@ const styles = StyleSheet.create({
   },
   devInner: {
     borderColor: colors.text.muted,
+  },
+  settingsCircle: {
+    position: "absolute",
+  },
+  settingsInner: {
+    borderColor: colors.border.gold,
   },
   devIcon: {
     fontSize: 22,

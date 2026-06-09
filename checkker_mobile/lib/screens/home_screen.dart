@@ -88,7 +88,7 @@ class HomeScreen extends ConsumerWidget {
                             'assets/logo.png',
                             width: 80,
                             height: 80,
-                            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                            errorBuilder: (_, _, _) => const SizedBox.shrink(),
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -107,6 +107,7 @@ class HomeScreen extends ConsumerWidget {
                         // _MenuButton(label: 'Play on your network (LAN)', icon: Icons.wifi, onTap: () => context.push('/lan')),
                         _MenuButton(label: 'Tutorials and trainings', icon: Icons.school, onTap: () => context.push('/tutorial')),
                         _MenuButton(label: 'Puzzles', icon: Icons.extension, onTap: () => context.push('/puzzles')),
+                        _MenuButton(label: 'Shop', icon: Icons.store, onTap: () => context.push('/shop')),
                         _MenuButton(label: 'Live rankings and leaderboard', icon: Icons.leaderboard, onTap: () => context.push('/leaderboard')),
 
                         const SizedBox(height: AppSpacing.xs),

@@ -6,6 +6,7 @@ import '../models/game.dart';
 import '../models/game_client.dart';
 import '../models/puzzle.dart';
 import '../models/replay.dart';
+import '../models/cosmetic.dart';
 
 const String _defaultServerUrl = String.fromEnvironment(
   'SERVER_URL',
@@ -82,6 +83,27 @@ class BetSettledPayload {
       betAmountUsd: (json['betAmountUsd'] as num?)?.toDouble() ?? 0,
       result: json['result'] as String? ?? '',
       outcome: json['outcome'] as String? ?? 'draw',
+    );
+  }
+}
+
+class CosmeticsData {
+  final List<Cosmetic> cosmetics;
+  final List<UserCosmetic> userCosmetics;
+
+  const CosmeticsData({
+    required this.cosmetics,
+    required this.userCosmetics,
+  });
+
+  factory CosmeticsData.fromJson(Map<String, dynamic> json) {
+    return CosmeticsData(
+      cosmetics: (json['cosmetics'] as List? ?? [])
+          .map((c) => Cosmetic.fromJson(c as Map<String, dynamic>))
+          .toList(),
+      userCosmetics: (json['userCosmetics'] as List? ?? [])
+          .map((u) => UserCosmetic.fromJson(u as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -338,6 +360,7 @@ class SocketService {
   DepositStatus? _depositStatus;
   SpectateGameState? _spectateState;
   List<SpectateMove> _spectateMoves = [];
+  CosmeticsData? _cosmeticsData;
 
   // Broadcast streams
   final _connectedController = StreamController<bool>.broadcast();
@@ -348,6 +371,7 @@ class SocketService {
   final _depositStatusController = StreamController<DepositStatus?>.broadcast();
   final _spectateStateController = StreamController<SpectateGameState?>.broadcast();
   final _spectateMovesController = StreamController<List<SpectateMove>>.broadcast();
+  final _cosmeticsController = StreamController<CosmeticsData>.broadcast();
 
   // Callback streams for one-off events
   final _moveErrorController = StreamController<String>.broadcast();
@@ -379,6 +403,7 @@ class SocketService {
   DepositStatus? get depositStatus => _depositStatus;
   SpectateGameState? get spectateState => _spectateState;
   List<SpectateMove> get spectateMoves => _spectateMoves;
+  CosmeticsData? get cosmeticsData => _cosmeticsData;
 
   // Public streams
   Stream<bool> get connectedStream => _connectedController.stream;
@@ -389,6 +414,7 @@ class SocketService {
   Stream<DepositStatus?> get depositStatusStream => _depositStatusController.stream;
   Stream<SpectateGameState?> get spectateStateStream => _spectateStateController.stream;
   Stream<List<SpectateMove>> get spectateMovesStream => _spectateMovesController.stream;
+  Stream<CosmeticsData> get cosmeticsStream => _cosmeticsController.stream;
   Stream<String> get moveErrorStream => _moveErrorController.stream;
   Stream<Map<String, dynamic>> get botFallbackStream => _botFallbackController.stream;
   Stream<String> get coachingTipStream => _coachingTipController.stream;
@@ -594,6 +620,32 @@ class SocketService {
       _replayMovesController.add(ReplayData.fromJson(_toMap(data)));
     });
 
+    // Cosmetics events
+    s.on('cosmetics', (data) {
+      _cosmeticsData = CosmeticsData.fromJson(_toMap(data));
+      _cosmeticsController.add(_cosmeticsData!);
+    });
+
+    s.on('cosmetic_equipped', (data) {
+      final json = _toMap(data);
+      final equipped = (json['equipped'] as List? ?? []).cast<String>();
+      if (_cosmeticsData != null) {
+        final updatedUserCosmetics = _cosmeticsData!.userCosmetics.map((uc) {
+          return UserCosmetic(
+            userId: uc.userId,
+            cosmeticId: uc.cosmeticId,
+            equipped: equipped.contains(uc.cosmeticId),
+            cosmetic: uc.cosmetic,
+          );
+        }).toList();
+        _cosmeticsData = CosmeticsData(
+          cosmetics: _cosmeticsData!.cosmetics,
+          userCosmetics: updatedUserCosmetics,
+        );
+        _cosmeticsController.add(_cosmeticsData!);
+      }
+    });
+
     // Spectate
     s.on('spectate_game_start', (data) {
       final json = _toMap(data);
@@ -776,6 +828,15 @@ class SocketService {
     socket.emit('get_game_moves', {'gameId': gameId});
   }
 
+  // Cosmetics methods
+  void getCosmetics() {
+    socket.emit('get_cosmetics');
+  }
+
+  void equipCosmetic(String cosmeticId) {
+    socket.emit('equip_cosmetic', {'cosmeticId': cosmeticId});
+  }
+
   // FCM token
   void registerFcmToken(String token) {
     socket.emit('register_fcm_token', {'token': token});
@@ -848,5 +909,6 @@ class SocketService {
     _puzzlesListController.close();
     _puzzleResultController.close();
     _replayMovesController.close();
+    _cosmeticsController.close();
   }
 }

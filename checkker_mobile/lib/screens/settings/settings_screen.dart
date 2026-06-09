@@ -145,7 +145,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         subtitle: Text(subtitle, style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.sm)),
         value: value,
         onChanged: onChanged,
-        activeColor: AppColors.accent.gold,
+        activeThumbColor: AppColors.accent.gold,
         inactiveThumbColor: AppColors.text.muted,
       ),
     );

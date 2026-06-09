@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { io, type Socket } from "socket.io-client";
 import type { ChatMessage, Card, Color, GameResult, ScoredGame, GameOdds, PlayerProfile, BotDifficulty } from "@checkker/shared";
 import type { GameClientState, GameStartPayload, GameUpdatePayload, MoveErrorPayload, GameOverPayload } from "../types/game";
+import type { Puzzle, PuzzleResult, PuzzlesListData } from "../types/puzzle";
 import { SERVER_URL } from "../config/features";
 
 /* ── Lazy socket singleton ──────────────────────────────────────────── */
@@ -123,6 +124,25 @@ let _spectateState: SpectateGameState | null = null;
 let _spectateMoves: SpectateMove[] = [];
 const spectateStateListeners = new Set<(v: SpectateGameState | null) => void>();
 const spectateMovesListeners = new Set<(v: SpectateMove[]) => void>();
+
+let _replayMoves: any[] | null = null;
+const replayMovesListeners = new Set<(v: any[] | null) => void>();
+
+/* ── Cosmetics state ──────────────────────────────────────── */
+
+let _cosmetics: any[] | null = null;
+let _userCosmetics: any[] | null = null;
+const cosmeticsListeners = new Set<(v: any[] | null) => void>();
+const userCosmeticsListeners = new Set<(v: any[] | null) => void>();
+
+/* ── Puzzle state ──────────────────────────────────────────── */
+
+let _puzzles: PuzzlesListData | null = null;
+let _puzzleResult: PuzzleResult | null = null;
+let _dailyPuzzle: Puzzle | null = null;
+const puzzlesListeners = new Set<(v: PuzzlesListData | null) => void>();
+const puzzleResultListeners = new Set<(v: PuzzleResult | null) => void>();
+const dailyPuzzleListeners = new Set<(v: Puzzle | null) => void>();
 
 /* ── Attach all socket event listeners (called once) ────────────────── */
 
@@ -310,6 +330,93 @@ function attachListeners(s: Socket) {
       spectateStateListeners.forEach((fn) => fn(_spectateState));
     }
   });
+
+  /* ── Replay listeners ───────────────────────────────────────────── */
+
+  s.on("game_moves", (data: { gameId: string; moves: any[] }) => {
+    _replayMoves = data.moves;
+    replayMovesListeners.forEach((fn) => fn(_replayMoves));
+  });
+
+  /* ── Puzzle listeners ─────────────────────────────────────────────── */
+
+  s.on("daily_puzzle", (data: Puzzle) => {
+    _dailyPuzzle = data;
+    dailyPuzzleListeners.forEach((fn) => fn(_dailyPuzzle));
+  });
+
+  s.on("puzzles", (data: PuzzlesListData) => {
+    _puzzles = data;
+    puzzlesListeners.forEach((fn) => fn(_puzzles));
+  });
+
+  s.on("puzzle_result", (data: PuzzleResult) => {
+    _puzzleResult = data;
+    puzzleResultListeners.forEach((fn) => fn(_puzzleResult));
+  });
+
+  /* ── Cosmetics listeners ─────────────────────────────────────────── */
+
+  s.on("cosmetics", (data: { cosmetics: any[]; userCosmetics: any[] }) => {
+    _cosmetics = data.cosmetics;
+    _userCosmetics = data.userCosmetics;
+    cosmeticsListeners.forEach((fn) => fn(_cosmetics));
+    userCosmeticsListeners.forEach((fn) => fn(_userCosmetics));
+  });
+
+  s.on("cosmetic_equipped", (data: { cosmeticId: string; equipped: boolean }) => {
+    if (_userCosmetics) {
+      _userCosmetics = _userCosmetics.map((uc) =>
+        uc.cosmeticId === data.cosmeticId ? { ...uc, equipped: data.equipped } : { ...uc, equipped: false }
+      );
+      userCosmeticsListeners.forEach((fn) => fn(_userCosmetics));
+    }
+  });
+}
+
+/* ── Server reconnection (LAN support) ──────────────────────────────── */
+
+export function connectToServer(url: string) {
+  const oldSocket = socket;
+  if (oldSocket) {
+    oldSocket.removeAllListeners();
+    oldSocket.disconnect();
+  }
+
+  _gameId = null;
+  _gameState = null;
+  _scores = null;
+  _chatMessages = [];
+  _depositStatus = null;
+  _authState = null;
+  _spectateState = null;
+  _spectateMoves = [];
+  _replayMoves = null;
+  _puzzles = null;
+  _puzzleResult = null;
+  _dailyPuzzle = null;
+
+  listenersAttached = false;
+  singletonConnected = false;
+
+  socket = io(url, { autoConnect: true });
+  attachListeners(socket);
+
+  gameStateListeners.forEach((fn) => fn(null));
+  scoresListeners.forEach((fn) => fn(null));
+  chatListeners.forEach((fn) => fn([]));
+  depositStatusListeners.forEach((fn) => fn(null));
+  authStateListeners.forEach((fn) => fn(null));
+  spectateStateListeners.forEach((fn) => fn(null));
+  spectateMovesListeners.forEach((fn) => fn([]));
+  replayMovesListeners.forEach((fn) => fn(null));
+  puzzlesListeners.forEach((fn) => fn(null));
+  puzzleResultListeners.forEach((fn) => fn(null));
+  dailyPuzzleListeners.forEach((fn) => fn(null));
+}
+
+export function reconnectToDefault() {
+  connectToServer(SERVER_URL);
 }
 
 export function useSocket() {
@@ -549,6 +656,18 @@ export function useSocket() {
     };
   }, []);
 
+  /* ── Replay ──────────────────────────────────────────────────────────── */
+
+  const [replayMoves, setReplayMoves] = useState<any[] | null>(_replayMoves);
+
+  useEffect(() => {
+    const onReplayMoves = (v: any[] | null) => setReplayMoves(v);
+    replayMovesListeners.add(onReplayMoves);
+    return () => {
+      replayMovesListeners.delete(onReplayMoves);
+    };
+  }, []);
+
   const startSpectateGame = useCallback((whiteDifficulty: string, blackDifficulty: string) => {
     getSocket().emit("start_spectate_bot_game", { whiteDifficulty, blackDifficulty });
   }, []);
@@ -575,6 +694,68 @@ export function useSocket() {
     _spectateMoves = [];
     spectateStateListeners.forEach((fn) => fn(null));
     spectateMovesListeners.forEach((fn) => fn([]));
+  }, []);
+
+  /* ── Replay ──────────────────────────────────────────────────────────── */
+
+  const getGameMoves = useCallback((gameId: string) => {
+    getSocket().emit("get_game_moves", { gameId });
+  }, []);
+
+  /* ── Puzzle ────────────────────────────────────────────────────────── */
+
+  const [puzzles, setPuzzles] = useState<PuzzlesListData | null>(_puzzles);
+  const [puzzleResult, setPuzzleResult] = useState<PuzzleResult | null>(_puzzleResult);
+  const [dailyPuzzle, setDailyPuzzle] = useState<Puzzle | null>(_dailyPuzzle);
+
+  useEffect(() => {
+    const onPuzzles = (v: PuzzlesListData | null) => setPuzzles(v);
+    const onPuzzleResult = (v: PuzzleResult | null) => setPuzzleResult(v);
+    const onDailyPuzzle = (v: Puzzle | null) => setDailyPuzzle(v);
+    puzzlesListeners.add(onPuzzles);
+    puzzleResultListeners.add(onPuzzleResult);
+    dailyPuzzleListeners.add(onDailyPuzzle);
+    return () => {
+      puzzlesListeners.delete(onPuzzles);
+      puzzleResultListeners.delete(onPuzzleResult);
+      dailyPuzzleListeners.delete(onDailyPuzzle);
+    };
+  }, []);
+
+  const getPuzzles = useCallback((category: string, limit?: number) => {
+    getSocket().emit("get_puzzles", { category, limit });
+  }, []);
+
+  const getDailyPuzzle = useCallback(() => {
+    getSocket().emit("get_daily_puzzle");
+  }, []);
+
+  const submitPuzzle = useCallback((puzzleId: string, moveUci: string, timeSpentMs: number, usedHint: boolean) => {
+    getSocket().emit("submit_puzzle", { puzzleId, moveUci, timeSpentMs, usedHint });
+  }, []);
+
+  /* ── Cosmetics ────────────────────────────────────────────────────── */
+
+  const [cosmetics, setCosmetics] = useState<any[] | null>(_cosmetics);
+  const [userCosmetics, setUserCosmetics] = useState<any[] | null>(_userCosmetics);
+
+  useEffect(() => {
+    const onCosmetics = (v: any[] | null) => setCosmetics(v);
+    const onUserCosmetics = (v: any[] | null) => setUserCosmetics(v);
+    cosmeticsListeners.add(onCosmetics);
+    userCosmeticsListeners.add(onUserCosmetics);
+    return () => {
+      cosmeticsListeners.delete(onCosmetics);
+      userCosmeticsListeners.delete(onUserCosmetics);
+    };
+  }, []);
+
+  const getCosmetics = useCallback(() => {
+    getSocket().emit("get_cosmetics");
+  }, []);
+
+  const equipCosmetic = useCallback((cosmeticId: string) => {
+    getSocket().emit("equip_cosmetic", { cosmeticId });
   }, []);
 
   return {
@@ -627,5 +808,23 @@ export function useSocket() {
     spectateStepForward,
     spectateStepBackward,
     spectateLeave,
+    // Replay
+    replayMoves,
+    getGameMoves,
+    // Puzzles
+    puzzles,
+    puzzleResult,
+    dailyPuzzle,
+    getPuzzles,
+    getDailyPuzzle,
+    submitPuzzle,
+    // Cosmetics
+    cosmetics,
+    userCosmetics,
+    getCosmetics,
+    equipCosmetic,
+    // Server reconnection (LAN support)
+    connectToServer,
+    reconnectToDefault,
   };
 }
