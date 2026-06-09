@@ -11,6 +11,9 @@ import 'screens/tutorial/tutorial_hub_screen.dart';
 import 'screens/tutorial/tutorial_lesson_screen.dart';
 import 'screens/tutorial/tutorial_book_screen.dart';
 import 'screens/puzzles/puzzles_screen.dart';
+import 'screens/puzzles/puzzle_play_screen.dart';
+import 'screens/replay/replay_screen.dart';
+import 'screens/settings/settings_screen.dart';
 import 'screens/spectate/spectate_browse_screen.dart';
 import 'screens/spectate/spectate_watch_screen.dart';
 import 'screens/lan/lan_screen.dart';
@@ -41,6 +44,9 @@ final goRouter = GoRouter(
     GoRoute(path: '/tutorial/book', builder: (_, __) => const TutorialBookScreen()),
     GoRoute(path: '/tutorial/lesson/:id', builder: (_, state) => TutorialLessonScreen(id: state.pathParameters['id']!)),
     GoRoute(path: '/puzzles', builder: (_, __) => const PuzzlesScreen()),
+    GoRoute(path: '/puzzles/play/:category', builder: (_, state) => PuzzlePlayScreen(category: state.pathParameters['category']!)),
+    GoRoute(path: '/replay/:gameId', builder: (_, state) => ReplayScreen(gameId: state.pathParameters['gameId']!)),
+    GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
     GoRoute(path: '/spectate', builder: (_, __) => const SpectateBrowseScreen()),
     GoRoute(path: '/spectate/watch', builder: (_, __) => const SpectateWatchScreen()),
     GoRoute(path: '/spectate/:id', builder: (_, state) => SpectateWatchScreen(id: state.pathParameters['id'])),

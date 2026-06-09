@@ -20,6 +20,11 @@ export type CompleteGameInput = {
   moveCount: number;
 };
 
+export type RecentGame = Game & {
+  whitePlayer: { id: string; username: string; avatarId: string; rating: number };
+  blackPlayer: { id: string; username: string; avatarId: string; rating: number };
+};
+
 export const GameRepository = {
   async create(input: CreateGameInput): Promise<Game> {
     return getDb().game.create({ data: input });
@@ -39,7 +44,7 @@ export const GameRepository = {
     return getDb().game.findUnique({ where: { id: gameId } });
   },
 
-  async getRecentByUser(userId: string, limit = 10): Promise<Game[]> {
+  async getRecentByUser(userId: string, limit = 10): Promise<RecentGame[]> {
     return getDb().game.findMany({
       where: {
         OR: [{ whiteUserId: userId }, { blackUserId: userId }],
@@ -47,6 +52,10 @@ export const GameRepository = {
       },
       orderBy: { endedAt: "desc" },
       take: limit,
-    });
+      include: {
+        whitePlayer: { select: { id: true, username: true, avatarId: true, rating: true } },
+        blackPlayer: { select: { id: true, username: true, avatarId: true, rating: true } },
+      },
+    }) as Promise<RecentGame[]>;
   },
 };

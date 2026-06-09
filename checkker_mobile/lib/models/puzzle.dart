@@ -67,12 +67,27 @@ const List<PuzzleCategoryData> puzzleCategories = [
   ),
 ];
 
+String categoryToServerValue(PuzzleCategory category) {
+  switch (category) {
+    case PuzzleCategory.daily:
+      return 'daily';
+    case PuzzleCategory.tactics:
+      return 'tactics';
+    case PuzzleCategory.cardPlay:
+      return 'card_management';
+    case PuzzleCategory.endgame:
+      return 'endgame';
+    case PuzzleCategory.weakness:
+      return 'weakness';
+  }
+}
+
 class Puzzle {
   final String id;
   final String fen;
-  final List<String> solution;
+  final String solution; // UCI best move
+  final String hint;
   final String difficulty;
-  final String description;
   final String category;
   final int rating;
 
@@ -80,21 +95,59 @@ class Puzzle {
     required this.id,
     required this.fen,
     required this.solution,
+    required this.hint,
     required this.difficulty,
-    required this.description,
     required this.category,
     required this.rating,
   });
 
   factory Puzzle.fromJson(Map<String, dynamic> json) {
+    final solutionRaw = json['solution'];
+    String solution;
+    if (solutionRaw is String) {
+      solution = solutionRaw;
+    } else if (solutionRaw is List && solutionRaw.isNotEmpty) {
+      solution = solutionRaw.first as String;
+    } else {
+      solution = '';
+    }
     return Puzzle(
-      id: json['id'] as String,
-      fen: json['fen'] as String,
-      solution: (json['solution'] as List).cast<String>(),
-      difficulty: json['difficulty'] as String,
-      description: json['description'] as String,
-      category: json['category'] as String,
-      rating: json['rating'] as int,
+      id: json['id'] as String? ?? '',
+      fen: json['fen'] as String? ?? '',
+      solution: solution,
+      hint: json['hint'] as String? ?? json['description'] as String? ?? '',
+      difficulty: json['difficulty'] as String? ?? 'beginner',
+      category: json['category'] as String? ?? 'tactics',
+      rating: json['rating'] as int? ?? 1500,
+    );
+  }
+}
+
+class PuzzleResult {
+  final bool correct;
+  final String solution;
+  final String hint;
+  final int streak;
+  final int solved;
+  final String? error;
+
+  const PuzzleResult({
+    required this.correct,
+    required this.solution,
+    required this.hint,
+    this.streak = 0,
+    this.solved = 0,
+    this.error,
+  });
+
+  factory PuzzleResult.fromJson(Map<String, dynamic> json) {
+    return PuzzleResult(
+      correct: json['correct'] as bool? ?? false,
+      solution: json['solution'] as String? ?? '',
+      hint: json['hint'] as String? ?? '',
+      streak: (json['stats']?['streak'] as num?)?.toInt() ?? 0,
+      solved: (json['stats']?['solved'] as num?)?.toInt() ?? 0,
+      error: json['error'] as String?,
     );
   }
 }

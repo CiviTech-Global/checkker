@@ -4,6 +4,8 @@ import 'package:socket_io_client/socket_io_client.dart' as io;
 import '../models/card.dart';
 import '../models/game.dart';
 import '../models/game_client.dart';
+import '../models/puzzle.dart';
+import '../models/replay.dart';
 
 const String _defaultServerUrl = String.fromEnvironment(
   'SERVER_URL',
@@ -100,20 +102,96 @@ class LeaderboardData {
 
 class ProfileData {
   final PlayerProfile? profile;
-  final List<dynamic> recentGames;
+  final List<RecentGame> recentGames;
   final int? rank;
   final Map<String, dynamic>? user;
+  final PuzzleStats? puzzleStats;
 
-  const ProfileData({this.profile, this.recentGames = const [], this.rank, this.user});
+  const ProfileData({
+    this.profile,
+    this.recentGames = const [],
+    this.rank,
+    this.user,
+    this.puzzleStats,
+  });
 
   factory ProfileData.fromJson(Map<String, dynamic> json) {
     return ProfileData(
       profile: json['profile'] != null
           ? PlayerProfile.fromJson(json['profile'] as Map<String, dynamic>)
           : null,
-      recentGames: json['recentGames'] as List? ?? [],
+      recentGames: (json['recentGames'] as List? ?? [])
+          .map((g) => RecentGame.fromJson(g as Map<String, dynamic>))
+          .toList(),
       rank: json['rank'] as int?,
       user: json['user'] as Map<String, dynamic>?,
+      puzzleStats: json['puzzleStats'] != null
+          ? PuzzleStats.fromJson(json['puzzleStats'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+class PuzzleStats {
+  final int streak;
+  final int solved;
+  final int attempted;
+
+  const PuzzleStats({this.streak = 0, this.solved = 0, this.attempted = 0});
+
+  factory PuzzleStats.fromJson(Map<String, dynamic> json) {
+    return PuzzleStats(
+      streak: json['streak'] as int? ?? 0,
+      solved: json['solved'] as int? ?? 0,
+      attempted: json['attempted'] as int? ?? 0,
+    );
+  }
+}
+
+class PuzzleData {
+  final Puzzle? puzzle;
+
+  const PuzzleData({this.puzzle});
+
+  factory PuzzleData.fromJson(Map<String, dynamic> json) {
+    return PuzzleData(
+      puzzle: json['puzzle'] != null
+          ? Puzzle.fromJson(json['puzzle'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+class PuzzlesListData {
+  final String category;
+  final List<Puzzle> puzzles;
+  final int count;
+
+  const PuzzlesListData({required this.category, required this.puzzles, required this.count});
+
+  factory PuzzlesListData.fromJson(Map<String, dynamic> json) {
+    return PuzzlesListData(
+      category: json['category'] as String? ?? 'tactics',
+      puzzles: (json['puzzles'] as List? ?? [])
+          .map((p) => Puzzle.fromJson(p as Map<String, dynamic>))
+          .toList(),
+      count: json['count'] as int? ?? 0,
+    );
+  }
+}
+
+class ReplayData {
+  final String gameId;
+  final List<ReplayMove> moves;
+
+  const ReplayData({required this.gameId, required this.moves});
+
+  factory ReplayData.fromJson(Map<String, dynamic> json) {
+    return ReplayData(
+      gameId: json['gameId'] as String? ?? '',
+      moves: (json['moves'] as List? ?? [])
+          .map((m) => ReplayMove.fromJson(m as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -208,6 +286,8 @@ class SpectateGameState {
     List<PlayingCard>? blackHand,
     List<PlayingCard>? whiteScorePile,
     List<PlayingCard>? blackScorePile,
+    PlayerProfile? whiteProfile,
+    PlayerProfile? blackProfile,
     GameOdds? odds,
     GameResult? result,
     ScoredGame? scores,
@@ -220,8 +300,8 @@ class SpectateGameState {
       blackHand: blackHand ?? this.blackHand,
       whiteScorePile: whiteScorePile ?? this.whiteScorePile,
       blackScorePile: blackScorePile ?? this.blackScorePile,
-      whiteProfile: whiteProfile,
-      blackProfile: blackProfile,
+      whiteProfile: whiteProfile ?? this.whiteProfile,
+      blackProfile: blackProfile ?? this.blackProfile,
       odds: odds ?? this.odds,
       whiteDifficulty: whiteDifficulty,
       blackDifficulty: blackDifficulty,
@@ -247,6 +327,7 @@ class SocketService {
 
   io.Socket? _socket;
   bool _listenersAttached = false;
+  String _serverUrl = _defaultServerUrl;
 
   // Internal state
   String? _gameId;
@@ -283,6 +364,10 @@ class SocketService {
   final _queueJoinedController = StreamController<Map<String, dynamic>>.broadcast();
   final _leaderboardController = StreamController<LeaderboardData>.broadcast();
   final _profileDataController = StreamController<ProfileData>.broadcast();
+  final _dailyPuzzleController = StreamController<PuzzleData>.broadcast();
+  final _puzzlesListController = StreamController<PuzzlesListData>.broadcast();
+  final _puzzleResultController = StreamController<PuzzleResult>.broadcast();
+  final _replayMovesController = StreamController<ReplayData>.broadcast();
 
   // Public getters
   bool get isConnected => _socket?.connected ?? false;
@@ -318,6 +403,10 @@ class SocketService {
   Stream<Map<String, dynamic>> get queueJoinedStream => _queueJoinedController.stream;
   Stream<LeaderboardData> get leaderboardStream => _leaderboardController.stream;
   Stream<ProfileData> get profileDataStream => _profileDataController.stream;
+  Stream<PuzzleData> get dailyPuzzleStream => _dailyPuzzleController.stream;
+  Stream<PuzzlesListData> get puzzlesListStream => _puzzlesListController.stream;
+  Stream<PuzzleResult> get puzzleResultStream => _puzzleResultController.stream;
+  Stream<ReplayData> get replayMovesStream => _replayMovesController.stream;
 
   io.Socket get socket {
     _socket ??= _createSocket();
@@ -325,12 +414,26 @@ class SocketService {
   }
 
   io.Socket _createSocket() {
-    final s = io.io(_defaultServerUrl, <String, dynamic>{
+    final s = io.io(_serverUrl, <String, dynamic>{
       'autoConnect': true,
       'transports': ['websocket'],
     });
     _attachListeners(s);
     return s;
+  }
+
+  void setServerUrl(String url) {
+    if (_serverUrl == url) return;
+    _serverUrl = url;
+  }
+
+  void reconnect() {
+    _socket?.disconnect();
+    _socket?.dispose();
+    _socket = null;
+    _listenersAttached = false;
+    // Trigger lazy re-creation on next socket access.
+    socket.connect();
   }
 
   void _attachListeners(io.Socket s) {
@@ -471,6 +574,24 @@ class SocketService {
 
     s.on('profile_data', (data) {
       _profileDataController.add(ProfileData.fromJson(_toMap(data)));
+    });
+
+    // Puzzle events
+    s.on('daily_puzzle', (data) {
+      _dailyPuzzleController.add(PuzzleData.fromJson(_toMap(data)));
+    });
+
+    s.on('puzzles', (data) {
+      _puzzlesListController.add(PuzzlesListData.fromJson(_toMap(data)));
+    });
+
+    s.on('puzzle_result', (data) {
+      _puzzleResultController.add(PuzzleResult.fromJson(_toMap(data)));
+    });
+
+    // Replay events
+    s.on('game_moves', (data) {
+      _replayMovesController.add(ReplayData.fromJson(_toMap(data)));
     });
 
     // Spectate
@@ -632,6 +753,34 @@ class SocketService {
     socket.emit('get_profile');
   }
 
+  // Puzzle methods
+  void getDailyPuzzle() {
+    socket.emit('get_daily_puzzle');
+  }
+
+  void getPuzzles(String category, {int limit = 20}) {
+    socket.emit('get_puzzles', {'category': category, 'limit': limit});
+  }
+
+  void submitPuzzle(String puzzleId, String moveUci, {int timeSpentMs = 0, bool usedHint = false}) {
+    socket.emit('submit_puzzle', {
+      'puzzleId': puzzleId,
+      'moveUci': moveUci,
+      'timeSpentMs': timeSpentMs,
+      'usedHint': usedHint,
+    });
+  }
+
+  // Replay methods
+  void getGameMoves(String gameId) {
+    socket.emit('get_game_moves', {'gameId': gameId});
+  }
+
+  // FCM token
+  void registerFcmToken(String token) {
+    socket.emit('register_fcm_token', {'token': token});
+  }
+
   // Spectate methods
   void startSpectateGame(String whiteDifficulty, String blackDifficulty) {
     socket.emit('start_spectate_bot_game', {
@@ -695,5 +844,9 @@ class SocketService {
     _queueJoinedController.close();
     _leaderboardController.close();
     _profileDataController.close();
+    _dailyPuzzleController.close();
+    _puzzlesListController.close();
+    _puzzleResultController.close();
+    _replayMovesController.close();
   }
 }

@@ -1,5 +1,6 @@
 /// Playing card types for the Checkker card system.
 /// Port of packages/shared/src/cards.ts
+library;
 
 enum Suit { clubs, diamonds, hearts, spades }
 
@@ -50,7 +51,7 @@ class PlayingCard {
   PieceType get pieceType => cardToPieceMap[rank]!;
   String get rankLabel => rankLabels[rank]!;
   String get suitName => suit.name;
-  String get id => '${rankLabel}${suitName[0]}';
+  String get id => '$rankLabel${suitName[0]}';
 
   String get suitSymbol {
     switch (suit) {

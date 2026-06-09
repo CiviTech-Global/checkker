@@ -58,14 +58,7 @@ class _PuzzlesScreenState extends ConsumerState<PuzzlesScreen> {
   }
 
   void _onCategoryTap(PuzzleCategoryData category) {
-    // TODO: Navigate to puzzle solving screen when implemented
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${category.title} — coming soon!'),
-        backgroundColor: AppColors.bg.tertiary,
-        duration: const Duration(seconds: 1),
-      ),
-    );
+    context.push('/puzzles/play/${category.category.name}');
   }
 
   @override

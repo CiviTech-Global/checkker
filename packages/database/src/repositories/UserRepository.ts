@@ -105,4 +105,11 @@ export const UserRepository = {
     });
     return count + 1;
   },
+
+  async updateFcmToken(id: string, token: string | null): Promise<User> {
+    return getDb().user.update({
+      where: { id },
+      data: { fcmToken: token },
+    });
+  },
 };

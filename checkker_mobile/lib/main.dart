@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 import 'router.dart';
+import 'services/settings_service.dart';
+import 'services/sound_service.dart';
 import 'services/wallet_service.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  WalletService().load();
+  await WalletService().load();
+  await SettingsService().load();
+  SoundService().enabled = SettingsService().settings.soundEnabled;
   runApp(const ProviderScope(child: CheckkerApp()));
 }
 

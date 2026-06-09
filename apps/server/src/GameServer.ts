@@ -35,6 +35,7 @@ interface Match {
   rematchRequests: Set<string>;
   chatHistory: ChatMessage[];
   betSetup: BetSetup | null;
+  dbGameId?: string; // Persisted database Game ID for move history and replays
 }
 
 /** Tracks games that are waiting for player deposits before starting */
@@ -232,11 +233,31 @@ export class GameServer {
         return;
       }
       try {
-        const { GameRepository, UserRepository } = await import("@checkker/database");
+        const { GameRepository, UserRepository, PuzzleRepository } = await import("@checkker/database");
         const user = await UserRepository.findById(auth.userId);
         const recentGames = await GameRepository.getRecentByUser(auth.userId, 10);
         const rank = await UserRepository.getUserRank(auth.userId);
-        socket.emit("profile_data", { profile: playerStore.get(socket.id), recentGames, rank, user });
+        const puzzleStats = await PuzzleRepository.getUserStats(auth.userId);
+        socket.emit("profile_data", {
+          profile: playerStore.get(socket.id),
+          recentGames: recentGames.map((g) => ({
+            id: g.id,
+            mode: g.mode,
+            difficulty: g.difficulty,
+            timeControl: g.timeControl,
+            opponentName: g.whiteUserId === auth.userId ? g.blackPlayer.username : g.whitePlayer.username,
+            opponentAvatar: g.whiteUserId === auth.userId ? g.blackPlayer.avatarId : g.whitePlayer.avatarId,
+            opponentRating: g.whiteUserId === auth.userId ? g.blackRatingBefore : g.whiteRatingBefore,
+            result: g.winnerUserId === auth.userId ? "win" : g.winnerUserId ? "loss" : "draw",
+            myRatingBefore: g.whiteUserId === auth.userId ? g.whiteRatingBefore : g.blackRatingBefore,
+            myRatingAfter: g.whiteUserId === auth.userId ? g.whiteRatingAfter : g.blackRatingAfter,
+            moveCount: g.moveCount,
+            playedAt: g.endedAt,
+          })),
+          rank,
+          user,
+          puzzleStats,
+        });
       } catch {
         socket.emit("profile_data", { profile: playerStore.get(socket.id), recentGames: [] });
       }
@@ -340,9 +361,124 @@ export class GameServer {
       }
     });
 
+    /* ── Puzzles ─────────────────────────────────────────────────────── */
+
+    socket.on("get_daily_puzzle", async () => {
+      try {
+        const { PuzzleRepository } = await import("@checkker/database");
+        const puzzle = await PuzzleRepository.getDaily();
+        socket.emit("daily_puzzle", { puzzle });
+      } catch {
+        socket.emit("daily_puzzle", { puzzle: null });
+      }
+    });
+
+    socket.on("get_puzzles", async ({ category, limit }: { category?: string; limit?: number }) => {
+      try {
+        const { PuzzleRepository } = await import("@checkker/database");
+        const effectiveCategory = category ?? "tactics";
+        const [puzzles, count] = await Promise.all([
+          PuzzleRepository.getByCategory(effectiveCategory, limit ?? 20),
+          PuzzleRepository.countByCategory(effectiveCategory),
+        ]);
+        socket.emit("puzzles", { category: effectiveCategory, puzzles, count });
+      } catch {
+        socket.emit("puzzles", { category: category ?? "tactics", puzzles: [], count: 0 });
+      }
+    });
+
+    socket.on("submit_puzzle", async ({ puzzleId, moveUci, timeSpentMs, usedHint }: { puzzleId: string; moveUci: string; timeSpentMs: number; usedHint?: boolean }) => {
+      try {
+        const { PuzzleRepository } = await import("@checkker/database");
+        const puzzle = await PuzzleRepository.getById(puzzleId);
+        if (!puzzle) {
+          socket.emit("puzzle_result", { correct: false, error: "Puzzle not found" });
+          return;
+        }
+
+        const normalize = (uci: string) => uci.trim().toLowerCase();
+        const correct = normalize(moveUci) === normalize(puzzle.solution);
+
+        const auth = authenticatedSockets.get(socket.id);
+        if (auth) {
+          await PuzzleRepository.recordAttempt({
+            puzzleId,
+            userId: auth.userId,
+            solved: correct,
+            timeSpentMs: timeSpentMs ?? 0,
+            usedHint: usedHint ?? false,
+          });
+        }
+
+        const stats = auth ? await PuzzleRepository.getUserStats(auth.userId) : { streak: 0, solved: 0, attempted: 0 };
+        socket.emit("puzzle_result", { correct, solution: puzzle.solution, hint: puzzle.hint, stats });
+      } catch {
+        socket.emit("puzzle_result", { correct: false, error: "Submission failed" });
+      }
+    });
+
+    /* ── Replays ─────────────────────────────────────────────────────── */
+
+    socket.on("get_game_moves", async ({ gameId }: { gameId: string }) => {
+      try {
+        const { GameMoveRepository } = await import("@checkker/database");
+        const moves = await GameMoveRepository.getByGameId(gameId);
+        socket.emit("game_moves", { gameId, moves });
+      } catch {
+        socket.emit("game_moves", { gameId, moves: [] });
+      }
+    });
+
+    /* ── Push Notifications ──────────────────────────────────────────── */
+
+    socket.on("register_fcm_token", async ({ token }: { token: string }) => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) {
+        socket.emit("fcm_token_error", { error: "Not authenticated" });
+        return;
+      }
+      try {
+        const { UserRepository } = await import("@checkker/database");
+        await UserRepository.updateFcmToken(auth.userId, token);
+        socket.emit("fcm_token_registered", { token });
+      } catch {
+        socket.emit("fcm_token_error", { error: "Failed to register token" });
+      }
+    });
+
+    /* ── Cosmetics ───────────────────────────────────────────────────── */
+
+    socket.on("get_cosmetics", async () => {
+      try {
+        const { CosmeticRepository } = await import("@checkker/database");
+        const auth = authenticatedSockets.get(socket.id);
+        const cosmetics = await CosmeticRepository.getAll();
+        const userCosmetics = auth ? await CosmeticRepository.getByUser(auth.userId) : [];
+        socket.emit("cosmetics", { cosmetics, userCosmetics });
+      } catch {
+        socket.emit("cosmetics", { cosmetics: [], userCosmetics: [] });
+      }
+    });
+
+    socket.on("equip_cosmetic", async ({ cosmeticId }: { cosmeticId: string }) => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) {
+        socket.emit("cosmetic_error", { error: "Not authenticated" });
+        return;
+      }
+      try {
+        const { CosmeticRepository } = await import("@checkker/database");
+        await CosmeticRepository.equip(auth.userId, cosmeticId);
+        const equipped = await CosmeticRepository.getEquipped(auth.userId);
+        socket.emit("cosmetic_equipped", { cosmeticId, equipped });
+      } catch {
+        socket.emit("cosmetic_error", { error: "Failed to equip cosmetic" });
+      }
+    });
+
     /* ── In-Game Events ──────────────────────────────────────────────── */
 
-    socket.on("play_move", ({ gameId, card, move }: { gameId: string; card: string; move: string }) => {
+    socket.on("play_move", async ({ gameId, card, move }: { gameId: string; card: string; move: string }) => {
       const match = this.matches.get(gameId);
       if (!match) return;
       const { game, white, black } = match;
@@ -351,8 +487,31 @@ export class GameServer {
       const color: Color = socket.id === white.id ? "white" : "black";
       if (game.getState().turn !== color) return;
 
+      const beforeFen = game.getState().fen;
       const result = game.playCard(card, move);
       if (result.success) {
+        // Persist move to DB if the game is tracked
+        if (match.dbGameId && playerStore.isDbEnabled) {
+          try {
+            const { GameMoveRepository } = await import("@checkker/database");
+            const state = game.getState();
+            const moveHistory = state.moveHistory;
+            const latest = moveHistory[moveHistory.length - 1];
+            await GameMoveRepository.create({
+              gameId: match.dbGameId,
+              moveNumber: moveHistory.length,
+              fen: state.fen,
+              moveUci: move,
+              san: latest?.move,
+              cardRank: card.slice(0, -1), // e.g. "K" from "K♠"
+              cardSuit: card.slice(-1),    // e.g. "♠" from "K♠"
+              color,
+            });
+          } catch {
+            // Non-fatal: game continues even if move persistence fails
+          }
+        }
+
         this.broadcastGame(gameId);
         if (game.isOver()) {
           this.handleGameOver(gameId);
@@ -569,7 +728,7 @@ export class GameServer {
             p.whiteDeposited = true;
             p1.socket.emit("deposit_confirmed", { player: "self" });
             p2.socket.emit("deposit_confirmed", { player: "opponent" });
-            BetManager.confirmDeposit(gameId, p1.userId ?? "").catch(() => {});
+            BetManager.confirmDeposit(gameId, p1.userId ?? "", "").catch(() => {});
           }
           return ok;
         });
@@ -580,7 +739,7 @@ export class GameServer {
             p.blackDeposited = true;
             p2.socket.emit("deposit_confirmed", { player: "self" });
             p1.socket.emit("deposit_confirmed", { player: "opponent" });
-            BetManager.confirmDeposit(gameId, p2.userId ?? "").catch(() => {});
+            BetManager.confirmDeposit(gameId, p2.userId ?? "", "").catch(() => {});
           }
           return ok;
         });
@@ -626,6 +785,25 @@ export class GameServer {
       chatHistory: [],
       betSetup,
     };
+
+    // Persist game record upfront so moves can be tracked with a stable DB ID
+    if (playerStore.isDbEnabled && p1.userId && p2.userId) {
+      try {
+        const { GameRepository } = await import("@checkker/database");
+        const dbGame = await GameRepository.create({
+          whiteUserId: p1.userId,
+          blackUserId: p2.userId,
+          mode,
+          difficulty,
+          timeControl: tc,
+          whiteRatingBefore: p1.rating,
+          blackRatingBefore: p2.rating,
+        });
+        match.dbGameId = dbGame.id;
+      } catch {
+        // DB write failed; game continues without move persistence
+      }
+    }
 
     this.matches.set(game.id, match);
 
@@ -793,30 +971,20 @@ export class GameServer {
       await playerStore.persistAfterGame(white.id, whiteOutcome, whiteRatingBefore, whiteRatingAfter).catch(() => {});
       await playerStore.persistAfterGame(black.id, blackOutcome, blackRatingBefore, blackRatingAfter).catch(() => {});
 
-      // Record game in DB
+      // Complete game in DB
       try {
         const { GameRepository } = await import("@checkker/database");
         const whiteAuth = authenticatedSockets.get(white.id);
         const blackAuth = authenticatedSockets.get(black.id);
-        if (whiteAuth && blackAuth) {
-          await GameRepository.create({
-            whiteUserId: whiteAuth.userId,
-            blackUserId: blackAuth.userId,
-            mode: match.mode,
-            difficulty: match.difficulty,
-            timeControl: match.tc,
-            whiteRatingBefore,
-            blackRatingBefore,
-          }).then(async (dbGame) => {
-            const winnerAuth = whiteOutcome === "win" ? whiteAuth : blackOutcome === "win" ? blackAuth : undefined;
-            await GameRepository.complete(dbGame.id, {
-              resultType: result.type,
-              winnerColor: "winner" in result ? result.winner : undefined,
-              winnerUserId: winnerAuth?.userId,
-              whiteRatingAfter,
-              blackRatingAfter,
-              moveCount: game.getState().moveHistory.length,
-            });
+        if (match.dbGameId && whiteAuth && blackAuth) {
+          const winnerAuth = whiteOutcome === "win" ? whiteAuth : blackOutcome === "win" ? blackAuth : undefined;
+          await GameRepository.complete(match.dbGameId, {
+            resultType: result.type,
+            winnerColor: "winner" in result ? result.winner : undefined,
+            winnerUserId: winnerAuth?.userId,
+            whiteRatingAfter,
+            blackRatingAfter,
+            moveCount: game.getState().moveHistory.length,
           });
         }
       } catch {

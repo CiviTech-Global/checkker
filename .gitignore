@@ -4,3 +4,9 @@ node_modules
 dist
 agents
 rules
+*.txt
+*.json
+*.py
+/plans
+graphify-out
+.graphify-out

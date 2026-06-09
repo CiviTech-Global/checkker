@@ -103,7 +103,8 @@ class HomeScreen extends ConsumerWidget {
                         _MenuButton(label: 'Play Ranked', icon: Icons.emoji_events, onTap: () => context.push('/game/ranked')),
                         _MenuButton(label: 'Find an Opponent', icon: Icons.people, onTap: () => context.push('/game/casual')),
                         _MenuButton(label: 'Play with AI and improve', icon: Icons.smart_toy, onTap: () => context.push('/bot/difficulty')),
-                        _MenuButton(label: 'Play on your network (LAN)', icon: Icons.wifi, onTap: () => context.push('/lan')),
+                        // LAN hidden for v1 — real P2P networking not yet implemented
+                        // _MenuButton(label: 'Play on your network (LAN)', icon: Icons.wifi, onTap: () => context.push('/lan')),
                         _MenuButton(label: 'Tutorials and trainings', icon: Icons.school, onTap: () => context.push('/tutorial')),
                         _MenuButton(label: 'Puzzles', icon: Icons.extension, onTap: () => context.push('/puzzles')),
                         _MenuButton(label: 'Live rankings and leaderboard', icon: Icons.leaderboard, onTap: () => context.push('/leaderboard')),
@@ -157,6 +158,18 @@ class HomeScreen extends ConsumerWidget {
                   color: AppColors.accent.goldBright,
                   borderColor: AppColors.accent.gold,
                   onTap: () => context.push('/profile'),
+                ),
+              ),
+
+              // Settings circle - top right
+              Positioned(
+                top: AppSpacing.md,
+                right: AppSpacing.md,
+                child: _CircleButton(
+                  icon: Icons.settings,
+                  color: AppColors.text.secondary,
+                  borderColor: AppColors.border.gold,
+                  onTap: () => context.push('/settings'),
                 ),
               ),
 

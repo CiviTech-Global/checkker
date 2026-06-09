@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../services/lan_service.dart';
+import '../../services/socket_service.dart';
 import '../../theme/tokens.dart';
 
 enum _LanMode { select, host, join }
@@ -16,7 +18,23 @@ class LanScreen extends ConsumerStatefulWidget {
 class _LanScreenState extends ConsumerState<LanScreen> {
   _LanMode _mode = _LanMode.select;
   final _serverAddressController = TextEditingController();
-  // bool _hosting = false; // reserved for future LAN server implementation
+  final _lanService = LanService();
+  String? _localIp;
+  bool _connecting = false;
+  String? _connectionError;
+
+  @override
+  void initState() {
+    super.initState();
+    _discoverIp();
+  }
+
+  Future<void> _discoverIp() async {
+    final ip = await _lanService.discoverLocalIp();
+    if (mounted) {
+      setState(() => _localIp = ip);
+    }
+  }
 
   @override
   void dispose() {
@@ -25,10 +43,7 @@ class _LanScreenState extends ConsumerState<LanScreen> {
   }
 
   void _handleHost() {
-    setState(() {
-      _mode = _LanMode.host;
-      // _hosting = true;
-    });
+    setState(() => _mode = _LanMode.host);
   }
 
   void _handleJoin() {
@@ -38,15 +53,43 @@ class _LanScreenState extends ConsumerState<LanScreen> {
   void _handleConnect() {
     final addr = _serverAddressController.text.trim();
     if (addr.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter the host\'s IP address or code.')),
-      );
+      _showSnack('Please enter the host\'s IP address or code.');
       return;
     }
+    setState(() {
+      _connecting = true;
+      _connectionError = null;
+    });
+
+    final ok = _lanService.connectToLanHost(addr);
+    if (!ok) {
+      setState(() {
+        _connecting = false;
+        _connectionError = 'Invalid address';
+      });
+      _showSnack('Invalid address.');
+      return;
+    }
+
+    // Wait briefly for connection result.
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      setState(() => _connecting = false);
+      if (SocketService().isConnected) {
+        _showSnack('Connected to LAN host. You can now queue or challenge a friend.');
+      } else {
+        setState(() => _connectionError = 'Could not connect to $addr. Make sure the host is reachable.');
+        _showSnack('Could not connect to $addr. Make sure the host is reachable.');
+      }
+    });
+  }
+
+  void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Attempting to connect to $addr. LAN play networking will be implemented in a future update.'),
+        content: Text(message),
         backgroundColor: AppColors.bg.tertiary,
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -125,14 +168,14 @@ class _LanScreenState extends ConsumerState<LanScreen> {
         _OptionCard(
           icon: Icons.wifi_tethering,
           title: 'Host Game',
-          description: 'Create a game and share your code with a friend nearby',
+          description: 'Create a game and share your local IP with a friend nearby',
           onTap: _handleHost,
         ),
         const SizedBox(height: AppSpacing.md),
         _OptionCard(
           icon: Icons.lan_outlined,
           title: 'Join Game',
-          description: 'Enter a host\'s IP address or game code to connect',
+          description: 'Enter a host\'s IP address to connect to their server',
           onTap: _handleJoin,
         ),
       ],
@@ -140,6 +183,7 @@ class _LanScreenState extends ConsumerState<LanScreen> {
   }
 
   Widget _buildHostMode() {
+    final ip = _localIp ?? 'Discovering...';
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -166,7 +210,7 @@ class _LanScreenState extends ConsumerState<LanScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'Share this device\'s IP address with the other player so they can join.',
+                'Share your local IP with the other player so they can join.',
                 style: TextStyle(
                   fontSize: AppTypography.sm,
                   color: AppColors.text.muted,
@@ -194,8 +238,8 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      'Check Wi-Fi settings',
+                    SelectableText(
+                      ip,
                       style: TextStyle(
                         fontSize: AppTypography.body,
                         fontWeight: FontWeight.w700,
@@ -206,17 +250,21 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                   ],
                 ),
               ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'A Checkker server must be running on this device or on your LAN.',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: AppColors.text.muted,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),
         const SizedBox(height: AppSpacing.md),
         _SecondaryButton(
-          onPressed: () {
-            setState(() {
-              _mode = _LanMode.select;
-              // _hosting = false;
-            });
-          },
+          onPressed: () => setState(() => _mode = _LanMode.select),
           label: 'Cancel Hosting',
         ),
       ],
@@ -269,6 +317,7 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                     borderRadius: BorderRadius.circular(AppRadius.md),
                     borderSide: BorderSide(color: AppColors.accent.gold),
                   ),
+                  errorText: _connectionError,
                 ),
                 keyboardType: TextInputType.url,
                 textInputAction: TextInputAction.go,
@@ -278,7 +327,7 @@ class _LanScreenState extends ConsumerState<LanScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _handleConnect,
+                  onPressed: _connecting ? null : _handleConnect,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent.primary,
                     foregroundColor: AppColors.text.primary,
@@ -287,10 +336,16 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                       borderRadius: BorderRadius.circular(AppRadius.lg),
                     ),
                   ),
-                  child: const Text(
-                    'Connect',
-                    style: TextStyle(fontSize: AppTypography.body, fontWeight: FontWeight.w600),
-                  ),
+                  child: _connecting
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text(
+                          'Connect',
+                          style: TextStyle(fontSize: AppTypography.body, fontWeight: FontWeight.w600),
+                        ),
                 ),
               ),
             ],

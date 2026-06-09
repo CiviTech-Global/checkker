@@ -19,13 +19,16 @@ model User {
   draws         Int      @default(0)
   currentStreak Int      @default(0) @map("current_streak")
   bestStreak    Int      @default(0) @map("best_streak")
+  fcmToken      String?  @map("fcm_token")
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  whiteGames Game[] @relation("WhitePlayer")
-  blackGames Game[] @relation("BlackPlayer")
-  wonGames   Game[] @relation("Winner")
-  bets       Bet[]
+  whiteGames    Game[]         @relation("WhitePlayer")
+  blackGames    Game[]         @relation("BlackPlayer")
+  wonGames      Game[]         @relation("Winner")
+  bets          Bet[]
+  puzzleAttempts PuzzleAttempt[]
+  cosmetics     UserCosmetic[]
 
   @@index([rating(sort: Desc)])
   @@map("users")
@@ -49,10 +52,11 @@ model Game {
   startedAt         DateTime  @default(now()) @map("started_at") @db.Timestamptz()
   endedAt           DateTime? @map("ended_at") @db.Timestamptz()
 
-  whitePlayer User  @relation("WhitePlayer", fields: [whiteUserId], references: [id])
-  blackPlayer User  @relation("BlackPlayer", fields: [blackUserId], references: [id])
-  winner      User? @relation("Winner", fields: [winnerUserId], references: [id])
+  whitePlayer User     @relation("WhitePlayer", fields: [whiteUserId], references: [id])
+  blackPlayer User     @relation("BlackPlayer", fields: [blackUserId], references: [id])
+  winner      User?    @relation("Winner", fields: [winnerUserId], references: [id])
   bets        Bet[]
+  moves       GameMove[]
 
   @@index([whiteUserId])
   @@index([blackUserId])
@@ -60,18 +64,36 @@ model Game {
   @@map("games")
 }
 
+model GameMove {
+  id         String   @id @default(uuid()) @db.Uuid
+  gameId     String   @map("game_id") @db.Uuid
+  moveNumber Int      @map("move_number")
+  fen        String   // Position after move
+  moveUci    String   @map("move_uci") // UCI notation
+  san        String?  // Standard algebraic notation
+  cardRank   String?  @map("card_rank") @db.VarChar(2)
+  cardSuit   String?  @map("card_suit") @db.VarChar(8)
+  color      String   @db.VarChar(5) // white | black
+  timestamp  DateTime @default(now()) @db.Timestamptz()
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@index([gameId, moveNumber])
+  @@map("game_moves")
+}
+
 model Bet {
-  id            String   @id @default(uuid()) @db.Uuid
-  gameId        String   @map("game_id") @db.Uuid
-  userId        String   @map("user_id") @db.Uuid
-  amountWei     String   @map("amount_wei") // stored as string for BigInt precision
-  amountUsd     Decimal  @map("amount_usd") @db.Decimal(10, 2)
-  depositTxHash String   @map("deposit_tx_hash") @db.VarChar(66)
-  payoutTxHash  String?  @map("payout_tx_hash") @db.VarChar(66)
-  payoutAmountWei String? @map("payout_amount_wei")
-  status        String   @default("pending") @db.VarChar(16) // pending | confirmed | paid_out | refunded | cancelled
-  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+  id              String   @id @default(uuid()) @db.Uuid
+  gameId          String   @map("game_id") @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  amountWei       String   @map("amount_wei") // stored as string for BigInt precision
+  amountUsd       Decimal  @map("amount_usd") @db.Decimal(10, 2)
+  depositTxHash   String   @map("deposit_tx_hash") @db.VarChar(66)
+  payoutTxHash    String?  @map("payout_tx_hash") @db.VarChar(66)
+  payoutAmountWei String?  @map("payout_amount_wei")
+  status          String   @default("pending") @db.VarChar(16) // pending | confirmed | paid_out | refunded | cancelled
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
   game Game @relation(fields: [gameId], references: [id])
   user User @relation(fields: [userId], references: [id])
@@ -79,6 +101,73 @@ model Bet {
   @@index([gameId])
   @@index([userId])
   @@map("bets")
+}
+
+model Puzzle {
+  id         String   @id @default(uuid()) @db.Uuid
+  fen        String   // Target position FEN
+  solution   String   // Best move in UCI notation
+  hint       String   // Text hint for player
+  difficulty String   @db.VarChar(16) // beginner | intermediate | advanced | master
+  category   String   @db.VarChar(24) // daily | tactics | card_management | endgame | weakness
+  rating     Int      @default(1500)  // Estimated puzzle rating
+  isDaily    Boolean  @default(false) @map("is_daily")
+  dailyDate  DateTime? @map("daily_date") @db.Date
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  attempts PuzzleAttempt[]
+
+  @@index([difficulty])
+  @@index([category])
+  @@index([isDaily, dailyDate])
+  @@map("puzzles")
+}
+
+model PuzzleAttempt {
+  id          String   @id @default(uuid()) @db.Uuid
+  puzzleId    String   @map("puzzle_id") @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  solved      Boolean
+  attempts    Int      @default(1)
+  timeSpentMs Int      @map("time_spent_ms")
+  usedHint    Boolean  @default(false) @map("used_hint")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  puzzle Puzzle @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("puzzle_attempts")
+}
+
+model Cosmetic {
+  id          String         @id @default(uuid()) @db.Uuid
+  type        String         @db.VarChar(16) // board | piece | card_back
+  name        String         @db.VarChar(64)
+  description String?        @db.VarChar(256)
+  price       Int            @default(0) // In-game currency
+  rarity      String         @default("common") @db.VarChar(16)
+  assetUrl    String?        @map("asset_url")
+  isDefault   Boolean        @default(false) @map("is_default")
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  owners UserCosmetic[]
+
+  @@map("cosmetics")
+}
+
+model UserCosmetic {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  cosmeticId  String   @map("cosmetic_id") @db.Uuid
+  equipped    Boolean  @default(false)
+  purchasedAt DateTime @default(now()) @map("purchased_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cosmetic Cosmetic @relation(fields: [cosmeticId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cosmeticId])
+  @@map("user_cosmetics")
 }
 
 model TransactionLog {

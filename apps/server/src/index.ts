@@ -30,6 +30,17 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+app.post("/admin/seed-puzzles", async (_req, res) => {
+  try {
+    const { seedPuzzlesIntoDb } = await import("./seed-puzzles");
+    const created = await seedPuzzlesIntoDb();
+    res.json({ success: true, created });
+  } catch (err) {
+    console.error("[admin] seed-puzzles failed:", err);
+    res.status(500).json({ success: false, error: String(err) });
+  }
+});
+
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 httpServer.listen(PORT, () => {
   const actualPort = (httpServer.address() as any)?.port ?? PORT;
