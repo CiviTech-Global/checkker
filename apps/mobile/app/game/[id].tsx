@@ -121,6 +121,8 @@ export default function GameScreen() {
     undoMove,
     onCoachingTip,
     onSpectatorComment,
+    onRematchRequested,
+    onBetSettled,
   } = useSocket();
 
   const [selectedCardIdx, setSelectedCardIdx] = useState<number | null>(null);
@@ -130,12 +132,44 @@ export default function GameScreen() {
   const [chatExpanded, setChatExpanded] = useState(false);
   const [coachingTip, setCoachingTip] = useState<string | null>(null);
   const [spectatorComment, setSpectatorComment] = useState<string | null>(null);
+  const [rematchPending, setRematchPending] = useState(false);
+  const [opponentWantsRematch, setOpponentWantsRematch] = useState(false);
+  const [betSettlement, setBetSettlement] = useState<{
+    outcome: "win" | "loss" | "draw";
+    betAmountUsd: number;
+    txHash: string;
+  } | null>(null);
 
   useEffect(() => {
     onMoveError((msg: string) => setMoveError(msg));
     onCoachingTip((tip: string) => setCoachingTip(tip));
     onSpectatorComment((comment: string) => setSpectatorComment(comment));
+    onRematchRequested(() => setOpponentWantsRematch(true));
+    onBetSettled((data) => setBetSettlement({
+      outcome: data.outcome,
+      betAmountUsd: data.betAmountUsd,
+      txHash: data.txHash,
+    }));
   }, []);
+
+  // Handle rematch: detect new game_start with different gameId
+  const currentGameId = useRef(id);
+  useEffect(() => {
+    const gsAny = gameState as any;
+    if (gsAny?.gameId && gsAny.gameId !== currentGameId.current) {
+      // A new game started (rematch accepted) — navigate to it
+      currentGameId.current = gsAny.gameId;
+      setRematchPending(false);
+      setOpponentWantsRematch(false);
+      setBetSettlement(null);
+      router.replace(`/game/${gsAny.gameId}`);
+    }
+  }, [(gameState as any)?.gameId]);
+
+  const handleRematch = useCallback(() => {
+    setRematchPending(true);
+    requestRematch();
+  }, [requestRematch]);
 
   const isBotGame = id?.startsWith("bot-") ?? false;
 
@@ -390,8 +424,11 @@ export default function GameScreen() {
           result={result}
           playerColor={color}
           scores={scores}
-          onRematch={requestRematch}
+          onRematch={handleRematch}
           onHome={() => router.replace("/")}
+          rematchPending={rematchPending}
+          opponentWantsRematch={opponentWantsRematch}
+          betSettlement={betSettlement}
         />
         <PromotionPicker
           visible={promotionMoves !== null}

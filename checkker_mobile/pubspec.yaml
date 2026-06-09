@@ -1,0 +1,87 @@
+name: checkker_mobile
+description: "Checkker - Chess + Poker hybrid strategy game"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.6.1
+
+  # Navigation
+  go_router: ^14.8.1
+
+  # Socket.IO
+  socket_io_client: ^3.0.2
+
+  # Local storage
+  sqflite: ^2.4.2
+  path_provider: ^2.1.5
+  shared_preferences: ^2.5.3
+
+  # Audio
+  audioplayers: ^6.1.0
+
+  # Icons
+  material_design_icons_flutter: ^7.0.7296
+  cupertino_icons: ^1.0.8
+
+  # Animation
+  flutter_animate: ^4.5.2
+  confetti: any
+
+  # Chess logic
+  chess: any
+
+  # Utilities
+  uuid: ^4.5.1
+
+  # Web3 / WalletConnect
+  reown_appkit: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.5
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#1A1A2E"
+  adaptive_icon_foreground: "assets/icon.png"
+  web:
+    generate: true
+    image_path: "assets/icon.png"
+    background_color: "#1A1A2E"
+    theme_color: "#1A1A2E"
+  windows:
+    generate: true
+    image_path: "assets/icon.png"
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: "assets/icon.png"
+
+flutter_native_splash:
+  color: "#1A1A2E"
+  image: "assets/icon.png"
+  android: true
+  ios: true
+  web: false
+  android_12:
+    color: "#1A1A2E"
+    image: "assets/icon.png"

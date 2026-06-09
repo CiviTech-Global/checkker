@@ -16,6 +16,12 @@ import { useSpringPress, staggerDelay } from "../utils/animations";
 import type { GameResult, Color, ScoredGame, PokerResult } from "@checkker/shared";
 import { PokerHand } from "@checkker/shared";
 
+export interface BetSettlementInfo {
+  outcome: "win" | "loss" | "draw";
+  betAmountUsd: number;
+  txHash: string;
+}
+
 interface GameResultOverlayProps {
   visible: boolean;
   result: GameResult | null;
@@ -23,6 +29,9 @@ interface GameResultOverlayProps {
   scores?: ScoredGame | null;
   onRematch?: () => void;
   onHome: () => void;
+  rematchPending?: boolean;
+  opponentWantsRematch?: boolean;
+  betSettlement?: BetSettlementInfo | null;
 }
 
 const HAND_NAMES: Record<number, string> = {
@@ -218,6 +227,9 @@ export default function GameResultOverlay({
   scores,
   onRematch,
   onHome,
+  rematchPending,
+  opponentWantsRematch,
+  betSettlement,
 }: GameResultOverlayProps) {
   if (!result) return null;
 
@@ -316,20 +328,50 @@ export default function GameResultOverlay({
               <Text style={styles.type}>({resultLabel(result)})</Text>
             </Animated.View>
 
+            {/* Bet Settlement */}
+            {betSettlement && (
+              <Animated.View
+                entering={FadeIn.duration(300).delay(staggerDelay(3, 100))}
+                style={styles.betSettlementBox}
+              >
+                <Text
+                  style={[
+                    styles.betAmount,
+                    betSettlement.outcome === "win" && { color: colors.accent.green },
+                    betSettlement.outcome === "loss" && { color: colors.accent.red },
+                    betSettlement.outcome === "draw" && { color: colors.accent.blue },
+                  ]}
+                >
+                  {betSettlement.outcome === "win" && `+$${betSettlement.betAmountUsd.toFixed(2)}`}
+                  {betSettlement.outcome === "loss" && `-$${betSettlement.betAmountUsd.toFixed(2)}`}
+                  {betSettlement.outcome === "draw" && `$${betSettlement.betAmountUsd.toFixed(2)} Refunded`}
+                </Text>
+                <Text style={styles.txHash}>
+                  Tx: {betSettlement.txHash.slice(0, 6)}...{betSettlement.txHash.slice(-4)}
+                </Text>
+              </Animated.View>
+            )}
+
             {/* Actions */}
             <View style={styles.actions}>
               {onRematch && (
                 <ActionButton
-                  label="Rematch"
+                  label={
+                    rematchPending
+                      ? "Waiting..."
+                      : opponentWantsRematch
+                      ? "Accept Rematch"
+                      : "Rematch"
+                  }
                   primary
                   onPress={onRematch}
-                  delay={staggerDelay(3, 100)}
+                  delay={staggerDelay(4, 100)}
                 />
               )}
               <ActionButton
                 label="Return Home"
                 onPress={onHome}
-                delay={staggerDelay(4, 100)}
+                delay={staggerDelay(5, 100)}
               />
             </View>
           </View>
@@ -424,5 +466,18 @@ const styles = StyleSheet.create({
   },
   confettiParticle: {
     position: "absolute",
+  },
+  betSettlementBox: {
+    alignItems: "center",
+    gap: spacing.xxs,
+    zIndex: 1,
+  },
+  betAmount: {
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  txHash: {
+    fontSize: 10,
+    color: colors.text.muted,
   },
 });

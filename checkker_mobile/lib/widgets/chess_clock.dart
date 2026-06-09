@@ -1,0 +1,90 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+
+import '../theme/tokens.dart';
+
+class ChessClock extends StatefulWidget {
+  final int timeMs;
+  final bool active;
+
+  const ChessClock({super.key, required this.timeMs, this.active = false});
+
+  @override
+  State<ChessClock> createState() => _ChessClockState();
+}
+
+class _ChessClockState extends State<ChessClock> {
+  late int _displayMs;
+  Timer? _timer;
+  bool _blinkOn = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayMs = widget.timeMs;
+    if (widget.active) _startTimer();
+  }
+
+  @override
+  void didUpdateWidget(ChessClock oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _displayMs = widget.timeMs;
+    if (widget.active && !oldWidget.active) {
+      _startTimer();
+    } else if (!widget.active && oldWidget.active) {
+      _timer?.cancel();
+      _timer = null;
+    }
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      if (mounted) {
+        setState(() {
+          _blinkOn = !_blinkOn;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String _format(int ms) {
+    final totalSec = (ms / 1000).ceil();
+    final min = totalSec ~/ 60;
+    final sec = totalSec % 60;
+    return '${min.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isLow = _displayMs < 30000;
+    final textColor = isLow
+        ? (widget.active && !_blinkOn ? Colors.transparent : AppColors.accent.red)
+        : AppColors.text.primary;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: widget.active
+            ? Colors.white.withValues(alpha: 0.1)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
+      child: Text(
+        _format(_displayMs),
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+          fontFamily: 'monospace',
+          color: textColor,
+        ),
+      ),
+    );
+  }
+}

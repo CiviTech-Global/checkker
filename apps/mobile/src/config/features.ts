@@ -1,3 +1,6 @@
+/** Server URL for Socket.IO connection */
+export const SERVER_URL = process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:3001";
+
 /**
  * Feature flags for the Checkker app.
  * Toggle flags to enable/disable features across the app.

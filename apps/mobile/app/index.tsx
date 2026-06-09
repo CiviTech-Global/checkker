@@ -18,6 +18,7 @@ import { useLocalProfile } from "../src/context/LocalProfileContext";
 import { getAvatar } from "@checkker/shared";
 import { features } from "../src/config/features";
 import Icon, { type IconName } from "../src/components/Icon";
+import { useSocket } from "../src/hooks/useSocket";
 
 /* ── Ornamental Divider ────────────────────────────────────────────── */
 
@@ -131,6 +132,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { localProfile } = useLocalProfile();
   const avatar = getAvatar(localProfile.avatarId);
+  const { connected } = useSocket();
 
   return (
     <LinearGradient
@@ -139,6 +141,17 @@ export default function HomeScreen() {
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
     >
+      {/* Offline Banner */}
+      {!connected && (
+        <Animated.View
+          entering={FadeIn.duration(300)}
+          style={[styles.offlineBanner, { top: insets.top }]}
+        >
+          <Icon name="close" size={14} color={colors.accent.red} />
+          <Text style={styles.offlineText}>Offline — reconnecting...</Text>
+        </Animated.View>
+      )}
+
       <ScrollView
         style={[styles.scrollRoot, { paddingTop: insets.top, paddingBottom: insets.bottom }]}
         contentContainerStyle={styles.scrollContent}
@@ -429,5 +442,22 @@ const styles = StyleSheet.create({
   devIcon: {
     fontSize: 22,
     color: colors.text.muted,
+  },
+  offlineBanner: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xs,
+    paddingVertical: spacing.xs,
+    backgroundColor: "rgba(224, 64, 64, 0.15)",
+  },
+  offlineText: {
+    fontSize: 12,
+    color: colors.accent.red,
+    fontWeight: "600",
   },
 });

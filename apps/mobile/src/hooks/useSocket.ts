@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { io, type Socket } from "socket.io-client";
 import type { ChatMessage, Card, Color, GameResult, ScoredGame, GameOdds, PlayerProfile, BotDifficulty } from "@checkker/shared";
 import type { GameClientState, GameStartPayload, GameUpdatePayload, MoveErrorPayload, GameOverPayload } from "../types/game";
+import { SERVER_URL } from "../config/features";
 
 /* ── Lazy socket singleton ──────────────────────────────────────────── */
 
@@ -10,10 +11,7 @@ let listenersAttached = false;
 
 function getSocket(): Socket {
   if (!socket) {
-    const url =
-      (typeof window !== "undefined" && (window as any).__CHECKKER_SERVER_URL__) ||
-      "http://localhost:3001";
-    socket = io(url, { autoConnect: true });
+    socket = io(SERVER_URL, { autoConnect: true });
     attachListeners(socket);
   }
   return socket;
@@ -32,6 +30,7 @@ let _botFallbackCallback: ((data: { tc: string }) => void) | null = null;
 let _coachingTipCallback: ((tip: string) => void) | null = null;
 let _spectatorCommentCallback: ((comment: string) => void) | null = null;
 let _gameOverLocalCallback: ((data: GameOverPayload) => void) | null = null;
+let _rematchRequestedCallback: (() => void) | null = null;
 
 /* ── Auth & Betting state ──────────────────────────────────────────── */
 
@@ -170,6 +169,10 @@ function attachListeners(s: Socket) {
 
   s.on("bot_fallback_offer", (data: { tc: string }) => {
     _botFallbackCallback?.(data);
+  });
+
+  s.on("rematch_requested", () => {
+    _rematchRequestedCallback?.();
   });
 
   s.on("chat_message", (msg: ChatMessage) => {
@@ -318,6 +321,7 @@ export function useSocket() {
   const botFallbackCbRef = useRef<((data: { tc: string }) => void) | null>(null);
   const coachingTipCbRef = useRef<((tip: string) => void) | null>(null);
   const spectatorCommentCbRef = useRef<((comment: string) => void) | null>(null);
+  const rematchRequestedCbRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     // Initialize socket lazily on first hook mount
@@ -346,6 +350,7 @@ export function useSocket() {
     _botFallbackCallback = (data: { tc: string }) => botFallbackCbRef.current?.(data);
     _coachingTipCallback = (tip: string) => coachingTipCbRef.current?.(tip);
     _spectatorCommentCallback = (comment: string) => spectatorCommentCbRef.current?.(comment);
+    _rematchRequestedCallback = () => rematchRequestedCbRef.current?.();
   }, []);
 
   const joinQueue = useCallback((rating: number, tc: string) => {
@@ -403,6 +408,10 @@ export function useSocket() {
 
   const onSpectatorComment = useCallback((fn: (comment: string) => void) => {
     spectatorCommentCbRef.current = fn;
+  }, []);
+
+  const onRematchRequested = useCallback((fn: () => void) => {
+    rematchRequestedCbRef.current = fn;
   }, []);
 
   const gameOverLocalCbRef = useRef<((data: GameOverPayload) => void) | null>(null);
@@ -587,6 +596,7 @@ export function useSocket() {
     onCoachingTip,
     onSpectatorComment,
     onGameOverLocal,
+    onRematchRequested,
     // Auth
     authState,
     authRequest,
