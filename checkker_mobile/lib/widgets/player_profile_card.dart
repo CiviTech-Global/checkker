@@ -54,6 +54,8 @@ class PlayerProfileCard extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 color: AppColors.text.primary,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             if (rating != null)
               Text(

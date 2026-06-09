@@ -79,7 +79,7 @@ class _ChatPanelState extends State<ChatPanel> {
 
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(maxHeight: 200),
+      constraints: BoxConstraints(maxHeight: (MediaQuery.of(context).size.height * 0.25).clamp(120, 240)),
       decoration: BoxDecoration(
         color: AppColors.bg.secondary,
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -162,10 +162,14 @@ class _ChatPanelState extends State<ChatPanel> {
                     onSubmitted: (_) => _send(),
                   ),
                 ),
-                const SizedBox(width: 4),
-                GestureDetector(
-                  onTap: _send,
-                  child: Icon(Icons.send, size: 18, color: AppColors.accent.gold),
+                const SizedBox(width: AppSpacing.xxs),
+                SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: IconButton(
+                    onPressed: _send,
+                    icon: Icon(Icons.send, size: 20, color: AppColors.accent.gold),
+                  ),
                 ),
               ],
             ),

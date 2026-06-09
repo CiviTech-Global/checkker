@@ -151,12 +151,16 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
         backgroundColor: AppColors.bg.secondary,
         foregroundColor: AppColors.text.primary,
       ),
-      body: Padding(
+      body: SafeArea(
+        child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.vertical - kToolbarHeight - AppSpacing.lg * 2),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Spacer(),
+            const SizedBox(height: AppSpacing.xl),
 
             // Wallet icon
             Center(
@@ -349,7 +353,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               ),
             ],
 
-            const Spacer(flex: 2),
+            const SizedBox(height: AppSpacing.xl),
 
             // Info note
             Container(
@@ -376,6 +380,8 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               ),
             ),
           ],
+        ),
+        ),
         ),
       ),
     );

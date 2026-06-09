@@ -69,7 +69,7 @@ class _ChessClockState extends State<ChessClock> {
         : AppColors.text.primary;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xxs),
       decoration: BoxDecoration(
         color: widget.active
             ? Colors.white.withValues(alpha: 0.1)

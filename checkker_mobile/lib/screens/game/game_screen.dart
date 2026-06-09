@@ -311,8 +311,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
         final myBestMoves = gameState.bestMoves?[colorStr] ?? [];
 
-        final screenWidth = MediaQuery.of(context).size.width;
-        final isLandscape = screenWidth >= 600;
+        final screenSize = MediaQuery.of(context).size;
+        final screenWidth = screenSize.width;
+        final isLandscape = screenWidth > screenSize.height && screenWidth >= 600;
 
         if (isLandscape) {
           return _buildLandscapeLayout(gameState, scores, chatMessages, highlightedSquares, myBestMoves, colorStr, opponentColorStr, myTurn, result);
@@ -342,7 +343,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               padding: const EdgeInsets.all(AppSpacing.sm),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 480),
+                  constraints: BoxConstraints(maxWidth: AppSizes.contentMaxWidth(MediaQuery.of(context).size.width)),
                   child: Column(
                     children: [
                       // Opponent info bar
@@ -460,7 +461,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           ResignButton(onResign: () => ref.read(socketServiceProvider).resign()),
                         ],
                       ),
-                      const SizedBox(height: 120),
+                      SizedBox(height: AppSpacing.xxl * 2),
                     ],
                   ),
                 ),
@@ -575,7 +576,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       child: Column(
                         children: [
                           ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 480),
+                            constraints: BoxConstraints(maxWidth: AppSizes.contentMaxWidth(MediaQuery.of(context).size.width)),
                             child: ChessBoard(
                               fen: gs.fen,
                               orientation: colorStr,
@@ -697,11 +698,11 @@ class _BotThinkingIndicatorState extends State<_BotThinkingIndicator>
       animation: _controller,
       builder: (context, child) {
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
           decoration: BoxDecoration(
             color: const Color(0x14F5F0E8),
             border: Border.all(color: AppColors.border.gold),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppRadius.md),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

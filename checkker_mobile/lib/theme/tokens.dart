@@ -149,6 +149,29 @@ const glassDecoration = BoxDecoration(
   ),
 );
 
+class AppSizes {
+  AppSizes._();
+
+  static double contentMaxWidth(double screenWidth) {
+    if (screenWidth >= 1024) return 600;
+    if (screenWidth >= 600) return 520;
+    return screenWidth;
+  }
+
+  static double cardWidth(double screenWidth) =>
+      (screenWidth / 6.5).clamp(48.0, 80.0);
+
+  static double cardHeight(double cardW) => cardW * 1.375;
+
+  static double miniCardWidth(double screenWidth) =>
+      cardWidth(screenWidth) * 0.625;
+
+  static int gridColumns(double screenWidth, double minItemWidth) =>
+      (screenWidth / minItemWidth).floor().clamp(3, 8);
+
+  static bool isTablet(double screenWidth) => screenWidth >= 600;
+}
+
 const Map<String, Map<String, String>> pieceUnicode = {
   'k': {'white': '\u2654', 'black': '\u265A'},
   'q': {'white': '\u2655', 'black': '\u265B'},

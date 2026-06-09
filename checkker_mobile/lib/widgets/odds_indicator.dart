@@ -26,7 +26,7 @@ class OddsIndicator extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: SizedBox(
-              height: 24,
+              height: 28,
               child: Row(
                 children: [
                   Expanded(
@@ -36,7 +36,7 @@ class OddsIndicator extends StatelessWidget {
                       alignment: Alignment.center,
                       child: o.whiteWinPct >= 8
                           ? Text('${o.whiteWinPct.round()}%',
-                              style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: AppColors.bg.primary))
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.bg.primary))
                           : null,
                     ),
                   ),
@@ -47,7 +47,7 @@ class OddsIndicator extends StatelessWidget {
                       alignment: Alignment.center,
                       child: o.drawPct >= 8
                           ? Text('${o.drawPct.round()}%',
-                              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.white))
+                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white))
                           : null,
                     ),
                   ),
@@ -58,7 +58,7 @@ class OddsIndicator extends StatelessWidget {
                       alignment: Alignment.center,
                       child: o.blackWinPct >= 8
                           ? Text('${o.blackWinPct.round()}%',
-                              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.white))
+                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white))
                           : null,
                     ),
                   ),
@@ -70,9 +70,9 @@ class OddsIndicator extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('White', style: TextStyle(fontSize: 9, color: AppColors.text.muted)),
-              Text('Draw', style: TextStyle(fontSize: 9, color: AppColors.text.muted)),
-              Text('Black', style: TextStyle(fontSize: 9, color: AppColors.text.muted)),
+              Text('White', style: TextStyle(fontSize: 10, color: AppColors.text.muted)),
+              Text('Draw', style: TextStyle(fontSize: 10, color: AppColors.text.muted)),
+              Text('Black', style: TextStyle(fontSize: 10, color: AppColors.text.muted)),
             ],
           ),
         ],

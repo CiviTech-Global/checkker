@@ -13,9 +13,10 @@ class BestMovesPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!visible || moves == null || moves!.isEmpty) return const SizedBox.shrink();
 
+    final screenWidth = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(maxWidth: 480),
+      constraints: BoxConstraints(maxWidth: AppSizes.contentMaxWidth(screenWidth)),
       decoration: BoxDecoration(
         color: AppColors.bg.secondary,
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -63,7 +64,9 @@ class BestMovesPanel extends StatelessWidget {
                     Expanded(
                       child: Text(
                         m.move,
-                        style: TextStyle(fontSize: 12, color: AppColors.text.primary),
+                        style: TextStyle(fontSize: AppTypography.xs, color: AppColors.text.primary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Text(

@@ -36,16 +36,19 @@ class MoveHistory extends StatelessWidget {
           child: Row(
             children: [
               SizedBox(
-                width: 24,
+                width: 28,
                 child: Text(
                   '${i + 1}.',
                   style: TextStyle(fontSize: 11, color: AppColors.text.muted),
+                  maxLines: 1,
                 ),
               ),
               Expanded(
                 child: Text(
                   _moveText(pair[0]),
                   style: TextStyle(fontSize: 11, color: AppColors.text.primary),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               if (pair.length > 1)
@@ -53,6 +56,8 @@ class MoveHistory extends StatelessWidget {
                   child: Text(
                     _moveText(pair[1]),
                     style: TextStyle(fontSize: 11, color: AppColors.text.primary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
             ],

@@ -32,7 +32,7 @@ class ScorePile extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xxs),
           if (cards.isEmpty)
             Text(
               'None',
@@ -44,7 +44,7 @@ class ScorePile extends StatelessWidget {
             )
           else
             SizedBox(
-              height: 28,
+              height: 32,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: cards.length,

@@ -49,15 +49,18 @@ class HomeScreen extends ConsumerWidget {
 
               // Main content
               Center(
-                child: SingleChildScrollView(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final screenWidth = constraints.maxWidth;
+                    return SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(
                     AppSpacing.md,
-                    (!connected ? 40 : AppSpacing.xl),
+                    (!connected ? AppSpacing.xxl : AppSpacing.xl),
                     AppSpacing.md,
-                    80,
+                    AppSpacing.xxl * 2,
                   ),
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 380),
+                    constraints: BoxConstraints(maxWidth: AppSizes.contentMaxWidth(screenWidth)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -78,9 +81,19 @@ class HomeScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.xs),
+                        const SizedBox(height: AppSpacing.sm),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
+                          child: Image.asset(
+                            'assets/logo.png',
+                            width: 80,
+                            height: 80,
+                            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
                         Text('CHESS + POKER',
-                          style: TextStyle(fontSize: 18, color: AppColors.text.secondary, letterSpacing: 5)),
+                          style: TextStyle(fontSize: AppTypography.md, color: AppColors.text.secondary, letterSpacing: 5)),
                         const SizedBox(height: AppSpacing.md),
 
                         const OrnamentDivider(),
@@ -130,6 +143,8 @@ class HomeScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
+                );
+                  },
                 ),
               ),
 

@@ -12,7 +12,8 @@ class RankedScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.bg.primary,
       appBar: AppBar(title: const Text('Ranked Play')),
-      body: ListView.builder(
+      body: SafeArea(
+        child: ListView.builder(
         padding: const EdgeInsets.all(AppSpacing.md),
         itemCount: betAmountsUsd.length,
         itemBuilder: (context, i) {
@@ -82,6 +83,7 @@ class RankedScreen extends ConsumerWidget {
             ),
           );
         },
+      ),
       ),
     );
   }

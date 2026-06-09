@@ -48,7 +48,9 @@ class _MoveErrorToastState extends State<MoveErrorToast> {
         child: Text(
           widget.message!,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+          style: const TextStyle(color: Colors.white, fontSize: AppTypography.sm, fontWeight: FontWeight.w600),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     );

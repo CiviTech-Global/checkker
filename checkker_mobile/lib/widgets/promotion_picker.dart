@@ -47,26 +47,27 @@ class PromotionPicker extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              Row(
-                mainAxisSize: MainAxisSize.min,
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
                 children: [
-                  for (final p in _promotionPieces) ...[
-                    if (p != _promotionPieces.first) const SizedBox(width: AppSpacing.sm),
+                  for (final p in _promotionPieces)
                     GestureDetector(
                       onTap: () => onSelect(p.piece),
                       child: Container(
+                        constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                         decoration: BoxDecoration(color: const Color(0x14F5F0E8), border: Border.all(color: AppColors.border.gold), borderRadius: BorderRadius.circular(AppRadius.md)),
                         padding: const EdgeInsets.all(AppSpacing.md),
                         child: Column(
                           children: [
                             Text(p.symbol, style: TextStyle(fontSize: 36, color: AppColors.text.primary)),
-                            const SizedBox(height: 4),
-                            Text(p.label, style: TextStyle(fontSize: 11, color: AppColors.text.muted)),
+                            const SizedBox(height: AppSpacing.xxs),
+                            Text(p.label, style: TextStyle(fontSize: AppTypography.xs, color: AppColors.text.muted)),
                           ],
                         ),
                       ),
                     ),
-                  ],
                 ],
               ),
               const SizedBox(height: AppSpacing.md),

@@ -57,6 +57,8 @@ class GameInfoBar extends StatelessWidget {
                   Text(
                     'Rating: $rating',
                     style: TextStyle(fontSize: 10, color: AppColors.text.muted),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
               ],
             ),

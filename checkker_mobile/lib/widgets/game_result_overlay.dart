@@ -151,74 +151,92 @@ class _GameResultOverlayState extends State<GameResultOverlay> {
           ),
 
           // Card
-          Container(
-            width: 320,
-            decoration: BoxDecoration(
-              color: AppColors.bg.primary,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(width: 2, color: AppColors.border.gold),
-              boxShadow: AppShadows.gold,
-            ),
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Header
-                Text(headerText, style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: headerColor)),
-                const SizedBox(height: AppSpacing.md),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final cardWidth = constraints.maxWidth * 0.88 < 400
+                  ? constraints.maxWidth * 0.88
+                  : 400.0;
 
-                // Scores
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _ScoreBox(label: 'You', total: playerTotal, poker: playerPoker != null ? _pokerSummary(playerPoker) : null),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                      child: Text('vs', style: TextStyle(fontSize: 16, color: AppColors.text.muted)),
-                    ),
-                    _ScoreBox(label: 'Opponent', total: opponentTotal, poker: opponentPoker != null ? _pokerSummary(opponentPoker) : null),
-                  ],
+              return Container(
+                width: cardWidth,
+                decoration: BoxDecoration(
+                  color: AppColors.bg.primary,
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  border: Border.all(width: 2, color: AppColors.border.gold),
+                  boxShadow: AppShadows.gold,
                 ),
-                const SizedBox(height: AppSpacing.md),
-
-                // Result detail
-                Text(_resultReason(result),
-                    style: TextStyle(fontSize: 14, color: AppColors.text.secondary), textAlign: TextAlign.center),
-                Text('(${_resultLabel(result)})',
-                    style: TextStyle(fontSize: 12, color: AppColors.text.muted)),
-
-                // Bet settlement
-                if (widget.betSettlement != null) ...[
-                  const SizedBox(height: AppSpacing.md),
-                  _BetSettlement(bet: widget.betSettlement!),
-                ],
-
-                const SizedBox(height: AppSpacing.lg),
-
-                // Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (widget.onRematch != null)
-                      ElevatedButton(
-                        onPressed: widget.onRematch,
-                        child: Text(
-                          widget.rematchPending
-                              ? 'Waiting...'
-                              : widget.opponentWantsRematch
-                                  ? 'Accept Rematch'
-                                  : 'Rematch',
+                    // Header
+                    Text(headerText, style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: headerColor)),
+                    const SizedBox(height: AppSpacing.md),
+
+                    // Scores
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: _ScoreBox(label: 'You', total: playerTotal, poker: playerPoker != null ? _pokerSummary(playerPoker) : null),
                         ),
-                      ),
-                    if (widget.onRematch != null) const SizedBox(width: AppSpacing.sm),
-                    OutlinedButton(
-                      onPressed: widget.onHome,
-                      child: const Text('Return Home'),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                          child: Text('vs', style: TextStyle(fontSize: AppTypography.body, color: AppColors.text.muted)),
+                        ),
+                        Flexible(
+                          child: _ScoreBox(label: 'Opponent', total: opponentTotal, poker: opponentPoker != null ? _pokerSummary(opponentPoker) : null),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+
+                    // Result detail
+                    Text(
+                      _resultReason(result),
+                      style: TextStyle(fontSize: AppTypography.sm, color: AppColors.text.secondary),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text('(${_resultLabel(result)})',
+                        style: TextStyle(fontSize: AppTypography.xs, color: AppColors.text.muted)),
+
+                    // Bet settlement
+                    if (widget.betSettlement != null) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      _BetSettlement(bet: widget.betSettlement!),
+                    ],
+
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // Actions
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.xs,
+                      children: [
+                        if (widget.onRematch != null)
+                          ElevatedButton(
+                            onPressed: widget.onRematch,
+                            child: Text(
+                              widget.rematchPending
+                                  ? 'Waiting...'
+                                  : widget.opponentWantsRematch
+                                      ? 'Accept Rematch'
+                                      : 'Rematch',
+                            ),
+                          ),
+                        OutlinedButton(
+                          onPressed: widget.onHome,
+                          child: const Text('Return Home'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
         ],
       ),
@@ -237,16 +255,13 @@ class _ScoreBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(label, style: TextStyle(fontSize: 12, color: AppColors.text.muted)),
+        Text(label, style: TextStyle(fontSize: AppTypography.xs, color: AppColors.text.muted), maxLines: 1, overflow: TextOverflow.ellipsis),
         Text(
           total != null ? '$total' : '-',
           style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: AppColors.text.primary),
         ),
         if (poker != null)
-          SizedBox(
-            width: 120,
-            child: Text(poker!, style: TextStyle(fontSize: 10, color: AppColors.text.muted), textAlign: TextAlign.center),
-          ),
+          Text(poker!, style: TextStyle(fontSize: 10, color: AppColors.text.muted), textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis),
       ],
     );
   }
@@ -271,11 +286,15 @@ class _BetSettlement extends StatelessWidget {
             ? '-\$${bet.betAmountUsd.toStringAsFixed(2)}'
             : '\$${bet.betAmountUsd.toStringAsFixed(2)} Refunded';
 
+    final txDisplay = bet.txHash.length >= 10
+        ? 'Tx: ${bet.txHash.substring(0, 6)}...${bet.txHash.substring(bet.txHash.length - 4)}'
+        : 'Tx: ${bet.txHash}';
+
     return Column(
       children: [
         Text(text, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: color)),
         Text(
-          'Tx: ${bet.txHash.substring(0, 6)}...${bet.txHash.substring(bet.txHash.length - 4)}',
+          txDisplay,
           style: TextStyle(fontSize: 10, color: AppColors.text.muted),
         ),
       ],

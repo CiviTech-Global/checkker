@@ -35,9 +35,10 @@ class _SpectatorBannerState extends State<SpectatorBanner> {
   Widget build(BuildContext context) {
     if (widget.comment == null) return const SizedBox.shrink();
 
+    final screenWidth = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(maxWidth: 480),
+      constraints: BoxConstraints(maxWidth: AppSizes.contentMaxWidth(screenWidth)),
       decoration: BoxDecoration(
         color: AppColors.accent.primary.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -66,10 +67,12 @@ class _SpectatorBannerState extends State<SpectatorBanner> {
           Text(
             widget.comment!,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: AppTypography.xs,
               color: AppColors.text.primary,
               fontStyle: FontStyle.italic,
             ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

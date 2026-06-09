@@ -35,9 +35,10 @@ class _CoachingTipBannerState extends State<CoachingTipBanner> {
   Widget build(BuildContext context) {
     if (widget.tip == null) return const SizedBox.shrink();
 
+    final screenWidth = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(maxWidth: 480),
+      constraints: BoxConstraints(maxWidth: AppSizes.contentMaxWidth(screenWidth)),
       decoration: BoxDecoration(
         color: AppColors.bg.secondary,
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -73,6 +74,8 @@ class _CoachingTipBannerState extends State<CoachingTipBanner> {
           Text(
             widget.tip!,
             style: TextStyle(fontSize: 13, color: AppColors.text.primary, height: 1.4),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

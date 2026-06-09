@@ -111,9 +111,10 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(
-                width: 60, height: 60,
-                child: CircularProgressIndicator(strokeWidth: 3),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.15,
+                height: MediaQuery.of(context).size.width * 0.15,
+                child: const CircularProgressIndicator(strokeWidth: 3),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text('Searching for opponent...',

@@ -18,7 +18,8 @@ class CasualScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.bg.primary,
       appBar: AppBar(title: const Text('Casual Play')),
-      body: ListView.builder(
+      body: SafeArea(
+        child: ListView.builder(
         padding: const EdgeInsets.all(AppSpacing.md),
         itemCount: _tiers.length,
         itemBuilder: (context, i) {
@@ -68,6 +69,7 @@ class CasualScreen extends ConsumerWidget {
             ),
           );
         },
+      ),
       ),
     );
   }

@@ -52,7 +52,7 @@ class ChessBoard extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final coordSize = 20.0;
+        final coordSize = (constraints.maxWidth * 0.05).clamp(14.0, 24.0);
         final squareSize = ((constraints.maxWidth - coordSize) / 8).floorToDouble();
 
         return Container(

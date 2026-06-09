@@ -21,7 +21,7 @@ class GameMenuButton extends StatelessWidget {
       child: IconButton(
         icon: Icon(Icons.menu, color: AppColors.text.primary, size: 18),
         onPressed: () => _showMenu(context),
-        constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+        constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
         padding: EdgeInsets.zero,
       ),
     );

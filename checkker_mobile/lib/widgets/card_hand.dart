@@ -29,9 +29,6 @@ String _pieceTypeLabel(PieceType piece) {
   }
 }
 
-const double _cardWidth = 64;
-const double _cardHeight = 88;
-
 class CardHand extends StatelessWidget {
   final List<PlayingCard> cards;
   final int? selectedIndex;
@@ -50,22 +47,35 @@ class CardHand extends StatelessWidget {
   Widget build(BuildContext context) {
     final totalSlots = cards.length < 3 ? 3 : cards.length;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (var i = 0; i < totalSlots; i++) ...[
-          if (i > 0) const SizedBox(width: AppSpacing.xs),
-          if (i < cards.length)
-            _CardItem(
-              card: cards[i],
-              isSelected: selectedIndex == i,
-              onTap: () => onCardTap(i),
-              disabled: disabled,
-            )
-          else
-            _EmptySlot(),
-        ],
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final cardW = AppSizes.cardWidth(screenWidth);
+        final cardH = AppSizes.cardHeight(cardW);
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < totalSlots; i++) ...[
+                if (i > 0) const SizedBox(width: AppSpacing.xs),
+                if (i < cards.length)
+                  _CardItem(
+                    card: cards[i],
+                    isSelected: selectedIndex == i,
+                    onTap: () => onCardTap(i),
+                    disabled: disabled,
+                    cardWidth: cardW,
+                    cardHeight: cardH,
+                  )
+                else
+                  _EmptySlot(cardWidth: cardW, cardHeight: cardH),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -75,12 +85,16 @@ class _CardItem extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final bool disabled;
+  final double cardWidth;
+  final double cardHeight;
 
   const _CardItem({
     required this.card,
     required this.isSelected,
     required this.onTap,
     required this.disabled,
+    required this.cardWidth,
+    required this.cardHeight,
   });
 
   @override
@@ -88,6 +102,7 @@ class _CardItem extends StatelessWidget {
     final suitColor = _suitColor[card.suit] ?? AppColors.text.dark;
     final borderColor = isSelected ? AppColors.accent.gold : suitColor;
     final label = _pieceTypeLabel(cardToPiece(card));
+    final fontScale = cardWidth / 64;
 
     return GestureDetector(
       onTap: disabled ? null : onTap,
@@ -95,8 +110,8 @@ class _CardItem extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
         transform: Matrix4.translationValues(0, isSelected ? -12 : 0, 0),
-        width: _cardWidth,
-        height: _cardHeight,
+        width: cardWidth,
+        height: cardHeight,
         decoration: BoxDecoration(
           color: AppColors.cardFace,
           borderRadius: BorderRadius.circular(AppRadius.md),
@@ -115,7 +130,7 @@ class _CardItem extends StatelessWidget {
                   child: Text(
                     card.rankLabel,
                     style: TextStyle(
-                      fontSize: AppTypography.sm,
+                      fontSize: AppTypography.sm * fontScale,
                       fontFamily: 'monospace',
                       fontWeight: FontWeight.w700,
                       color: suitColor,
@@ -124,15 +139,17 @@ class _CardItem extends StatelessWidget {
                 ),
                 Text(
                   _suitSymbol[card.suit] ?? '',
-                  style: TextStyle(fontSize: AppTypography.lg, color: suitColor),
+                  style: TextStyle(fontSize: AppTypography.lg * fontScale, color: suitColor),
                 ),
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: AppTypography.xs,
+                    fontSize: AppTypography.xs * fontScale,
                     fontWeight: FontWeight.w500,
                     color: suitColor,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -144,11 +161,16 @@ class _CardItem extends StatelessWidget {
 }
 
 class _EmptySlot extends StatelessWidget {
+  final double cardWidth;
+  final double cardHeight;
+
+  const _EmptySlot({required this.cardWidth, required this.cardHeight});
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: _cardWidth,
-      height: _cardHeight,
+      width: cardWidth,
+      height: cardHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(width: 2, color: AppColors.border.gold),

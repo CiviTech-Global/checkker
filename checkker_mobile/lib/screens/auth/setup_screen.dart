@@ -207,11 +207,14 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
-            GridView.builder(
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final columns = AppSizes.gridColumns(constraints.maxWidth, 72);
+                return GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
                 crossAxisSpacing: AppSpacing.sm,
                 mainAxisSpacing: AppSpacing.sm,
               ),
@@ -242,6 +245,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                     ),
                   ),
                 );
+              },
+            );
               },
             ),
 
