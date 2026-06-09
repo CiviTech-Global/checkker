@@ -7,7 +7,7 @@ import '../models/game_client.dart';
 
 const String _defaultServerUrl = String.fromEnvironment(
   'SERVER_URL',
-  defaultValue: 'http://localhost:3001',
+  defaultValue: 'http://192.168.1.105:3001',
 );
 
 // Auth types
