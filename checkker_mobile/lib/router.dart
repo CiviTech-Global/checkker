@@ -22,6 +22,9 @@ import 'screens/auth/setup_screen.dart';
 import 'screens/donate/donate_screen.dart';
 import 'screens/dev/dev_screen.dart';
 import 'screens/shop/shop_screen.dart';
+import 'screens/friends/friends_screen.dart';
+import 'screens/notifications/notifications_screen.dart';
+import 'screens/offline/offline_game_screen.dart';
 
 final goRouter = GoRouter(
   initialLocation: '/',
@@ -45,6 +48,14 @@ final goRouter = GoRouter(
     GoRoute(path: '/tutorial/book', builder: (_, _) => const TutorialBookScreen()),
     GoRoute(path: '/tutorial/lesson/:id', builder: (_, state) => TutorialLessonScreen(id: state.pathParameters['id']!)),
     GoRoute(path: '/shop', builder: (_, _) => const ShopScreen()),
+    GoRoute(path: '/friends', builder: (_, _) => const FriendsScreen()),
+    GoRoute(path: '/notifications', builder: (_, _) => const NotificationsScreen()),
+    GoRoute(
+      path: '/offline',
+      builder: (_, state) => OfflineGameScreen(
+        difficulty: state.uri.queryParameters['difficulty'] ?? 'beginner',
+      ),
+    ),
     GoRoute(path: '/puzzles', builder: (_, _) => const PuzzlesScreen()),
     GoRoute(path: '/puzzles/play/:category', builder: (_, state) => PuzzlePlayScreen(category: state.pathParameters['category']!)),
     GoRoute(path: '/replay/:gameId', builder: (_, state) => ReplayScreen(gameId: state.pathParameters['gameId']!)),

@@ -19,6 +19,7 @@ model User {
   draws         Int      @default(0)
   currentStreak Int      @default(0) @map("current_streak")
   bestStreak    Int      @default(0) @map("best_streak")
+  coins         Int      @default(200)
   fcmToken      String?  @map("fcm_token")
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
@@ -29,9 +30,42 @@ model User {
   bets          Bet[]
   puzzleAttempts PuzzleAttempt[]
   cosmetics     UserCosmetic[]
+  sentFriendRequests     Friendship[]  @relation("FriendRequester")
+  receivedFriendRequests Friendship[]  @relation("FriendAddressee")
+  notifications Notification[]
 
   @@index([rating(sort: Desc)])
   @@map("users")
+}
+
+model Friendship {
+  id          String   @id @default(uuid()) @db.Uuid
+  requesterId String   @map("requester_id") @db.Uuid
+  addresseeId String   @map("addressee_id") @db.Uuid
+  status      String   @default("pending") @db.VarChar(16) // pending | accepted | declined
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  respondedAt DateTime? @map("responded_at") @db.Timestamptz()
+
+  requester User @relation("FriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee User @relation("FriendAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+  @@map("friendships")
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  type      String   @db.VarChar(32) // friend_request | friend_accepted | game_invite | daily_puzzle | system
+  payload   String   @default("{}") // JSON payload
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read, createdAt(sort: Desc)])
+  @@map("notifications")
 }
 
 model Game {
@@ -111,6 +145,7 @@ model Puzzle {
   difficulty String   @db.VarChar(16) // beginner | intermediate | advanced | master
   category   String   @db.VarChar(24) // daily | tactics | card_management | endgame | weakness
   rating     Int      @default(1500)  // Estimated puzzle rating
+  cards      String?  // JSON 3-card hand; contains a card able to play the solution
   isDaily    Boolean  @default(false) @map("is_daily")
   dailyDate  DateTime? @map("daily_date") @db.Date
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()

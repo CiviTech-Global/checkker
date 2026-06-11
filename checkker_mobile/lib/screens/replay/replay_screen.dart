@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chess/chess.dart' as chess_lib;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -93,6 +94,65 @@ class _ReplayScreenState extends ConsumerState<ReplayScreen> {
     return 'No card';
   }
 
+  static const _suitLetters = {
+    'clubs': 'c',
+    'diamonds': 'd',
+    'hearts': 'h',
+    'spades': 's',
+  };
+
+  /// Checkker Notation: PGN-like text with card annotations, matching the
+  /// RN app's formatCheckkerGame output.
+  String _exportText() {
+    final lines = <String>[];
+    final now = DateTime.now();
+    final date =
+        '${now.year}.${now.month.toString().padLeft(2, '0')}.${now.day.toString().padLeft(2, '0')}';
+    lines.add('[Event "Checkker game"]');
+    lines.add('[Date "$date"]');
+    lines.add('[GameId "${widget.gameId}"]');
+    lines.add('[Result "*"]');
+    lines.add('[Variant "Checkker (card-driven chess + poker scoring)"]');
+    lines.add('');
+
+    final tokens = <String>[];
+    for (int i = 0; i < _moves.length; i++) {
+      final m = _moves[i];
+      if (i % 2 == 0) tokens.add('${i ~/ 2 + 1}.');
+      var token = (m.san?.isNotEmpty ?? false) ? m.san! : m.moveUci;
+      if (m.cardRank != null) {
+        final suit = m.cardSuit != null
+            ? (_suitLetters[m.cardSuit] ?? m.cardSuit![0])
+            : '';
+        token += ' {${m.cardRank}$suit}';
+      }
+      tokens.add(token);
+    }
+
+    var line = '';
+    for (final token in tokens) {
+      if (line.length + token.length + 1 > 80) {
+        lines.add(line);
+        line = token;
+      } else {
+        line = line.isEmpty ? token : '$line $token';
+      }
+    }
+    if (line.isNotEmpty) lines.add(line);
+    return lines.join('\n');
+  }
+
+  Future<void> _shareGame() async {
+    if (_moves.isEmpty) return;
+    final text =
+        '${_exportText()}\n\nWatch the replay: checkker://replay/${widget.gameId}';
+    await Clipboard.setData(ClipboardData(text: text));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Game copied to clipboard (Checkker Notation + replay link)')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,6 +166,13 @@ class _ReplayScreenState extends ConsumerState<ReplayScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: 'Copy game export',
+            onPressed: _shareGame,
+          ),
+        ],
       ),
       body: _buildBody(),
     );

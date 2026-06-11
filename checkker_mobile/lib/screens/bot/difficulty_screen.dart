@@ -156,6 +156,21 @@ class _DifficultyScreenState extends ConsumerState<DifficultyScreen> {
                     : Text('Start Game', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
               ),
             ),
+            const SizedBox(height: AppSpacing.sm),
+            Center(
+              child: TextButton.icon(
+                onPressed: () {
+                  final offlineDifficulty =
+                      _selectedDifficulty == 'master' ? 'advanced' : _selectedDifficulty;
+                  context.push('/offline?difficulty=$offlineDifficulty');
+                },
+                icon: Icon(Icons.wifi_off, size: 16, color: AppColors.text.muted),
+                label: Text(
+                  'Play offline (no connection needed)',
+                  style: TextStyle(color: AppColors.text.muted, fontSize: 13),
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -13,7 +13,21 @@
       "Bash(node --version:*)",
       "Bash(node --input-type=commonjs:*)",
       "WebFetch(domain:github.com)",
-      "Bash(npx claude-mem install:*)"
+      "Bash(npx claude-mem install:*)",
+      "PowerShell(node --version; npx claude-mem install)",
+      "PowerShell(npx claude-mem start)",
+      "PowerShell(Invoke-WebRequest -UseBasicParsing http://localhost:37777/health | Select-Object -ExpandProperty Content)",
+      "PowerShell(npm run *)",
+      "PowerShell(npx turbo test 2>&1 | Select-Object -Last 40)",
+      "PowerShell(npm test *)",
+      "PowerShell(foreach \\($w in 'packages/chess','packages/poker','packages/shared','packages/ai-brain'\\) { Write-Output \"=== $w ===\"; npm test -w $w 2>&1 | Select-String -Pattern 'Tests:|Test Suites:|failed|FAIL' | Select-Object -First 4 })"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "playwright",
+    "claude-mem",
+    "perplexity",
+    "firecrawl",
+    "glif"
+  ]
 }

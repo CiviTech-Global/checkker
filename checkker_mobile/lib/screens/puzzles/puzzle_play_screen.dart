@@ -284,6 +284,38 @@ class _PuzzlePlayScreenState extends ConsumerState<PuzzlePlayScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
+          if (puzzle.cards.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Your hand: ',
+                  style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.sm),
+                ),
+                for (final card in puzzle.cards)
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.bg.tertiary,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: Text(
+                      '${card.rank}${card.suitSymbol}',
+                      style: TextStyle(
+                        color: card.isRed ? AppColors.accent.red : AppColors.text.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
           const SizedBox(height: AppSpacing.md),
           if (!_submitted)
             SizedBox(

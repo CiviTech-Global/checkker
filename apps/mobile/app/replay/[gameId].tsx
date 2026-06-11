@@ -6,11 +6,13 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  Share,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Chess } from "chess.js";
+import { formatCheckkerGame, buildReplayLink } from "@checkker/shared";
 import ChessBoard from "../../src/components/ChessBoard";
 import { useSocket } from "../../src/hooks/useSocket";
 import { colors, spacing, radius, glassStyle } from "../../src/theme/tokens";
@@ -103,6 +105,21 @@ export default function ReplayScreen() {
     applyIndex(movesRef.current.length - 1);
   }, [applyIndex]);
 
+  const shareGame = useCallback(async () => {
+    const movesList = movesRef.current;
+    if (movesList.length === 0) return;
+    const exportText = formatCheckkerGame(movesList, { gameId });
+    const link = gameId ? buildReplayLink(gameId) : "";
+    try {
+      await Share.share({
+        message: `${exportText}\n\nWatch the replay: ${link}`,
+        title: "Checkker Game Replay",
+      });
+    } catch {
+      // user dismissed the share sheet
+    }
+  }, [gameId]);
+
   const moves = movesRef.current;
   const currentMove =
     currentIndex >= 0 && currentIndex < moves.length
@@ -191,6 +208,13 @@ export default function ReplayScreen() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Game Replay</Text>
         <View style={styles.headerSpacer} />
+        <TouchableOpacity
+          style={styles.shareBtn}
+          onPress={shareGame}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.shareBtnText}>Share</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -386,6 +410,18 @@ const styles = StyleSheet.create({
   },
   headerSpacer: {
     flex: 1,
+  },
+  shareBtn: {
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.accent.gold,
+  },
+  shareBtnText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.accent.gold,
   },
   scrollContent: {
     padding: spacing.md,

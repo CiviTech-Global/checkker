@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/cosmetic_catalog.dart';
 import '../theme/tokens.dart';
 
 class ChessSquare extends StatelessWidget {
@@ -12,6 +13,8 @@ class ChessSquare extends StatelessWidget {
   final bool isCheck;
   final ValueChanged<String> onPress;
   final double size;
+  final BoardTheme? boardColors;
+  final PieceTheme? pieceColors;
 
   const ChessSquare({
     super.key,
@@ -24,11 +27,15 @@ class ChessSquare extends StatelessWidget {
     this.isCheck = false,
     required this.onPress,
     required this.size,
+    this.boardColors,
+    this.pieceColors,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bg = isLight ? AppColors.board.light : AppColors.board.dark;
+    final bg = isLight
+        ? (boardColors?.light ?? AppColors.board.light)
+        : (boardColors?.dark ?? AppColors.board.dark);
 
     final pieceColor = piece != null && piece == piece!.toUpperCase() ? 'white' : 'black';
     final pieceKey = piece?.toLowerCase();
@@ -73,6 +80,11 @@ class ChessSquare extends StatelessWidget {
                 unicode,
                 style: TextStyle(
                   fontSize: size * 0.65,
+                  color: pieceColors != null
+                      ? (pieceColor == 'white'
+                          ? pieceColors!.white
+                          : pieceColors!.black)
+                      : null,
                   shadows: const [
                     Shadow(
                       color: Color(0x80000000),

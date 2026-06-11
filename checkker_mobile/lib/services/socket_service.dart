@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
 import '../models/card.dart';
@@ -90,10 +91,12 @@ class BetSettledPayload {
 class CosmeticsData {
   final List<Cosmetic> cosmetics;
   final List<UserCosmetic> userCosmetics;
+  final int coins;
 
   const CosmeticsData({
     required this.cosmetics,
     required this.userCosmetics,
+    this.coins = 0,
   });
 
   factory CosmeticsData.fromJson(Map<String, dynamic> json) {
@@ -104,6 +107,44 @@ class CosmeticsData {
       userCosmetics: (json['userCosmetics'] as List? ?? [])
           .map((u) => UserCosmetic.fromJson(u as Map<String, dynamic>))
           .toList(),
+      coins: json['coins'] as int? ?? 0,
+    );
+  }
+}
+
+class CosmeticPurchaseResult {
+  final bool success;
+  final String? cosmeticId;
+  final int? coins;
+  final String? error;
+
+  const CosmeticPurchaseResult({
+    required this.success,
+    this.cosmeticId,
+    this.coins,
+    this.error,
+  });
+
+  factory CosmeticPurchaseResult.fromJson(Map<String, dynamic> json) {
+    return CosmeticPurchaseResult(
+      success: json['success'] as bool? ?? false,
+      cosmeticId: json['cosmeticId'] as String?,
+      coins: json['coins'] as int?,
+      error: json['error'] as String?,
+    );
+  }
+}
+
+class CoinsAwarded {
+  final int amount;
+  final int balance;
+
+  const CoinsAwarded({required this.amount, required this.balance});
+
+  factory CoinsAwarded.fromJson(Map<String, dynamic> json) {
+    return CoinsAwarded(
+      amount: json['amount'] as int? ?? 0,
+      balance: json['balance'] as int? ?? 0,
     );
   }
 }
@@ -214,6 +255,127 @@ class ReplayData {
       moves: (json['moves'] as List? ?? [])
           .map((m) => ReplayMove.fromJson(m as Map<String, dynamic>))
           .toList(),
+    );
+  }
+}
+
+// Friends types
+class FriendSummary {
+  final String friendshipId;
+  final String userId;
+  final String username;
+  final String avatarId;
+  final int rating;
+  final bool online;
+
+  const FriendSummary({
+    required this.friendshipId,
+    required this.userId,
+    required this.username,
+    required this.avatarId,
+    required this.rating,
+    this.online = false,
+  });
+
+  factory FriendSummary.fromJson(Map<String, dynamic> json) {
+    return FriendSummary(
+      friendshipId: json['friendshipId'] as String? ?? '',
+      userId: json['userId'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      avatarId: json['avatarId'] as String? ?? 'knight',
+      rating: json['rating'] as int? ?? 1200,
+      online: json['online'] as bool? ?? false,
+    );
+  }
+}
+
+class PendingFriendRequest {
+  final String friendshipId;
+  final String fromUserId;
+  final String fromUsername;
+  final String fromAvatarId;
+
+  const PendingFriendRequest({
+    required this.friendshipId,
+    required this.fromUserId,
+    required this.fromUsername,
+    required this.fromAvatarId,
+  });
+
+  factory PendingFriendRequest.fromJson(Map<String, dynamic> json) {
+    return PendingFriendRequest(
+      friendshipId: json['friendshipId'] as String? ?? '',
+      fromUserId: json['fromUserId'] as String? ?? '',
+      fromUsername: json['fromUsername'] as String? ?? '',
+      fromAvatarId: json['fromAvatarId'] as String? ?? 'knight',
+    );
+  }
+}
+
+class FriendsData {
+  final List<FriendSummary> friends;
+  final List<PendingFriendRequest> pending;
+  final String? error;
+
+  const FriendsData({this.friends = const [], this.pending = const [], this.error});
+
+  factory FriendsData.fromJson(Map<String, dynamic> json) {
+    return FriendsData(
+      friends: (json['friends'] as List? ?? [])
+          .map((f) => FriendSummary.fromJson(Map<String, dynamic>.from(f as Map)))
+          .toList(),
+      pending: (json['pending'] as List? ?? [])
+          .map((p) => PendingFriendRequest.fromJson(Map<String, dynamic>.from(p as Map)))
+          .toList(),
+      error: json['error'] as String?,
+    );
+  }
+}
+
+class AppNotification {
+  final String id;
+  final String type;
+  final Map<String, dynamic> payload;
+  final bool read;
+
+  const AppNotification({
+    required this.id,
+    required this.type,
+    this.payload = const {},
+    this.read = false,
+  });
+
+  factory AppNotification.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic> payload = {};
+    final raw = json['payload'];
+    if (raw is Map) {
+      payload = Map<String, dynamic>.from(raw);
+    } else if (raw is String && raw.isNotEmpty) {
+      try {
+        payload = Map<String, dynamic>.from(jsonDecode(raw) as Map);
+      } catch (_) {}
+    }
+    return AppNotification(
+      id: json['id'] as String? ?? '',
+      type: json['type'] as String? ?? 'system',
+      payload: payload,
+      read: json['read'] as bool? ?? false,
+    );
+  }
+}
+
+class NotificationsData {
+  final List<AppNotification> notifications;
+  final int unread;
+
+  const NotificationsData({this.notifications = const [], this.unread = 0});
+
+  factory NotificationsData.fromJson(Map<String, dynamic> json) {
+    return NotificationsData(
+      notifications: (json['notifications'] as List? ?? [])
+          .map((n) => AppNotification.fromJson(Map<String, dynamic>.from(n as Map)))
+          .toList(),
+      unread: json['unread'] as int? ?? 0,
     );
   }
 }
@@ -392,6 +554,19 @@ class SocketService {
   final _puzzlesListController = StreamController<PuzzlesListData>.broadcast();
   final _puzzleResultController = StreamController<PuzzleResult>.broadcast();
   final _replayMovesController = StreamController<ReplayData>.broadcast();
+  final _friendsDataController = StreamController<FriendsData>.broadcast();
+  final _friendRequestResultController = StreamController<Map<String, dynamic>>.broadcast();
+  final _incomingFriendRequestController = StreamController<Map<String, dynamic>>.broadcast();
+  final _friendAcceptedController = StreamController<Map<String, dynamic>>.broadcast();
+  final _inviteSentController = StreamController<Map<String, dynamic>>.broadcast();
+  final _privateInviteController = StreamController<Map<String, dynamic>>.broadcast();
+  final _inviteDeclinedController = StreamController<Map<String, dynamic>>.broadcast();
+  final _inviteResponseResultController = StreamController<Map<String, dynamic>>.broadcast();
+  final _notificationsController = StreamController<NotificationsData>.broadcast();
+  final _cosmeticPurchasedController = StreamController<CosmeticPurchaseResult>.broadcast();
+  final _coinsAwardedController = StreamController<CoinsAwarded>.broadcast();
+  final _lanGameHostedController = StreamController<Map<String, dynamic>>.broadcast();
+  final _lanJoinResultController = StreamController<Map<String, dynamic>>.broadcast();
 
   // Public getters
   bool get isConnected => _socket?.connected ?? false;
@@ -433,6 +608,19 @@ class SocketService {
   Stream<PuzzlesListData> get puzzlesListStream => _puzzlesListController.stream;
   Stream<PuzzleResult> get puzzleResultStream => _puzzleResultController.stream;
   Stream<ReplayData> get replayMovesStream => _replayMovesController.stream;
+  Stream<FriendsData> get friendsDataStream => _friendsDataController.stream;
+  Stream<Map<String, dynamic>> get friendRequestResultStream => _friendRequestResultController.stream;
+  Stream<Map<String, dynamic>> get incomingFriendRequestStream => _incomingFriendRequestController.stream;
+  Stream<CosmeticPurchaseResult> get cosmeticPurchasedStream => _cosmeticPurchasedController.stream;
+  Stream<CoinsAwarded> get coinsAwardedStream => _coinsAwardedController.stream;
+  Stream<Map<String, dynamic>> get lanGameHostedStream => _lanGameHostedController.stream;
+  Stream<Map<String, dynamic>> get lanJoinResultStream => _lanJoinResultController.stream;
+  Stream<Map<String, dynamic>> get friendAcceptedStream => _friendAcceptedController.stream;
+  Stream<Map<String, dynamic>> get inviteSentStream => _inviteSentController.stream;
+  Stream<Map<String, dynamic>> get privateInviteStream => _privateInviteController.stream;
+  Stream<Map<String, dynamic>> get inviteDeclinedStream => _inviteDeclinedController.stream;
+  Stream<Map<String, dynamic>> get inviteResponseResultStream => _inviteResponseResultController.stream;
+  Stream<NotificationsData> get notificationsStream => _notificationsController.stream;
 
   io.Socket get socket {
     _socket ??= _createSocket();
@@ -545,6 +733,10 @@ class SocketService {
     s.on('auth_success', (data) {
       _authState = AuthState.fromJson(_toMap(data));
       _authStateController.add(_authState);
+      // Fetch cosmetics so equipped themes apply without visiting the shop,
+      // and notifications so the home badge is current.
+      s.emit('get_cosmetics');
+      s.emit('get_notifications');
     });
 
     s.on('auth_error', (data) {
@@ -620,6 +812,43 @@ class SocketService {
       _replayMovesController.add(ReplayData.fromJson(_toMap(data)));
     });
 
+    // Friends & private game events
+    s.on('friends_data', (data) {
+      _friendsDataController.add(FriendsData.fromJson(_toMap(data)));
+    });
+
+    s.on('friend_request_result', (data) {
+      _friendRequestResultController.add(_toMap(data));
+    });
+
+    s.on('friend_request', (data) {
+      _incomingFriendRequestController.add(_toMap(data));
+    });
+
+    s.on('friend_accepted', (data) {
+      _friendAcceptedController.add(_toMap(data));
+    });
+
+    s.on('invite_sent', (data) {
+      _inviteSentController.add(_toMap(data));
+    });
+
+    s.on('private_invite', (data) {
+      _privateInviteController.add(_toMap(data));
+    });
+
+    s.on('invite_declined', (data) {
+      _inviteDeclinedController.add(_toMap(data));
+    });
+
+    s.on('invite_response_result', (data) {
+      _inviteResponseResultController.add(_toMap(data));
+    });
+
+    s.on('notifications', (data) {
+      _notificationsController.add(NotificationsData.fromJson(_toMap(data)));
+    });
+
     // Cosmetics events
     s.on('cosmetics', (data) {
       _cosmeticsData = CosmeticsData.fromJson(_toMap(data));
@@ -628,22 +857,66 @@ class SocketService {
 
     s.on('cosmetic_equipped', (data) {
       final json = _toMap(data);
-      final equipped = (json['equipped'] as List? ?? []).cast<String>();
+      // Server sends `equipped` as the full list of equipped UserCosmetic rows.
+      final equippedIds = (json['equipped'] as List? ?? [])
+          .map((e) => e is Map ? e['cosmeticId'] as String? ?? '' : e.toString())
+          .toSet();
       if (_cosmeticsData != null) {
         final updatedUserCosmetics = _cosmeticsData!.userCosmetics.map((uc) {
           return UserCosmetic(
             userId: uc.userId,
             cosmeticId: uc.cosmeticId,
-            equipped: equipped.contains(uc.cosmeticId),
+            equipped: equippedIds.contains(uc.cosmeticId),
             cosmetic: uc.cosmetic,
           );
         }).toList();
         _cosmeticsData = CosmeticsData(
           cosmetics: _cosmeticsData!.cosmetics,
           userCosmetics: updatedUserCosmetics,
+          coins: _cosmeticsData!.coins,
         );
         _cosmeticsController.add(_cosmeticsData!);
       }
+    });
+
+    s.on('cosmetic_purchased', (data) {
+      final result = CosmeticPurchaseResult.fromJson(_toMap(data));
+      if (result.success && _cosmeticsData != null) {
+        final json = _toMap(data);
+        final userCosmetics = (json['userCosmetics'] as List? ?? [])
+            .map((u) => UserCosmetic.fromJson(u as Map<String, dynamic>))
+            .toList();
+        _cosmeticsData = CosmeticsData(
+          cosmetics: _cosmeticsData!.cosmetics,
+          userCosmetics: userCosmetics.isNotEmpty
+              ? userCosmetics
+              : _cosmeticsData!.userCosmetics,
+          coins: result.coins ?? _cosmeticsData!.coins,
+        );
+        _cosmeticsController.add(_cosmeticsData!);
+      }
+      _cosmeticPurchasedController.add(result);
+    });
+
+    s.on('lan_game_hosted', (data) {
+      _lanGameHostedController.add(_toMap(data));
+    });
+
+    s.on('lan_join_result', (data) {
+      _lanJoinResultController.add(_toMap(data));
+    });
+
+    s.on('coins_awarded', (data) {
+      final awarded = CoinsAwarded.fromJson(_toMap(data));
+      if (_cosmeticsData != null) {
+        _cosmeticsData = CosmeticsData(
+          cosmetics: _cosmeticsData!.cosmetics,
+          userCosmetics: _cosmeticsData!.userCosmetics,
+          coins: awarded.balance,
+        );
+        _cosmeticsController.add(_cosmeticsData!);
+      }
+      _coinsAwardedController.add(awarded);
     });
 
     // Spectate
@@ -828,6 +1101,39 @@ class SocketService {
     socket.emit('get_game_moves', {'gameId': gameId});
   }
 
+  // Friends & private game methods
+  void getFriends() {
+    socket.emit('get_friends');
+  }
+
+  void sendFriendRequest(String username) {
+    socket.emit('send_friend_request', {'username': username});
+  }
+
+  void respondFriendRequest(String friendshipId, bool accept) {
+    socket.emit('respond_friend_request', {'friendshipId': friendshipId, 'accept': accept});
+  }
+
+  void removeFriend(String friendshipId) {
+    socket.emit('remove_friend', {'friendshipId': friendshipId});
+  }
+
+  void inviteFriend(String friendUserId, {String tc = 'blitz'}) {
+    socket.emit('invite_friend', {'friendUserId': friendUserId, 'tc': tc});
+  }
+
+  void respondInvite(String inviteId, bool accept) {
+    socket.emit('respond_invite', {'inviteId': inviteId, 'accept': accept});
+  }
+
+  void getNotifications() {
+    socket.emit('get_notifications');
+  }
+
+  void markNotificationsRead() {
+    socket.emit('mark_notifications_read');
+  }
+
   // Cosmetics methods
   void getCosmetics() {
     socket.emit('get_cosmetics');
@@ -835,6 +1141,23 @@ class SocketService {
 
   void equipCosmetic(String cosmeticId) {
     socket.emit('equip_cosmetic', {'cosmeticId': cosmeticId});
+  }
+
+  void purchaseCosmetic(String cosmeticId) {
+    socket.emit('purchase_cosmetic', {'cosmeticId': cosmeticId});
+  }
+
+  // LAN methods
+  void hostLanGame({String tc = 'blitz'}) {
+    socket.emit('host_lan_game', {'tc': tc});
+  }
+
+  void cancelLanHost() {
+    socket.emit('cancel_lan_host');
+  }
+
+  void joinLanGame(String code) {
+    socket.emit('join_lan_game', {'code': code});
   }
 
   // FCM token
@@ -910,5 +1233,18 @@ class SocketService {
     _puzzleResultController.close();
     _replayMovesController.close();
     _cosmeticsController.close();
+    _cosmeticPurchasedController.close();
+    _coinsAwardedController.close();
+    _lanGameHostedController.close();
+    _lanJoinResultController.close();
+    _friendsDataController.close();
+    _friendRequestResultController.close();
+    _incomingFriendRequestController.close();
+    _friendAcceptedController.close();
+    _inviteSentController.close();
+    _privateInviteController.close();
+    _inviteDeclinedController.close();
+    _inviteResponseResultController.close();
+    _notificationsController.close();
   }
 }

@@ -53,6 +53,18 @@ interface PendingBetGame {
 /** Authenticated socket sessions */
 const authenticatedSockets = new Map<string, { walletAddress: string; userId: string }>();
 
+/** Pending private game invite between friends */
+interface PrivateInvite {
+  inviteId: string;
+  fromUserId: string;
+  fromUsername: string;
+  toUserId: string;
+  tc: TimeControl;
+  createdAt: number;
+}
+
+const INVITE_TTL_MS = 5 * 60 * 1000;
+
 export class GameServer {
   private io: SocketServer;
   private queue: Array<{ player: Player; tc: TimeControl }> = [];
@@ -70,6 +82,9 @@ export class GameServer {
   };
   private matches = new Map<string, Match>();
   private pendingBets = new Map<string, PendingBetGame>();
+  private userSockets = new Map<string, Socket>(); // userId → live socket
+  private privateInvites = new Map<string, PrivateInvite>();
+  private lanHosts = new Map<string, { hostSocketId: string; tc: TimeControl; createdAt: number }>(); // code → host
   private queueTimeouts = new Map<string, NodeJS.Timeout>();
   private botManager: BotManager;
   private spectateManager: SpectateManager;
@@ -111,6 +126,7 @@ export class GameServer {
           walletAddress: walletAddress.toLowerCase(),
           userId: profile.id,
         });
+        this.userSockets.set(profile.id, socket);
         socket.emit("auth_success", { profile, isNewUser: false });
       } else {
         // Wallet verified but no account yet — client should call set_username
@@ -140,6 +156,7 @@ export class GameServer {
           walletAddress: walletAddress.toLowerCase(),
           userId: profile.id,
         });
+        this.userSockets.set(profile.id, socket);
         socket.emit("auth_success", { profile, isNewUser: false });
       } else {
         socket.emit("auth_error", { error: "Failed to create account" });
@@ -331,8 +348,18 @@ export class GameServer {
     });
 
     socket.on("generate_puzzle", async ({ difficulty }: { difficulty?: BotDifficulty }) => {
-      const fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-      const puzzle = await brain.generatePuzzle(fen, "white", difficulty ?? "intermediate");
+      // Sample a middlegame position from a short random playout so generated
+      // puzzles aren't always the starting position.
+      const { Chess } = await import("@checkker/chess");
+      const playout = new Chess();
+      const plies = 10 + Math.floor(Math.random() * 20);
+      for (let i = 0; i < plies; i++) {
+        const moves = playout.moves();
+        if (moves.length === 0 || playout.isGameOver()) break;
+        playout.move(moves[Math.floor(Math.random() * moves.length)]);
+      }
+      const color = playout.turn() === "w" ? "white" : "black";
+      const puzzle = await brain.generatePuzzle(playout.fen(), color, difficulty ?? "intermediate");
       if (puzzle) {
         socket.emit("puzzle", { puzzle });
       }
@@ -366,7 +393,7 @@ export class GameServer {
     socket.on("get_daily_puzzle", async () => {
       try {
         const { PuzzleRepository } = await import("@checkker/database");
-        const puzzle = await PuzzleRepository.getDaily();
+        const puzzle = await PuzzleRepository.ensureDaily();
         socket.emit("daily_puzzle", { puzzle });
       } catch {
         socket.emit("daily_puzzle", { puzzle: null });
@@ -377,6 +404,15 @@ export class GameServer {
       try {
         const { PuzzleRepository } = await import("@checkker/database");
         const effectiveCategory = category ?? "tactics";
+        if (effectiveCategory === "daily") {
+          const daily = await PuzzleRepository.ensureDaily();
+          socket.emit("puzzles", {
+            category: "daily",
+            puzzles: daily ? [daily] : [],
+            count: daily ? 1 : 0,
+          });
+          return;
+        }
         const [puzzles, count] = await Promise.all([
           PuzzleRepository.getByCategory(effectiveCategory, limit ?? 20),
           PuzzleRepository.countByCategory(effectiveCategory),
@@ -417,6 +453,297 @@ export class GameServer {
       }
     });
 
+    /* ── Friends & Private Games ─────────────────────────────────────── */
+
+    const emitFriendsData = async (targetSocket: Socket, userId: string) => {
+      const { FriendshipRepository } = await import("@checkker/database");
+      const [friends, pending] = await Promise.all([
+        FriendshipRepository.listFriends(userId),
+        FriendshipRepository.listPendingFor(userId),
+      ]);
+      const withPresence = friends.map((f) => ({
+        ...f,
+        online: this.userSockets.has(f.userId),
+      }));
+      targetSocket.emit("friends_data", { friends: withPresence, pending });
+    };
+
+    socket.on("get_friends", async () => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) {
+        socket.emit("friends_data", { friends: [], pending: [], error: "Not authenticated" });
+        return;
+      }
+      try {
+        await emitFriendsData(socket, auth.userId);
+      } catch {
+        socket.emit("friends_data", { friends: [], pending: [], error: "Failed to load friends" });
+      }
+    });
+
+    socket.on("send_friend_request", async ({ username }: { username: string }) => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) {
+        socket.emit("friend_request_result", { success: false, error: "Not authenticated" });
+        return;
+      }
+      try {
+        const { UserRepository, FriendshipRepository, NotificationRepository } = await import("@checkker/database");
+        const target = await UserRepository.findByUsername(username?.trim() ?? "");
+        if (!target) {
+          socket.emit("friend_request_result", { success: false, error: "User not found" });
+          return;
+        }
+        if (target.id === auth.userId) {
+          socket.emit("friend_request_result", { success: false, error: "You can't add yourself" });
+          return;
+        }
+        const me = await UserRepository.findById(auth.userId);
+        const friendship = await FriendshipRepository.sendRequest(auth.userId, target.id);
+        if (!friendship) {
+          socket.emit("friend_request_result", { success: false, error: "Request already exists or you're already friends" });
+          return;
+        }
+        await NotificationRepository.create(target.id, "friend_request", {
+          friendshipId: friendship.id,
+          fromUsername: me?.username ?? "A player",
+        });
+        const targetSocket = this.userSockets.get(target.id);
+        if (targetSocket) {
+          targetSocket.emit("friend_request", {
+            friendshipId: friendship.id,
+            fromUsername: me?.username ?? "A player",
+          });
+          await emitFriendsData(targetSocket, target.id);
+        }
+        socket.emit("friend_request_result", { success: true, username: target.username });
+      } catch {
+        socket.emit("friend_request_result", { success: false, error: "Failed to send request" });
+      }
+    });
+
+    socket.on("respond_friend_request", async ({ friendshipId, accept }: { friendshipId: string; accept: boolean }) => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) return;
+      try {
+        const { UserRepository, FriendshipRepository, NotificationRepository } = await import("@checkker/database");
+        const friendship = await FriendshipRepository.respond(friendshipId, auth.userId, accept);
+        if (friendship && accept) {
+          const me = await UserRepository.findById(auth.userId);
+          await NotificationRepository.create(friendship.requesterId, "friend_accepted", {
+            username: me?.username ?? "A player",
+          });
+          const requesterSocket = this.userSockets.get(friendship.requesterId);
+          if (requesterSocket) {
+            requesterSocket.emit("friend_accepted", { username: me?.username ?? "A player" });
+            await emitFriendsData(requesterSocket, friendship.requesterId);
+          }
+        }
+        await emitFriendsData(socket, auth.userId);
+      } catch {
+        // refresh failed silently; client can re-request
+      }
+    });
+
+    socket.on("remove_friend", async ({ friendshipId }: { friendshipId: string }) => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) return;
+      try {
+        const { FriendshipRepository } = await import("@checkker/database");
+        await FriendshipRepository.remove(friendshipId, auth.userId);
+        await emitFriendsData(socket, auth.userId);
+      } catch {
+        // ignore
+      }
+    });
+
+    socket.on("invite_friend", async ({ friendUserId, tc }: { friendUserId: string; tc?: TimeControl }) => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) {
+        socket.emit("invite_sent", { success: false, error: "Not authenticated" });
+        return;
+      }
+      try {
+        const { UserRepository, FriendshipRepository, NotificationRepository } = await import("@checkker/database");
+        const friends = await FriendshipRepository.areFriends(auth.userId, friendUserId);
+        if (!friends) {
+          socket.emit("invite_sent", { success: false, error: "You can only invite friends" });
+          return;
+        }
+        const me = await UserRepository.findById(auth.userId);
+        const inviteId = uuid();
+        const invite: PrivateInvite = {
+          inviteId,
+          fromUserId: auth.userId,
+          fromUsername: me?.username ?? "A player",
+          toUserId: friendUserId,
+          tc: tc ?? "blitz",
+          createdAt: Date.now(),
+        };
+        this.privateInvites.set(inviteId, invite);
+        setTimeout(() => this.privateInvites.delete(inviteId), INVITE_TTL_MS).unref?.();
+
+        await NotificationRepository.create(friendUserId, "game_invite", {
+          inviteId,
+          fromUsername: invite.fromUsername,
+          tc: invite.tc,
+        });
+        const friendSocket = this.userSockets.get(friendUserId);
+        if (friendSocket) {
+          friendSocket.emit("private_invite", {
+            inviteId,
+            fromUsername: invite.fromUsername,
+            tc: invite.tc,
+          });
+        }
+        socket.emit("invite_sent", { success: true, online: !!friendSocket, inviteId });
+      } catch {
+        socket.emit("invite_sent", { success: false, error: "Failed to send invite" });
+      }
+    });
+
+    socket.on("respond_invite", async ({ inviteId, accept }: { inviteId: string; accept: boolean }) => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) return;
+      const invite = this.privateInvites.get(inviteId);
+      if (!invite || invite.toUserId !== auth.userId) {
+        socket.emit("invite_response_result", { success: false, error: "Invite expired" });
+        return;
+      }
+      this.privateInvites.delete(inviteId);
+
+      const inviterSocket = this.userSockets.get(invite.fromUserId);
+      if (!accept) {
+        inviterSocket?.emit("invite_declined", { inviteId, byUsername: playerStore.get(socket.id)?.displayName });
+        socket.emit("invite_response_result", { success: true, accepted: false });
+        return;
+      }
+      if (!inviterSocket) {
+        socket.emit("invite_response_result", { success: false, error: "Inviter is no longer online" });
+        return;
+      }
+
+      const inviterProfile = playerStore.getOrCreate(inviterSocket.id);
+      const myProfile = playerStore.getOrCreate(socket.id);
+      const inviterAuth = authenticatedSockets.get(inviterSocket.id);
+      const inviter: Player = {
+        id: inviterSocket.id,
+        socket: inviterSocket,
+        rating: inviterProfile.rating ?? 1000,
+        casual: true,
+        walletAddress: inviterAuth?.walletAddress,
+        userId: invite.fromUserId,
+      };
+      const accepter: Player = {
+        id: socket.id,
+        socket,
+        rating: myProfile.rating ?? 1000,
+        casual: true,
+        walletAddress: auth.walletAddress,
+        userId: auth.userId,
+      };
+      socket.emit("invite_response_result", { success: true, accepted: true });
+      // Private friendly game: casual mode, free tier.
+      this.startGame(inviter, accepter, invite.tc, "casual", "beginner");
+    });
+
+    /* ── LAN host/join handshake ─────────────────────────────────────────
+       Both devices connect to the same server (typically one running on the
+       host's machine on the local network). The host gets a short code that
+       the guest enters to pair up — no wallet auth required. */
+
+    socket.on("host_lan_game", ({ tc }: { tc?: TimeControl } = {}) => {
+      // One hosted game per socket: drop any previous code.
+      for (const [code, entry] of this.lanHosts) {
+        if (entry.hostSocketId === socket.id) this.lanHosts.delete(code);
+      }
+      let code: string;
+      do {
+        code = Math.floor(1000 + Math.random() * 9000).toString();
+      } while (this.lanHosts.has(code));
+      this.lanHosts.set(code, { hostSocketId: socket.id, tc: tc ?? "blitz", createdAt: Date.now() });
+      setTimeout(() => {
+        if (this.lanHosts.get(code)?.hostSocketId === socket.id) this.lanHosts.delete(code);
+      }, INVITE_TTL_MS).unref?.();
+      socket.emit("lan_game_hosted", { code, tc: tc ?? "blitz" });
+    });
+
+    socket.on("cancel_lan_host", () => {
+      for (const [code, entry] of this.lanHosts) {
+        if (entry.hostSocketId === socket.id) this.lanHosts.delete(code);
+      }
+    });
+
+    socket.on("join_lan_game", ({ code }: { code: string }) => {
+      const entry = this.lanHosts.get(String(code ?? "").trim());
+      if (!entry) {
+        socket.emit("lan_join_result", { success: false, error: "Game code not found. Check the code and try again." });
+        return;
+      }
+      const hostSocket = this.io.sockets.sockets.get(entry.hostSocketId);
+      if (!hostSocket || entry.hostSocketId === socket.id) {
+        this.lanHosts.delete(String(code).trim());
+        socket.emit("lan_join_result", { success: false, error: "The host is no longer available." });
+        return;
+      }
+      this.lanHosts.delete(String(code).trim());
+
+      const hostProfile = playerStore.getOrCreate(hostSocket.id);
+      const myProfile = playerStore.getOrCreate(socket.id);
+      const hostAuth = authenticatedSockets.get(hostSocket.id);
+      const myAuth = authenticatedSockets.get(socket.id);
+      const host: Player = {
+        id: hostSocket.id,
+        socket: hostSocket,
+        rating: hostProfile.rating ?? 1000,
+        casual: true,
+        walletAddress: hostAuth?.walletAddress,
+        userId: hostAuth?.userId,
+      };
+      const guest: Player = {
+        id: socket.id,
+        socket,
+        rating: myProfile.rating ?? 1000,
+        casual: true,
+        walletAddress: myAuth?.walletAddress,
+        userId: myAuth?.userId,
+      };
+      socket.emit("lan_join_result", { success: true });
+      this.startGame(host, guest, entry.tc, "casual", "beginner");
+    });
+
+    /* ── Notifications ───────────────────────────────────────────────── */
+
+    socket.on("get_notifications", async () => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) {
+        socket.emit("notifications", { notifications: [], unread: 0 });
+        return;
+      }
+      try {
+        const { NotificationRepository } = await import("@checkker/database");
+        const [notifications, unread] = await Promise.all([
+          NotificationRepository.listForUser(auth.userId),
+          NotificationRepository.unreadCount(auth.userId),
+        ]);
+        socket.emit("notifications", { notifications, unread });
+      } catch {
+        socket.emit("notifications", { notifications: [], unread: 0 });
+      }
+    });
+
+    socket.on("mark_notifications_read", async () => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) return;
+      try {
+        const { NotificationRepository } = await import("@checkker/database");
+        await NotificationRepository.markAllRead(auth.userId);
+        socket.emit("notifications_read", { success: true });
+      } catch {
+        socket.emit("notifications_read", { success: false });
+      }
+    });
+
     /* ── Replays ─────────────────────────────────────────────────────── */
 
     socket.on("get_game_moves", async ({ gameId }: { gameId: string }) => {
@@ -450,13 +777,34 @@ export class GameServer {
 
     socket.on("get_cosmetics", async () => {
       try {
-        const { CosmeticRepository } = await import("@checkker/database");
+        const { CosmeticRepository, UserRepository } = await import("@checkker/database");
         const auth = authenticatedSockets.get(socket.id);
         const cosmetics = await CosmeticRepository.getAll();
         const userCosmetics = auth ? await CosmeticRepository.getByUser(auth.userId) : [];
-        socket.emit("cosmetics", { cosmetics, userCosmetics });
+        const coins = auth ? await UserRepository.getCoins(auth.userId) : 0;
+        socket.emit("cosmetics", { cosmetics, userCosmetics, coins });
       } catch {
-        socket.emit("cosmetics", { cosmetics: [], userCosmetics: [] });
+        socket.emit("cosmetics", { cosmetics: [], userCosmetics: [], coins: 0 });
+      }
+    });
+
+    socket.on("purchase_cosmetic", async ({ cosmeticId }: { cosmeticId: string }) => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) {
+        socket.emit("cosmetic_purchased", { success: false, error: "Not authenticated" });
+        return;
+      }
+      try {
+        const { CosmeticRepository } = await import("@checkker/database");
+        const result = await CosmeticRepository.purchase(auth.userId, cosmeticId);
+        if (result.success) {
+          const userCosmetics = await CosmeticRepository.getByUser(auth.userId);
+          socket.emit("cosmetic_purchased", { success: true, cosmeticId, coins: result.coins, userCosmetics });
+        } else {
+          socket.emit("cosmetic_purchased", { success: false, cosmeticId, error: result.error });
+        }
+      } catch {
+        socket.emit("cosmetic_purchased", { success: false, cosmeticId, error: "Purchase failed" });
       }
     });
 
@@ -597,6 +945,19 @@ export class GameServer {
       this.botManager.disposeByHumanId(socket.id);
       this.spectateManager.disposeBySocket(socket.id);
 
+      for (const [code, entry] of this.lanHosts) {
+        if (entry.hostSocketId === socket.id) this.lanHosts.delete(code);
+      }
+
+      const auth = authenticatedSockets.get(socket.id);
+      if (auth) {
+        if (this.userSockets.get(auth.userId)?.id === socket.id) {
+          this.userSockets.delete(auth.userId);
+        }
+        for (const [inviteId, invite] of this.privateInvites) {
+          if (invite.fromUserId === auth.userId) this.privateInvites.delete(inviteId);
+        }
+      }
       authenticatedSockets.delete(socket.id);
       playerStore.remove(socket.id);
     });
@@ -989,6 +1350,24 @@ export class GameServer {
         }
       } catch {
         // DB write failed, game continues
+      }
+
+      // Award coins for playing online games
+      try {
+        const { UserRepository } = await import("@checkker/database");
+        const { COIN_REWARDS } = await import("@checkker/shared");
+        const whiteAuth = authenticatedSockets.get(white.id);
+        const blackAuth = authenticatedSockets.get(black.id);
+        if (whiteAuth) {
+          const updated = await UserRepository.addCoins(whiteAuth.userId, COIN_REWARDS[whiteOutcome]);
+          white.socket.emit("coins_awarded", { amount: COIN_REWARDS[whiteOutcome], balance: updated.coins });
+        }
+        if (blackAuth) {
+          const updated = await UserRepository.addCoins(blackAuth.userId, COIN_REWARDS[blackOutcome]);
+          black.socket.emit("coins_awarded", { amount: COIN_REWARDS[blackOutcome], balance: updated.coins });
+        }
+      } catch {
+        // Coin award failed, non-fatal
       }
     }
   }

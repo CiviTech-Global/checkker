@@ -18,6 +18,7 @@ class ShopScreen extends ConsumerStatefulWidget {
 class _ShopScreenState extends ConsumerState<ShopScreen>
     with SingleTickerProviderStateMixin {
   StreamSubscription<CosmeticsData>? _cosmeticsSub;
+  StreamSubscription<CosmeticPurchaseResult>? _purchaseSub;
   CosmeticsData? _data;
   bool _loading = true;
   late TabController _tabController;
@@ -41,12 +42,27 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
         });
       }
     });
+    _purchaseSub = socketService.cosmeticPurchasedStream.listen((result) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            result.success
+                ? 'Purchased! Balance: ${result.coins ?? 0} coins'
+                : 'Purchase failed: ${result.error ?? 'Unknown error'}',
+          ),
+          backgroundColor:
+              result.success ? AppColors.accent.green : AppColors.accent.red,
+        ),
+      );
+    });
     socketService.getCosmetics();
   }
 
   @override
   void dispose() {
     _cosmeticsSub?.cancel();
+    _purchaseSub?.cancel();
     _tabController.dispose();
     super.dispose();
   }
@@ -72,12 +88,52 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
     if (_isOwned(cosmetic.id)) {
       ref.read(socketServiceProvider).equipCosmetic(cosmetic.id);
     } else {
+      _confirmPurchase(cosmetic);
+    }
+  }
+
+  Future<void> _confirmPurchase(Cosmetic cosmetic) async {
+    final coins = _data?.coins ?? 0;
+    final price = cosmetic.isDefault ? 0 : cosmetic.price;
+    if (price > coins) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Purchasing not yet implemented'),
+          content: Text(
+            '${cosmetic.name} costs $price coins but you have $coins. Win games to earn more!',
+          ),
           backgroundColor: AppColors.bg.tertiary,
         ),
       );
+      return;
+    }
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.bg.secondary,
+        title: Text(
+          'Buy ${cosmetic.name}?',
+          style: TextStyle(color: AppColors.text.primary),
+        ),
+        content: Text(
+          price == 0
+              ? 'This item is free.'
+              : 'This will cost $price coins. You have $coins.',
+          style: TextStyle(color: AppColors.text.secondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('Buy', style: TextStyle(color: AppColors.accent.gold)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      ref.read(socketServiceProvider).purchaseCosmetic(cosmetic.id);
     }
   }
 
@@ -90,6 +146,40 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
         backgroundColor: AppColors.bg.secondary,
         foregroundColor: AppColors.text.primary,
         elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.md),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xs,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.gold.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(color: AppColors.accent.gold, width: 0.5),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.monetization_on,
+                        size: 16, color: AppColors.accent.gold),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${_data?.coins ?? 0}',
+                      style: TextStyle(
+                        color: AppColors.accent.goldBright,
+                        fontWeight: FontWeight.bold,
+                        fontSize: AppTypography.sm,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.accent.gold,
@@ -275,7 +365,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen>
                       )
                     else
                       Text(
-                        isFree ? 'FREE' : '\$${cosmetic.price}',
+                        isFree ? 'FREE' : '${cosmetic.price} coins',
                         style: TextStyle(
                           color: isFree
                               ? AppColors.accent.green

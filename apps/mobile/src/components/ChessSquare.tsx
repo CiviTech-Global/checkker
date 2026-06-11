@@ -20,13 +20,17 @@ interface ChessSquareProps {
   onPress: (square: string) => void;
   size: number;
   animateFrom?: { dx: number; dy: number } | null;
+  boardColors?: { light: string; dark: string };
+  pieceColors?: { white: string; black: string };
 }
 
 export default function ChessSquare({
   square, piece, isLight, isHighlighted, isSelected, isLastMove, isCheck,
-  onPress, size, animateFrom,
+  onPress, size, animateFrom, boardColors, pieceColors,
 }: ChessSquareProps) {
-  const bg = isLight ? colors.board.light : colors.board.dark;
+  const bg = isLight
+    ? (boardColors?.light ?? colors.board.light)
+    : (boardColors?.dark ?? colors.board.dark);
 
   // Piece movement animation
   const translateX = useSharedValue(animateFrom?.dx ?? 0);
@@ -95,7 +99,12 @@ export default function ChessSquare({
       {/* Piece */}
       {unicode && (
         <Animated.Text
-          style={[styles.piece, { fontSize: size * 0.65 }, pieceAnimStyle]}
+          style={[
+            styles.piece,
+            { fontSize: size * 0.65 },
+            pieceColors && { color: pieceColor === "white" ? pieceColors.white : pieceColors.black },
+            pieceAnimStyle,
+          ]}
         >
           {unicode}
         </Animated.Text>

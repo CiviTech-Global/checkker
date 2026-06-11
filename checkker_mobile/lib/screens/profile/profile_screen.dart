@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../models/avatar.dart';
 import '../../models/game.dart';
 import '../../models/rating.dart';
+import '../../models/replay.dart';
 import '../../providers/profile_provider.dart';
+import '../../providers/socket_provider.dart';
 import '../../services/local_database.dart';
 import '../../theme/tokens.dart';
 
@@ -20,9 +23,23 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _nameController = TextEditingController();
   bool _isEditingName = false;
+  List<RecentGame> _onlineGames = [];
+  StreamSubscription? _profileSub;
+
+  @override
+  void initState() {
+    super.initState();
+    final socket = ref.read(socketServiceProvider);
+    _profileSub = socket.profileDataStream.listen((data) {
+      if (!mounted) return;
+      setState(() => _onlineGames = data.recentGames);
+    });
+    socket.getProfile();
+  }
 
   @override
   void dispose() {
+    _profileSub?.cancel();
     _nameController.dispose();
     super.dispose();
   }
@@ -70,6 +87,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const SizedBox(height: AppSpacing.lg),
             _buildStatsSection(statsAsync),
             const SizedBox(height: AppSpacing.lg),
+            if (_onlineGames.isNotEmpty) ...[
+              _buildOnlineGames(),
+              const SizedBox(height: AppSpacing.lg),
+            ],
             _buildGameHistory(historyAsync),
           ],
         ),
@@ -360,6 +381,112 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             overflow: TextOverflow.ellipsis,
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOnlineGames() {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.bg.secondary,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.border.subtle, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Online Games — Tap to Replay',
+            style: TextStyle(
+              color: AppColors.text.secondary,
+              fontSize: AppTypography.body,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          ..._onlineGames.map((game) {
+            final resultColor = game.result == 'win'
+                ? AppColors.accent.green
+                : game.result == 'loss'
+                    ? AppColors.accent.red
+                    : AppColors.text.muted;
+            final delta = (game.myRatingAfter != null && game.myRatingBefore != null)
+                ? game.myRatingAfter! - game.myRatingBefore!
+                : null;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+              child: InkWell(
+                onTap: () => context.push('/replay/${game.id}'),
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.bg.tertiary,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        game.result == 'win'
+                            ? 'W'
+                            : game.result == 'loss'
+                                ? 'L'
+                                : 'D',
+                        style: TextStyle(
+                          color: resultColor,
+                          fontSize: AppTypography.md,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'vs ${game.opponentName}',
+                              style: TextStyle(
+                                color: AppColors.text.primary,
+                                fontSize: AppTypography.sm,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              '${game.mode} · ${game.moveCount} moves',
+                              style: TextStyle(
+                                color: AppColors.text.muted,
+                                fontSize: AppTypography.xs,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (delta != null)
+                        Padding(
+                          padding: const EdgeInsets.only(right: AppSpacing.xs),
+                          child: Text(
+                            '${delta >= 0 ? '+' : ''}$delta',
+                            style: TextStyle(
+                              color: delta >= 0
+                                  ? AppColors.accent.green
+                                  : AppColors.accent.red,
+                              fontSize: AppTypography.sm,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      Icon(Icons.chevron_right, color: AppColors.text.muted, size: 18),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );

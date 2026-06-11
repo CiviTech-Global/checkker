@@ -22,6 +22,10 @@ export const UserRepository = {
     return getDb().user.findUnique({ where: { id } });
   },
 
+  async findByUsername(username: string): Promise<User | null> {
+    return getDb().user.findUnique({ where: { username } });
+  },
+
   async isUsernameTaken(username: string): Promise<boolean> {
     const user = await getDb().user.findUnique({ where: { username } });
     return user !== null;
@@ -104,6 +108,18 @@ export const UserRepository = {
       },
     });
     return count + 1;
+  },
+
+  async addCoins(id: string, amount: number): Promise<User> {
+    return getDb().user.update({
+      where: { id },
+      data: { coins: { increment: amount } },
+    });
+  },
+
+  async getCoins(id: string): Promise<number> {
+    const user = await getDb().user.findUnique({ where: { id }, select: { coins: true } });
+    return user?.coins ?? 0;
   },
 
   async updateFcmToken(id: string, token: string | null): Promise<User> {

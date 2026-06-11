@@ -76,6 +76,7 @@ export default function ProfileScreen() {
   } = useLocalProfile();
 
   const [activeTab, setActiveTab] = useState<StatsTab>("all");
+  const [serverGames, setServerGames] = useState<any[]>([]);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(localProfile.offlineName);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
@@ -84,6 +85,9 @@ export default function ProfileScreen() {
   // Sync online stats when server data arrives
   useEffect(() => {
     onProfileData((data) => {
+      if (Array.isArray(data.recentGames)) {
+        setServerGames(data.recentGames);
+      }
       const profile = data.profile ?? data.user;
       if (profile) {
         syncFromServer({
@@ -313,6 +317,53 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         )}
       </Animated.View>
+
+      {/* Online Games with replays */}
+      {serverGames.length > 0 && activeTab !== "offline" && (
+        <Animated.View
+          entering={FadeIn.duration(300).delay(350)}
+          style={[styles.section, glassStyle]}
+        >
+          <Text style={styles.sectionTitle}>Online Games — Tap to Replay</Text>
+          {serverGames.map((game) => {
+            const resultColor =
+              game.result === "win"
+                ? colors.accent.green
+                : game.result === "loss"
+                ? colors.accent.red
+                : colors.text.muted;
+            const ratingDelta =
+              game.myRatingAfter != null && game.myRatingBefore != null
+                ? game.myRatingAfter - game.myRatingBefore
+                : null;
+            return (
+              <TouchableOpacity
+                key={game.id}
+                style={styles.gameRow}
+                onPress={() => router.push(`/replay/${game.id}`)}
+                activeOpacity={0.6}
+              >
+                <Text style={[styles.gameResult, { color: resultColor }]}>
+                  {game.result === "win" ? "W" : game.result === "loss" ? "L" : "D"}
+                </Text>
+                <Text style={styles.gameMode}>{game.mode}</Text>
+                <Text style={styles.gameOpponent}>{game.opponentName ?? "--"}</Text>
+                {ratingDelta != null && (
+                  <Text
+                    style={[
+                      styles.gameDifficulty,
+                      { color: ratingDelta >= 0 ? colors.accent.green : colors.accent.red },
+                    ]}
+                  >
+                    {ratingDelta >= 0 ? "+" : ""}{ratingDelta}
+                  </Text>
+                )}
+                <Icon name="chevron-right" size={14} color={colors.text.muted} />
+              </TouchableOpacity>
+            );
+          })}
+        </Animated.View>
+      )}
 
       {/* Game History */}
       {gameHistory.length > 0 && (

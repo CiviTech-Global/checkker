@@ -1,18 +1,22 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors, spacing, typography, radius } from '../theme/tokens';
+import { useEquippedTheme } from '../utils/cosmetics';
 
 interface OpponentHandProps {
   cardCount?: number;
 }
 
 export default function OpponentHand({ cardCount = 3 }: OpponentHandProps) {
+  const equippedTheme = useEquippedTheme();
+  const back = equippedTheme.cardBack?.isDefault ? undefined : equippedTheme.cardBack?.cardBack;
+
   return (
     <View style={styles.container} accessibilityLabel={`Opponent has ${cardCount} cards`}>
       {Array.from({ length: cardCount }, (_, i) => (
-        <View key={i} style={styles.cardBack}>
-          <View style={styles.pattern}>
-            <Text style={styles.symbol}>{'\u2660'}</Text>
+        <View key={i} style={[styles.cardBack, back && { backgroundColor: back.primary }]}>
+          <View style={[styles.pattern, back && { borderColor: back.accent }]}>
+            <Text style={[styles.symbol, back && { color: back.accent }]}>{'\u2660'}</Text>
           </View>
           <Text style={styles.label}>CHECKKER</Text>
         </View>

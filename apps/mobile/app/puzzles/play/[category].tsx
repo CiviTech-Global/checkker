@@ -29,10 +29,27 @@ import Icon from "../../../src/components/Icon";
 const CATEGORY_LABELS: Record<string, string> = {
   daily: "Daily Puzzle",
   tactics: "Tactical Puzzles",
-  card_play: "Card Management",
+  card_management: "Card Management",
   endgame: "Endgame Training",
   weakness: "Weakness Training",
 };
+
+const SUIT_SYMBOLS: Record<string, string> = {
+  clubs: "♣",
+  diamonds: "♦",
+  hearts: "♥",
+  spades: "♠",
+};
+
+function parseHand(cards?: string | null): Array<{ rank: string; suit: string }> {
+  if (!cards) return [];
+  try {
+    const parsed = JSON.parse(cards);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 function formatUci(uci: string): string {
   if (uci.length < 4) return uci.toUpperCase();
@@ -276,6 +293,34 @@ export default function PuzzlePlayScreen() {
         </Text>
       </Animated.View>
 
+      {/* Card hand (card-constrained puzzles) */}
+      {parseHand(currentPuzzle?.cards).length > 0 && (
+        <Animated.View
+          entering={FadeIn.duration(300).delay(220)}
+          style={styles.handRow}
+        >
+          <Text style={styles.handLabel}>Your hand:</Text>
+          {parseHand(currentPuzzle?.cards).map((card, i) => (
+            <View key={`${card.rank}${card.suit}${i}`} style={styles.handCard}>
+              <Text
+                style={[
+                  styles.handCardText,
+                  {
+                    color:
+                      card.suit === "hearts" || card.suit === "diamonds"
+                        ? colors.accent.red
+                        : colors.text.primary,
+                  },
+                ]}
+              >
+                {card.rank}
+                {SUIT_SYMBOLS[card.suit] ?? ""}
+              </Text>
+            </View>
+          ))}
+        </Animated.View>
+      )}
+
       {/* Hint button */}
       {!submitted && (
         <Animated.View
@@ -469,6 +514,29 @@ const styles = StyleSheet.create({
   },
   hintRow: {
     marginBottom: spacing.md,
+  },
+  handRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    marginBottom: spacing.md,
+  },
+  handLabel: {
+    fontSize: 13,
+    color: colors.text.muted,
+    marginRight: spacing.xs,
+  },
+  handCard: {
+    paddingVertical: 4,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.sm,
+    backgroundColor: colors.bg.tertiary,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+  },
+  handCardText: {
+    fontSize: 15,
+    fontWeight: "700",
   },
   hintButton: {
     flexDirection: "row",

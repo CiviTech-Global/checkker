@@ -2,6 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface AppSettings {
   soundEnabled: boolean;
+  musicEnabled: boolean;
+  musicVolume: number; // 0..1
   hapticEnabled: boolean;
   reducedMotion: boolean;
   boardTheme: string;
@@ -11,6 +13,8 @@ export interface AppSettings {
 
 const DEFAULTS: AppSettings = {
   soundEnabled: true,
+  musicEnabled: false,
+  musicVolume: 0.5,
   hapticEnabled: true,
   reducedMotion: false,
   boardTheme: "classic",
@@ -57,6 +61,27 @@ class SettingsServiceClass {
   async setSoundEnabled(value: boolean): Promise<void> {
     this._settings.soundEnabled = value;
     await this.persist();
+  }
+
+  async setMusicEnabled(value: boolean): Promise<void> {
+    this._settings.musicEnabled = value;
+    await this.persist();
+  }
+
+  async setMusicVolume(value: number): Promise<void> {
+    this._settings.musicVolume = Math.max(0, Math.min(1, value));
+    await this.persist();
+  }
+
+  /** Wipe all locally stored app data (settings, tutorial progress, streaks). */
+  async clearAllData(): Promise<void> {
+    try {
+      await AsyncStorage.clear();
+    } catch {
+      // ignore
+    }
+    this._settings = { ...DEFAULTS };
+    this._loaded = false;
   }
 
   async setHapticEnabled(value: boolean): Promise<void> {

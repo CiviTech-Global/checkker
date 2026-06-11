@@ -4,6 +4,8 @@ import type { ChatMessage, Card, Color, GameResult, ScoredGame, GameOdds, Player
 import type { GameClientState, GameStartPayload, GameUpdatePayload, MoveErrorPayload, GameOverPayload } from "../types/game";
 import type { Puzzle, PuzzleResult, PuzzlesListData } from "../types/puzzle";
 import { SERVER_URL } from "../config/features";
+import { setEquippedFromData } from "../utils/cosmetics";
+import { registerForPushNotifications } from "../utils/push";
 
 /* ── Lazy socket singleton ──────────────────────────────────────────── */
 
@@ -132,8 +134,47 @@ const replayMovesListeners = new Set<(v: any[] | null) => void>();
 
 let _cosmetics: any[] | null = null;
 let _userCosmetics: any[] | null = null;
+let _coins: number = 0;
 const cosmeticsListeners = new Set<(v: any[] | null) => void>();
 const userCosmeticsListeners = new Set<(v: any[] | null) => void>();
+const coinsListeners = new Set<(v: number) => void>();
+let _cosmeticPurchasedCallback: ((data: { success: boolean; cosmeticId?: string; coins?: number; error?: string }) => void) | null = null;
+
+/* ── Friends & Notifications state ─────────────────────────── */
+
+export interface FriendsData {
+  friends: any[];
+  pending: any[];
+  error?: string;
+}
+
+export interface NotificationsData {
+  notifications: any[];
+  unread: number;
+}
+
+export interface PrivateInvitePayload {
+  inviteId: string;
+  fromUsername: string;
+  tc: string;
+}
+
+let _friendsData: FriendsData | null = null;
+let _notificationsData: NotificationsData | null = null;
+const friendsDataListeners = new Set<(v: FriendsData | null) => void>();
+const notificationsListeners = new Set<(v: NotificationsData | null) => void>();
+let _friendRequestResultCallback: ((data: { success: boolean; error?: string; username?: string }) => void) | null = null;
+let _incomingFriendRequestCallback: ((data: { friendshipId: string; fromUsername: string }) => void) | null = null;
+let _friendAcceptedCallback: ((data: { username: string }) => void) | null = null;
+let _inviteSentCallback: ((data: { success: boolean; online?: boolean; error?: string }) => void) | null = null;
+let _privateInviteCallback: ((data: PrivateInvitePayload) => void) | null = null;
+let _inviteDeclinedCallback: ((data: { inviteId: string; byUsername?: string }) => void) | null = null;
+let _inviteResponseResultCallback: ((data: { success: boolean; accepted?: boolean; error?: string }) => void) | null = null;
+
+/* ── LAN state ─────────────────────────────────────────────── */
+
+let _lanHostedCallback: ((data: { code: string; tc: string }) => void) | null = null;
+let _lanJoinResultCallback: ((data: { success: boolean; error?: string }) => void) | null = null;
 
 /* ── Puzzle state ──────────────────────────────────────────── */
 
@@ -218,6 +259,14 @@ function attachListeners(s: Socket) {
   s.on("auth_success", (data: { profile: PlayerProfile | null; isNewUser: boolean; walletAddress?: string }) => {
     _authState = data;
     authStateListeners.forEach((fn) => fn(_authState));
+    // Load cosmetics so equipped themes apply in-game right away.
+    s.emit("get_cosmetics");
+    // Fetch in-app notifications and register for push (scaffold no-ops
+    // gracefully when expo-notifications isn't installed).
+    s.emit("get_notifications");
+    registerForPushNotifications((token) => {
+      s.emit("register_fcm_token", { token });
+    });
   });
 
   s.on("auth_error", (data: { error: string }) => {
@@ -338,6 +387,54 @@ function attachListeners(s: Socket) {
     replayMovesListeners.forEach((fn) => fn(_replayMoves));
   });
 
+  /* ── Friends & Notifications listeners ────────────────────────────── */
+
+  s.on("friends_data", (data: FriendsData) => {
+    _friendsData = data;
+    friendsDataListeners.forEach((fn) => fn(_friendsData));
+  });
+
+  s.on("friend_request_result", (data: { success: boolean; error?: string; username?: string }) => {
+    _friendRequestResultCallback?.(data);
+  });
+
+  s.on("friend_request", (data: { friendshipId: string; fromUsername: string }) => {
+    _incomingFriendRequestCallback?.(data);
+  });
+
+  s.on("friend_accepted", (data: { username: string }) => {
+    _friendAcceptedCallback?.(data);
+  });
+
+  s.on("invite_sent", (data: { success: boolean; online?: boolean; error?: string }) => {
+    _inviteSentCallback?.(data);
+  });
+
+  s.on("private_invite", (data: PrivateInvitePayload) => {
+    _privateInviteCallback?.(data);
+  });
+
+  s.on("invite_declined", (data: { inviteId: string; byUsername?: string }) => {
+    _inviteDeclinedCallback?.(data);
+  });
+
+  s.on("invite_response_result", (data: { success: boolean; accepted?: boolean; error?: string }) => {
+    _inviteResponseResultCallback?.(data);
+  });
+
+  s.on("lan_game_hosted", (data: { code: string; tc: string }) => {
+    _lanHostedCallback?.(data);
+  });
+
+  s.on("lan_join_result", (data: { success: boolean; error?: string }) => {
+    _lanJoinResultCallback?.(data);
+  });
+
+  s.on("notifications", (data: NotificationsData) => {
+    _notificationsData = data;
+    notificationsListeners.forEach((fn) => fn(_notificationsData));
+  });
+
   /* ── Puzzle listeners ─────────────────────────────────────────────── */
 
   s.on("daily_puzzle", (data: Puzzle) => {
@@ -357,20 +454,42 @@ function attachListeners(s: Socket) {
 
   /* ── Cosmetics listeners ─────────────────────────────────────────── */
 
-  s.on("cosmetics", (data: { cosmetics: any[]; userCosmetics: any[] }) => {
+  s.on("cosmetics", (data: { cosmetics: any[]; userCosmetics: any[]; coins?: number }) => {
     _cosmetics = data.cosmetics;
     _userCosmetics = data.userCosmetics;
+    _coins = data.coins ?? 0;
     cosmeticsListeners.forEach((fn) => fn(_cosmetics));
     userCosmeticsListeners.forEach((fn) => fn(_userCosmetics));
+    coinsListeners.forEach((fn) => fn(_coins));
+    setEquippedFromData(_cosmetics, _userCosmetics);
   });
 
-  s.on("cosmetic_equipped", (data: { cosmeticId: string; equipped: boolean }) => {
+  s.on("cosmetic_equipped", (data: { cosmeticId: string; equipped: any[] }) => {
     if (_userCosmetics) {
-      _userCosmetics = _userCosmetics.map((uc) =>
-        uc.cosmeticId === data.cosmeticId ? { ...uc, equipped: data.equipped } : { ...uc, equipped: false }
-      );
+      const equippedIds = new Set((data.equipped ?? []).map((e: any) => e.cosmeticId));
+      _userCosmetics = _userCosmetics.map((uc) => ({ ...uc, equipped: equippedIds.has(uc.cosmeticId) }));
       userCosmeticsListeners.forEach((fn) => fn(_userCosmetics));
+      setEquippedFromData(_cosmetics, _userCosmetics);
     }
+  });
+
+  s.on("cosmetic_purchased", (data: { success: boolean; cosmeticId?: string; coins?: number; userCosmetics?: any[]; error?: string }) => {
+    if (data.success) {
+      if (data.userCosmetics) {
+        _userCosmetics = data.userCosmetics;
+        userCosmeticsListeners.forEach((fn) => fn(_userCosmetics));
+      }
+      if (typeof data.coins === "number") {
+        _coins = data.coins;
+        coinsListeners.forEach((fn) => fn(_coins));
+      }
+    }
+    _cosmeticPurchasedCallback?.(data);
+  });
+
+  s.on("coins_awarded", (data: { amount: number; balance: number }) => {
+    _coins = data.balance;
+    coinsListeners.forEach((fn) => fn(_coins));
   });
 }
 
@@ -734,19 +853,146 @@ export function useSocket() {
     getSocket().emit("submit_puzzle", { puzzleId, moveUci, timeSpentMs, usedHint });
   }, []);
 
+  /* ── Friends & Notifications ──────────────────────────────────────── */
+
+  const [friendsData, setFriendsData] = useState<FriendsData | null>(_friendsData);
+  const [notifications, setNotifications] = useState<NotificationsData | null>(_notificationsData);
+  const friendRequestResultCbRef = useRef<((data: { success: boolean; error?: string; username?: string }) => void) | null>(null);
+  const incomingFriendRequestCbRef = useRef<((data: { friendshipId: string; fromUsername: string }) => void) | null>(null);
+  const friendAcceptedCbRef = useRef<((data: { username: string }) => void) | null>(null);
+  const inviteSentCbRef = useRef<((data: { success: boolean; online?: boolean; error?: string }) => void) | null>(null);
+  const privateInviteCbRef = useRef<((data: PrivateInvitePayload) => void) | null>(null);
+  const inviteDeclinedCbRef = useRef<((data: { inviteId: string; byUsername?: string }) => void) | null>(null);
+  const inviteResponseResultCbRef = useRef<((data: { success: boolean; accepted?: boolean; error?: string }) => void) | null>(null);
+
+  useEffect(() => {
+    const onFriends = (v: FriendsData | null) => setFriendsData(v);
+    const onNotifications = (v: NotificationsData | null) => setNotifications(v);
+    friendsDataListeners.add(onFriends);
+    notificationsListeners.add(onNotifications);
+    return () => {
+      friendsDataListeners.delete(onFriends);
+      notificationsListeners.delete(onNotifications);
+    };
+  }, []);
+
+  useEffect(() => {
+    _friendRequestResultCallback = (data) => friendRequestResultCbRef.current?.(data);
+    _incomingFriendRequestCallback = (data) => incomingFriendRequestCbRef.current?.(data);
+    _friendAcceptedCallback = (data) => friendAcceptedCbRef.current?.(data);
+    _inviteSentCallback = (data) => inviteSentCbRef.current?.(data);
+    _privateInviteCallback = (data) => privateInviteCbRef.current?.(data);
+    _inviteDeclinedCallback = (data) => inviteDeclinedCbRef.current?.(data);
+    _inviteResponseResultCallback = (data) => inviteResponseResultCbRef.current?.(data);
+  }, []);
+
+  const getFriends = useCallback(() => {
+    getSocket().emit("get_friends");
+  }, []);
+
+  const sendFriendRequest = useCallback((username: string) => {
+    getSocket().emit("send_friend_request", { username });
+  }, []);
+
+  const respondFriendRequest = useCallback((friendshipId: string, accept: boolean) => {
+    getSocket().emit("respond_friend_request", { friendshipId, accept });
+  }, []);
+
+  const removeFriend = useCallback((friendshipId: string) => {
+    getSocket().emit("remove_friend", { friendshipId });
+  }, []);
+
+  const inviteFriend = useCallback((friendUserId: string, tc?: string) => {
+    getSocket().emit("invite_friend", { friendUserId, tc });
+  }, []);
+
+  const respondInvite = useCallback((inviteId: string, accept: boolean) => {
+    getSocket().emit("respond_invite", { inviteId, accept });
+  }, []);
+
+  const getNotifications = useCallback(() => {
+    getSocket().emit("get_notifications");
+  }, []);
+
+  const markNotificationsRead = useCallback(() => {
+    getSocket().emit("mark_notifications_read");
+  }, []);
+
+  const onFriendRequestResult = useCallback((fn: (data: { success: boolean; error?: string; username?: string }) => void) => {
+    friendRequestResultCbRef.current = fn;
+  }, []);
+
+  const onIncomingFriendRequest = useCallback((fn: (data: { friendshipId: string; fromUsername: string }) => void) => {
+    incomingFriendRequestCbRef.current = fn;
+  }, []);
+
+  const onFriendAccepted = useCallback((fn: (data: { username: string }) => void) => {
+    friendAcceptedCbRef.current = fn;
+  }, []);
+
+  const onInviteSent = useCallback((fn: (data: { success: boolean; online?: boolean; error?: string }) => void) => {
+    inviteSentCbRef.current = fn;
+  }, []);
+
+  const onPrivateInvite = useCallback((fn: (data: PrivateInvitePayload) => void) => {
+    privateInviteCbRef.current = fn;
+  }, []);
+
+  const onInviteDeclined = useCallback((fn: (data: { inviteId: string; byUsername?: string }) => void) => {
+    inviteDeclinedCbRef.current = fn;
+  }, []);
+
+  const onInviteResponseResult = useCallback((fn: (data: { success: boolean; accepted?: boolean; error?: string }) => void) => {
+    inviteResponseResultCbRef.current = fn;
+  }, []);
+
+  /* ── LAN ──────────────────────────────────────────────────────────── */
+
+  const lanHostedCbRef = useRef<((data: { code: string; tc: string }) => void) | null>(null);
+  const lanJoinResultCbRef = useRef<((data: { success: boolean; error?: string }) => void) | null>(null);
+
+  useEffect(() => {
+    _lanHostedCallback = (data) => lanHostedCbRef.current?.(data);
+    _lanJoinResultCallback = (data) => lanJoinResultCbRef.current?.(data);
+  }, []);
+
+  const hostLanGame = useCallback((tc?: string) => {
+    getSocket().emit("host_lan_game", { tc });
+  }, []);
+
+  const cancelLanHost = useCallback(() => {
+    getSocket().emit("cancel_lan_host");
+  }, []);
+
+  const joinLanGame = useCallback((code: string) => {
+    getSocket().emit("join_lan_game", { code });
+  }, []);
+
+  const onLanGameHosted = useCallback((fn: ((data: { code: string; tc: string }) => void) | null) => {
+    lanHostedCbRef.current = fn;
+  }, []);
+
+  const onLanJoinResult = useCallback((fn: ((data: { success: boolean; error?: string }) => void) | null) => {
+    lanJoinResultCbRef.current = fn;
+  }, []);
+
   /* ── Cosmetics ────────────────────────────────────────────────────── */
 
   const [cosmetics, setCosmetics] = useState<any[] | null>(_cosmetics);
   const [userCosmetics, setUserCosmetics] = useState<any[] | null>(_userCosmetics);
+  const [coins, setCoins] = useState<number>(_coins);
 
   useEffect(() => {
     const onCosmetics = (v: any[] | null) => setCosmetics(v);
     const onUserCosmetics = (v: any[] | null) => setUserCosmetics(v);
+    const onCoins = (v: number) => setCoins(v);
     cosmeticsListeners.add(onCosmetics);
     userCosmeticsListeners.add(onUserCosmetics);
+    coinsListeners.add(onCoins);
     return () => {
       cosmeticsListeners.delete(onCosmetics);
       userCosmeticsListeners.delete(onUserCosmetics);
+      coinsListeners.delete(onCoins);
     };
   }, []);
 
@@ -757,6 +1003,17 @@ export function useSocket() {
   const equipCosmetic = useCallback((cosmeticId: string) => {
     getSocket().emit("equip_cosmetic", { cosmeticId });
   }, []);
+
+  const purchaseCosmetic = useCallback((cosmeticId: string) => {
+    getSocket().emit("purchase_cosmetic", { cosmeticId });
+  }, []);
+
+  const onCosmeticPurchased = useCallback(
+    (fn: ((data: { success: boolean; cosmeticId?: string; coins?: number; error?: string }) => void) | null) => {
+      _cosmeticPurchasedCallback = fn;
+    },
+    []
+  );
 
   return {
     connected,
@@ -818,11 +1075,37 @@ export function useSocket() {
     getPuzzles,
     getDailyPuzzle,
     submitPuzzle,
+    // Friends & Notifications
+    friendsData,
+    notifications,
+    getFriends,
+    sendFriendRequest,
+    respondFriendRequest,
+    removeFriend,
+    inviteFriend,
+    respondInvite,
+    getNotifications,
+    markNotificationsRead,
+    onFriendRequestResult,
+    onIncomingFriendRequest,
+    onFriendAccepted,
+    onInviteSent,
+    onPrivateInvite,
+    onInviteDeclined,
+    onInviteResponseResult,
+    hostLanGame,
+    cancelLanHost,
+    joinLanGame,
+    onLanGameHosted,
+    onLanJoinResult,
     // Cosmetics
     cosmetics,
     userCosmetics,
+    coins,
     getCosmetics,
     equipCosmetic,
+    purchaseCosmetic,
+    onCosmeticPurchased,
     // Server reconnection (LAN support)
     connectToServer,
     reconnectToDefault,

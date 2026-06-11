@@ -132,7 +132,8 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { localProfile } = useLocalProfile();
   const avatar = getAvatar(localProfile.avatarId);
-  const { connected } = useSocket();
+  const { connected, notifications } = useSocket();
+  const unreadCount = notifications?.unread ?? 0;
 
   return (
     <LinearGradient
@@ -234,6 +235,12 @@ export default function HomeScreen() {
             index={7}
             onPress={() => router.push("/leaderboard")}
           />
+          <MenuButton
+            label="Friends and private games"
+            symbol="profile"
+            index={8}
+            onPress={() => router.push("/friends")}
+          />
         </View>
 
         {/* Full-width Watch Bot vs Bot button */}
@@ -290,6 +297,28 @@ export default function HomeScreen() {
         >
           <View style={[styles.profileInner, styles.settingsInner]}>
             <Icon name="settings" size={22} color={colors.text.secondary} />
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Notifications bell — below settings, top-right */}
+      <Animated.View
+        entering={FadeIn.duration(400).delay(850)}
+        style={[styles.settingsCircle, { top: insets.top + spacing.xs + 64, right: spacing.md }]}
+      >
+        <TouchableOpacity
+          onPress={() => router.push("/notifications")}
+          activeOpacity={0.8}
+        >
+          <View style={[styles.profileInner, styles.settingsInner]}>
+            <Icon name="bell" size={22} color={colors.text.secondary} />
+            {unreadCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </Text>
+              </View>
+            )}
           </View>
         </TouchableOpacity>
       </Animated.View>
@@ -465,6 +494,23 @@ const styles = StyleSheet.create({
   },
   settingsInner: {
     borderColor: colors.border.gold,
+  },
+  badge: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.accent.red,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 3,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#fff",
   },
   devIcon: {
     fontSize: 22,

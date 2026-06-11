@@ -13,6 +13,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final connectedAsync = ref.watch(connectedProvider);
     final connected = connectedAsync.valueOrNull ?? false;
+    final unread = ref.watch(notificationsProvider).valueOrNull?.unread ?? 0;
 
     return Scaffold(
       body: Container(
@@ -103,12 +104,12 @@ class HomeScreen extends ConsumerWidget {
                         _MenuButton(label: 'Play Ranked', icon: Icons.emoji_events, onTap: () => context.push('/game/ranked')),
                         _MenuButton(label: 'Find an Opponent', icon: Icons.people, onTap: () => context.push('/game/casual')),
                         _MenuButton(label: 'Play with AI and improve', icon: Icons.smart_toy, onTap: () => context.push('/bot/difficulty')),
-                        // LAN hidden for v1 — real P2P networking not yet implemented
-                        // _MenuButton(label: 'Play on your network (LAN)', icon: Icons.wifi, onTap: () => context.push('/lan')),
+                        _MenuButton(label: 'Play on your network (LAN)', icon: Icons.wifi, onTap: () => context.push('/lan')),
                         _MenuButton(label: 'Tutorials and trainings', icon: Icons.school, onTap: () => context.push('/tutorial')),
                         _MenuButton(label: 'Puzzles', icon: Icons.extension, onTap: () => context.push('/puzzles')),
                         _MenuButton(label: 'Shop', icon: Icons.store, onTap: () => context.push('/shop')),
                         _MenuButton(label: 'Live rankings and leaderboard', icon: Icons.leaderboard, onTap: () => context.push('/leaderboard')),
+                        _MenuButton(label: 'Friends and private games', icon: Icons.group, onTap: () => context.push('/friends')),
 
                         const SizedBox(height: AppSpacing.xs),
 
@@ -171,6 +172,45 @@ class HomeScreen extends ConsumerWidget {
                   color: AppColors.text.secondary,
                   borderColor: AppColors.border.gold,
                   onTap: () => context.push('/settings'),
+                ),
+              ),
+
+              // Notifications bell - below settings, top right
+              Positioned(
+                top: AppSpacing.md + 64,
+                right: AppSpacing.md,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    _CircleButton(
+                      icon: Icons.notifications,
+                      color: AppColors.text.secondary,
+                      borderColor: AppColors.border.gold,
+                      onTap: () => context.push('/notifications'),
+                    ),
+                    if (unread > 0)
+                      Positioned(
+                        top: -2,
+                        right: -2,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                          decoration: BoxDecoration(
+                            color: AppColors.accent.red,
+                            borderRadius: BorderRadius.circular(9),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            unread > 9 ? '9+' : '$unread',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
 

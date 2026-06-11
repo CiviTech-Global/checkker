@@ -1,4 +1,5 @@
 import { PuzzleRepository } from "@checkker/database";
+import generatedPuzzles from "./puzzle-seed-data.json";
 
 const seedPuzzles = [
   {
@@ -68,14 +69,11 @@ const seedPuzzles = [
 ];
 
 export async function seedPuzzlesIntoDb(): Promise<number> {
-  let created = 0;
-  for (const data of seedPuzzles) {
-    try {
-      await PuzzleRepository.create(data as any);
-      created++;
-    } catch (err) {
-      console.error("[seed] Failed to create puzzle:", err);
-    }
-  }
-  return created;
+  // Skip if the database already holds the full seed set.
+  const existing = await PuzzleRepository.count();
+  if (existing >= 500) return 0;
+
+  const all = [...seedPuzzles, ...generatedPuzzles];
+  const { count } = await PuzzleRepository.createMany(all as any);
+  return count;
 }

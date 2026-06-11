@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Switch, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Switch, StyleSheet, Alert } from "react-native";
 import Animated, { FadeIn, SlideInUp } from "react-native-reanimated";
 import { useRouter } from "expo-router";
 import {
@@ -8,6 +8,7 @@ import {
   radius,
 } from "../../src/theme/tokens";
 import { appSettings, type AppSettings } from "../../src/services/SettingsService";
+import { syncMusicWithSettings, setMusicVolume } from "../../src/utils/music";
 import Icon from "../../src/components/Icon";
 
 function SectionTitle({ title, delay = 0 }: { title: string; delay?: number }) {
@@ -113,9 +114,11 @@ export default function SettingsScreen() {
     appSettings.load().then(setSettings);
   }, []);
 
-  const handle = async (key: keyof AppSettings, value: boolean | string) => {
+  const handle = async (key: keyof AppSettings, value: boolean | string | number) => {
     const methodMap: Record<keyof AppSettings, (v: any) => Promise<void>> = {
       soundEnabled: appSettings.setSoundEnabled.bind(appSettings),
+      musicEnabled: appSettings.setMusicEnabled.bind(appSettings),
+      musicVolume: appSettings.setMusicVolume.bind(appSettings),
       hapticEnabled: appSettings.setHapticEnabled.bind(appSettings),
       reducedMotion: appSettings.setReducedMotion.bind(appSettings),
       boardTheme: appSettings.setBoardTheme.bind(appSettings),
@@ -124,6 +127,28 @@ export default function SettingsScreen() {
     };
     await methodMap[key](value);
     setSettings((prev) => ({ ...prev, [key]: value }));
+    if (key === "musicEnabled") syncMusicWithSettings();
+    if (key === "musicVolume") setMusicVolume(value as number);
+  };
+
+  const confirmClearData = () => {
+    Alert.alert(
+      "Clear Local Data",
+      "This erases all locally stored settings, tutorial progress, and puzzle streaks on this device. This cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Clear Data",
+          style: "destructive",
+          onPress: async () => {
+            await appSettings.clearAllData();
+            const fresh = await appSettings.load();
+            setSettings(fresh);
+            syncMusicWithSettings();
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -155,6 +180,34 @@ export default function SettingsScreen() {
         onValueChange={(v) => handle("soundEnabled", v)}
         delay={150}
       />
+
+      <SwitchTile
+        icon="volume-high"
+        title="Background Music"
+        subtitle="Ambient music while you play"
+        value={settings.musicEnabled}
+        onValueChange={(v) => handle("musicEnabled", v)}
+        delay={175}
+      />
+
+      {settings.musicEnabled && (
+        <ChipSelector
+          icon="volume-high"
+          title="Music Volume"
+          value={
+            settings.musicVolume <= 0.34
+              ? "low"
+              : settings.musicVolume <= 0.67
+                ? "medium"
+                : "high"
+          }
+          options={["low", "medium", "high"]}
+          onChange={(v) =>
+            handle("musicVolume", v === "low" ? 0.25 : v === "medium" ? 0.5 : 0.9)
+          }
+          delay={185}
+        />
+      )}
 
       <SwitchTile
         icon="phone-vibrate"
@@ -203,6 +256,25 @@ export default function SettingsScreen() {
         onChange={(v) => handle("cardBack", v)}
         delay={450}
       />
+
+      {/* Account */}
+      <SectionTitle title="Account" delay={475} />
+
+      <Animated.View
+        entering={SlideInUp.duration(300).delay(490).springify().damping(15)}
+        style={styles.tileCard}
+      >
+        <TouchableOpacity onPress={confirmClearData} style={styles.actionRow} activeOpacity={0.7}>
+          <Icon name="incorrect" size={22} color={colors.accent.red} />
+          <View style={styles.switchTextCol}>
+            <Text style={[styles.tileTitle, { color: colors.accent.red }]}>Clear Local Data</Text>
+            <Text style={styles.tileSubtitle}>
+              Erase settings, tutorial progress, and puzzle streaks on this device
+            </Text>
+          </View>
+          <Icon name="chevron-right" size={18} color={colors.text.muted} />
+        </TouchableOpacity>
+      </Animated.View>
 
       {/* About */}
       <SectionTitle title="About" delay={500} />
@@ -327,6 +399,11 @@ const styles = StyleSheet.create({
     color: colors.text.dark,
   },
   aboutRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  actionRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,

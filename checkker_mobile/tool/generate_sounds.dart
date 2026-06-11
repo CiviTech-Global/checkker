@@ -201,6 +201,18 @@ void main() {
       _Tone(80, 520, _Waveform.sine, 0.18, attack: 0.06, fadeOut: 0.60, delayMs: 400),
       _Tone(55, 650, _Waveform.sine, 0.10, attack: 0.08, fadeOut: 0.70, delayMs: 480),
     ],
+    // 16-second ambient pad (Am – F – C – G), designed to loop seamlessly.
+    'bgm': [
+      for (int chord = 0; chord < 4; chord++)
+        for (final freq in [
+          [220, 262, 330],
+          [175, 220, 262],
+          [131, 165, 196],
+          [196, 247, 294],
+        ][chord])
+          _Tone(freq, 4000, _Waveform.sine, 0.10,
+              attack: 0.25, fadeOut: 0.25, delayMs: chord * 4000),
+    ],
   };
 
   for (final entry in sounds.entries) {

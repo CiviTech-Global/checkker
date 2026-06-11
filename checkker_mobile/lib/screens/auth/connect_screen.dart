@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 
+import '../../providers/socket_provider.dart';
 import '../../services/wallet_service.dart';
 import '../../theme/tokens.dart';
 
@@ -16,6 +20,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
   ReownAppKitModal? _appKitModal;
   bool _initializing = false;
   final _manualAddressController = TextEditingController();
+  final List<StreamSubscription> _subs = [];
+  String _authStep = 'idle'; // idle | signing | verifying | done
+  bool _authAttempted = false;
 
   static const String _projectId = String.fromEnvironment(
     'CHECKKER_WC_PROJECT_ID',
@@ -27,15 +34,72 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
     super.initState();
     _initWalletConnect();
     _loadManualAddress();
+    _listenForAuth();
   }
 
   @override
   void dispose() {
+    for (final sub in _subs) {
+      sub.cancel();
+    }
     _manualAddressController.dispose();
     _appKitModal?.onModalConnect.unsubscribe(_onConnect);
     _appKitModal?.onModalDisconnect.unsubscribe(_onDisconnect);
     _appKitModal?.onModalError.unsubscribe(_onError);
     super.dispose();
+  }
+
+  /// Server auth handshake: auth_request → auth_challenge → sign → auth_verify.
+  void _listenForAuth() {
+    final socket = ref.read(socketServiceProvider);
+    _subs.add(socket.authChallengeStream.listen((data) async {
+      final address = WalletService().address;
+      final message = data['message'] as String?;
+      if (address == null || message == null) return;
+      if (!WalletService().canSign) {
+        // Manual address fallback — identity only, no signing session.
+        if (mounted) setState(() => _authStep = 'idle');
+        return;
+      }
+      if (mounted) setState(() => _authStep = 'signing');
+      final signature = await WalletService().sign(message);
+      if (!mounted) return;
+      if (signature != null) {
+        setState(() => _authStep = 'verifying');
+        socket.authVerify(address, signature);
+      } else {
+        setState(() => _authStep = 'idle');
+        _authAttempted = false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Signature rejected or failed.')),
+        );
+      }
+    }));
+    _subs.add(socket.authErrorStream.listen((error) {
+      if (!mounted) return;
+      setState(() => _authStep = 'idle');
+      _authAttempted = false;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+    }));
+    _subs.add(socket.authStateStream.listen((auth) {
+      if (!mounted || auth == null) return;
+      setState(() => _authStep = 'done');
+      if (auth.isNewUser) {
+        context.go('/auth/setup');
+      } else if (context.canPop()) {
+        context.pop();
+      } else {
+        context.go('/');
+      }
+    }));
+  }
+
+  void _startServerAuth() {
+    final address = WalletService().address;
+    if (address == null || _authAttempted) return;
+    _authAttempted = true;
+    setState(() => _authStep = 'verifying');
+    ref.read(socketServiceProvider).authRequest(address);
   }
 
   Future<void> _loadManualAddress() async {
@@ -70,6 +134,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
       );
 
       await _appKitModal!.init();
+      WalletService().attachModal(_appKitModal);
 
       _appKitModal!.onModalConnect.subscribe(_onConnect);
       _appKitModal!.onModalDisconnect.subscribe(_onDisconnect);
@@ -90,7 +155,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
   }
 
   void _onDisconnect(ModalDisconnect? event) {
+    WalletService().attachModal(null);
     WalletService().setAddress(null);
+    _authAttempted = false;
     setState(() {});
   }
 
@@ -114,6 +181,8 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
     if (addr != null && addr.isNotEmpty) {
       WalletService().setAddress(addr);
       setState(() {});
+      // Wallet connected — authenticate with the game server.
+      _startServerAuth();
     }
   }
 
@@ -134,8 +203,10 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
     if (_appKitModal?.isConnected ?? false) {
       await _appKitModal!.disconnect();
     }
+    WalletService().attachModal(null);
     await WalletService().disconnect();
-    setState(() {});
+    _authAttempted = false;
+    setState(() => _authStep = 'idle');
   }
 
   @override
@@ -208,6 +279,32 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
                   textAlign: TextAlign.center,
                 ),
               ),
+              if (_authStep == 'signing' || _authStep == 'verifying') ...[
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.accent.gold,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      _authStep == 'signing'
+                          ? 'Waiting for wallet signature...'
+                          : 'Verifying with server...',
+                      style: TextStyle(
+                        fontSize: AppTypography.sm,
+                        color: AppColors.text.secondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: AppSpacing.xl),
               ElevatedButton.icon(
                 onPressed: _disconnect,

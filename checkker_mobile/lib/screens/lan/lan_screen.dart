@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../providers/socket_provider.dart';
 import '../../services/lan_service.dart';
 import '../../services/socket_service.dart';
 import '../../theme/tokens.dart';
@@ -18,15 +21,43 @@ class LanScreen extends ConsumerStatefulWidget {
 class _LanScreenState extends ConsumerState<LanScreen> {
   _LanMode _mode = _LanMode.select;
   final _serverAddressController = TextEditingController();
+  final _gameCodeController = TextEditingController();
   final _lanService = LanService();
+  final List<StreamSubscription> _subs = [];
   String? _localIp;
+  String? _hostCode;
   bool _connecting = false;
+  bool _scanning = false;
   String? _connectionError;
+  String? _lastGameId;
+  List<DiscoveredHost> _discoveredHosts = [];
 
   @override
   void initState() {
     super.initState();
     _discoverIp();
+    final socket = ref.read(socketServiceProvider);
+    _lastGameId = socket.gameId;
+    _subs.add(socket.lanGameHostedStream.listen((data) {
+      if (mounted) setState(() => _hostCode = data['code'] as String?);
+    }));
+    _subs.add(socket.lanJoinResultStream.listen((data) {
+      if (!mounted) return;
+      setState(() => _connecting = false);
+      if (data['success'] != true) {
+        final error = data['error'] as String? ?? 'Could not join the game.';
+        setState(() => _connectionError = error);
+        _showSnack(error);
+      }
+    }));
+    _subs.add(socket.gameStateStream.listen((_) {
+      if (!mounted) return;
+      final gameId = socket.gameId;
+      if (gameId != null && gameId != _lastGameId) {
+        _lastGameId = gameId;
+        context.push('/game/$gameId');
+      }
+    }));
   }
 
   Future<void> _discoverIp() async {
@@ -36,30 +67,64 @@ class _LanScreenState extends ConsumerState<LanScreen> {
     }
   }
 
+  Future<void> _scanForHosts() async {
+    setState(() => _scanning = true);
+    final hosts = await _lanService.discoverHosts();
+    if (mounted) {
+      setState(() {
+        _scanning = false;
+        _discoveredHosts = hosts;
+      });
+      if (hosts.isEmpty) {
+        _showSnack('No Checkker servers found on this network.');
+      }
+    }
+  }
+
   @override
   void dispose() {
+    for (final sub in _subs) {
+      sub.cancel();
+    }
     _serverAddressController.dispose();
+    _gameCodeController.dispose();
     super.dispose();
   }
 
   void _handleHost() {
-    setState(() => _mode = _LanMode.host);
+    setState(() {
+      _mode = _LanMode.host;
+      _hostCode = null;
+    });
+    ref.read(socketServiceProvider).hostLanGame();
   }
 
   void _handleJoin() {
     setState(() => _mode = _LanMode.join);
   }
 
+  void _connectToDiscovered(DiscoveredHost host) {
+    _serverAddressController.text = host.address;
+    _handleConnect();
+  }
+
   void _handleConnect() {
     final addr = _serverAddressController.text.trim();
-    if (addr.isEmpty) {
-      _showSnack('Please enter the host\'s IP address or code.');
+    final code = _gameCodeController.text.trim();
+    if (code.isEmpty) {
+      _showSnack('Please enter the host\'s game code.');
       return;
     }
     setState(() {
       _connecting = true;
       _connectionError = null;
     });
+
+    if (addr.isEmpty) {
+      // Same server (or already connected to the host's) — join directly.
+      ref.read(socketServiceProvider).joinLanGame(code);
+      return;
+    }
 
     final ok = _lanService.connectToLanHost(addr);
     if (!ok) {
@@ -71,14 +136,16 @@ class _LanScreenState extends ConsumerState<LanScreen> {
       return;
     }
 
-    // Wait briefly for connection result.
+    // Wait briefly for connection, then complete the join handshake.
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
-      setState(() => _connecting = false);
       if (SocketService().isConnected) {
-        _showSnack('Connected to LAN host. You can now queue or challenge a friend.');
+        ref.read(socketServiceProvider).joinLanGame(code);
       } else {
-        setState(() => _connectionError = 'Could not connect to $addr. Make sure the host is reachable.');
+        setState(() {
+          _connecting = false;
+          _connectionError = 'Could not connect to $addr. Make sure the host is reachable.';
+        });
         _showSnack('Could not connect to $addr. Make sure the host is reachable.');
       }
     });
@@ -210,7 +277,7 @@ class _LanScreenState extends ConsumerState<LanScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'Share your local IP with the other player so they can join.',
+                'Share this game code with the other player so they can join.',
                 style: TextStyle(
                   fontSize: AppTypography.sm,
                   color: AppColors.text.muted,
@@ -230,7 +297,7 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'Your Address',
+                      'Game Code',
                       style: TextStyle(
                         fontSize: AppTypography.xs,
                         color: AppColors.text.muted,
@@ -239,12 +306,13 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                     ),
                     const SizedBox(height: 2),
                     SelectableText(
-                      ip,
+                      _hostCode ?? '...',
                       style: TextStyle(
-                        fontSize: AppTypography.body,
+                        fontSize: AppTypography.lg,
                         fontWeight: FontWeight.w700,
                         color: AppColors.accent.gold,
                         fontFamily: 'monospace',
+                        letterSpacing: 4,
                       ),
                     ),
                   ],
@@ -252,7 +320,8 @@ class _LanScreenState extends ConsumerState<LanScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'A Checkker server must be running on this device or on your LAN.',
+                'Your address: $ip — if you are hosting the server locally, '
+                'the other player should connect to it first.',
                 style: TextStyle(
                   fontSize: 11,
                   color: AppColors.text.muted,
@@ -264,7 +333,13 @@ class _LanScreenState extends ConsumerState<LanScreen> {
         ),
         const SizedBox(height: AppSpacing.md),
         _SecondaryButton(
-          onPressed: () => setState(() => _mode = _LanMode.select),
+          onPressed: () {
+            ref.read(socketServiceProvider).cancelLanHost();
+            setState(() {
+              _mode = _LanMode.select;
+              _hostCode = null;
+            });
+          },
           label: 'Cancel Hosting',
         ),
       ],
@@ -286,7 +361,45 @@ class _LanScreenState extends ConsumerState<LanScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Host Address',
+                'Game Code',
+                style: TextStyle(
+                  fontSize: AppTypography.sm,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.text.primary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              TextField(
+                controller: _gameCodeController,
+                style: TextStyle(
+                  color: AppColors.text.primary,
+                  fontFamily: 'monospace',
+                ),
+                maxLength: 4,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: 'e.g. 4821',
+                  counterText: '',
+                  hintStyle: TextStyle(color: AppColors.text.muted),
+                  filled: true,
+                  fillColor: AppColors.bg.tertiary,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    borderSide: BorderSide(color: AppColors.border.subtle),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    borderSide: BorderSide(color: AppColors.border.subtle),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    borderSide: BorderSide(color: AppColors.accent.gold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Host Address (optional — leave blank if same server)',
                 style: TextStyle(
                   fontSize: AppTypography.sm,
                   fontWeight: FontWeight.w600,
@@ -348,6 +461,51 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                         ),
                 ),
               ),
+              const SizedBox(height: AppSpacing.md),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _scanning ? null : _scanForHosts,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.accent.gold,
+                    side: BorderSide(color: AppColors.border.subtle),
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                    ),
+                  ),
+                  icon: _scanning
+                      ? SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.accent.gold,
+                          ),
+                        )
+                      : const Icon(Icons.radar, size: 18),
+                  label: Text(_scanning ? 'Scanning...' : 'Scan for hosts'),
+                ),
+              ),
+              if (_discoveredHosts.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.sm),
+                for (final host in _discoveredHosts)
+                  ListTile(
+                    dense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                    leading: Icon(Icons.dns, color: AppColors.accent.gold, size: 20),
+                    title: Text(
+                      '${host.address}:${host.port}',
+                      style: TextStyle(
+                        color: AppColors.text.primary,
+                        fontFamily: 'monospace',
+                        fontSize: AppTypography.sm,
+                      ),
+                    ),
+                    trailing: Icon(Icons.chevron_right, color: AppColors.text.muted),
+                    onTap: _connecting ? null : () => _connectToDiscovered(host),
+                  ),
+              ],
             ],
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/cosmetics_theme.dart';
 import '../theme/tokens.dart';
 import 'chess_square.dart';
 
@@ -50,7 +51,9 @@ class ChessBoard extends StatelessWidget {
     final visibleRanks = orientation == 'white' ? _ranks : _ranks.reversed.toList();
     final visibleFiles = orientation == 'white' ? _files : _files.reversed.toList();
 
-    return LayoutBuilder(
+    return ValueListenableBuilder<EquippedVisuals>(
+      valueListenable: equippedVisuals,
+      builder: (context, visuals, _) => LayoutBuilder(
       builder: (context, constraints) {
         final coordSize = (constraints.maxWidth * 0.05).clamp(14.0, 24.0);
         final squareSize = ((constraints.maxWidth - coordSize) / 8).floorToDouble();
@@ -110,6 +113,8 @@ class ChessBoard extends StatelessWidget {
                                     isSelected: selectedSquare == sq,
                                     onPress: interactive ? onSquarePress : (_) {},
                                     size: squareSize,
+                                    boardColors: visuals.board,
+                                    pieceColors: visuals.piece,
                                   );
                                 }),
                             ],
@@ -141,6 +146,7 @@ class ChessBoard extends StatelessWidget {
           ),
         );
       },
+      ),
     );
   }
 }

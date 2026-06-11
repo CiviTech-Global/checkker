@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../services/music_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/sound_service.dart';
+import '../../services/wallet_service.dart';
 import '../../theme/tokens.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -14,6 +17,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settings = SettingsService();
   final _sound = SoundService();
+  final _music = MusicService();
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +47,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
               setState(() {});
             },
           ),
+          _buildSwitchTile(
+            icon: Icons.music_note,
+            title: 'Background Music',
+            subtitle: 'Ambient music while you play',
+            value: settings.musicEnabled,
+            onChanged: (value) async {
+              await _settings.setMusicEnabled(value);
+              await _music.sync(enabled: value, volume: settings.musicVolume);
+              setState(() {});
+            },
+          ),
+          if (settings.musicEnabled)
+            Container(
+              margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.bg.secondary,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.volume_down, color: AppColors.accent.gold, size: 20),
+                  Expanded(
+                    child: Slider(
+                      value: settings.musicVolume,
+                      onChanged: (value) async {
+                        await _settings.setMusicVolume(value);
+                        await _music.setVolume(value);
+                        setState(() {});
+                      },
+                      activeColor: AppColors.accent.gold,
+                      inactiveColor: AppColors.bg.tertiary,
+                    ),
+                  ),
+                  Icon(Icons.volume_up, color: AppColors.accent.gold, size: 20),
+                ],
+              ),
+            ),
           _buildSwitchTile(
             icon: Icons.vibration,
             title: 'Haptic Feedback',
@@ -96,6 +141,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
           const SizedBox(height: AppSpacing.lg),
+          _buildSectionTitle('Account'),
+          Container(
+            margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+            decoration: BoxDecoration(
+              color: AppColors.bg.secondary,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            child: ListTile(
+              leading: Icon(Icons.logout, color: AppColors.accent.gold),
+              title: Text('Log Out', style: TextStyle(color: AppColors.text.primary)),
+              subtitle: Text(
+                'Disconnect your wallet from this device',
+                style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.sm),
+              ),
+              onTap: _confirmLogout,
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+            decoration: BoxDecoration(
+              color: AppColors.bg.secondary,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            child: ListTile(
+              leading: Icon(Icons.delete_forever, color: AppColors.accent.red),
+              title: Text('Clear Local Data', style: TextStyle(color: AppColors.accent.red)),
+              subtitle: Text(
+                'Erase settings, streaks, and wallet session on this device',
+                style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.sm),
+              ),
+              onTap: _confirmClearData,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
           _buildSectionTitle('About'),
           ListTile(
             leading: Icon(Icons.info_outline, color: AppColors.accent.gold),
@@ -105,6 +184,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _confirmLogout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.bg.secondary,
+        title: Text('Log Out', style: TextStyle(color: AppColors.text.primary)),
+        content: Text(
+          'Disconnect your wallet from this device? You can reconnect anytime.',
+          style: TextStyle(color: AppColors.text.secondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('Log Out', style: TextStyle(color: AppColors.accent.gold)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await WalletService().disconnect();
+    if (mounted) context.go('/auth/connect');
+  }
+
+  Future<void> _confirmClearData() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.bg.secondary,
+        title: Text('Clear Local Data', style: TextStyle(color: AppColors.accent.red)),
+        content: Text(
+          'This erases all locally stored settings, puzzle streaks, and your '
+          'wallet session on this device. This cannot be undone.',
+          style: TextStyle(color: AppColors.text.secondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('Clear Data', style: TextStyle(color: AppColors.accent.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await _music.stop();
+    await _settings.clearAllData();
+    await WalletService().disconnect();
+    if (mounted) {
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Local data cleared')),
+      );
+    }
   }
 
   Widget _buildSectionTitle(String title) {

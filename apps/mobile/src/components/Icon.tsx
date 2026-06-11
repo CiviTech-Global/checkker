@@ -43,8 +43,9 @@ const ICON_MAP = {
   "chess-piece": { lib: "mci", name: "chess-pawn" },
   "cards-playing": { lib: "mci", name: "cards-playing-outline" },
   "information": { lib: "ion", name: "information-circle-outline" },
-  "shop": { lib: "ion", name: "storefront" },
-  shop: { lib: "mci", name: "store" },
+  shop: { lib: "ion", name: "storefront" },
+  coin: { lib: "mci", name: "circle-multiple" },
+  bell: { lib: "ion", name: "notifications" },
 } as const;
 
 export type IconName = keyof typeof ICON_MAP;

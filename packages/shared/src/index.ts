@@ -6,3 +6,5 @@ export * from "./betting";
 export * from "./avatars";
 export * from "./donations";
 export * from "./contract";
+export * from "./replay";
+export * from "./cosmetics";

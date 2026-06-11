@@ -211,8 +211,20 @@ export default function BotDifficultyScreen() {
   };
 
   const handleSelectPersonality = (personality: BotPersonality) => {
-    if (!connected || !selectedDifficulty) {
-      Alert.alert("Not connected", "Waiting for server connection...");
+    if (!selectedDifficulty) return;
+    if (!connected) {
+      const offlineDifficulty = selectedDifficulty === "master" ? "advanced" : selectedDifficulty;
+      Alert.alert(
+        "Not connected",
+        "You're offline. Play a local bot game instead?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Play Offline",
+            onPress: () => router.push(`/offline?difficulty=${offlineDifficulty}`),
+          },
+        ]
+      );
       return;
     }
     setLoading(true);
@@ -278,6 +290,18 @@ export default function BotDifficultyScreen() {
                 </TouchableOpacity>
               </Animated.View>
             ))}
+            <TouchableOpacity
+              onPress={() => {
+                const offlineDifficulty = selectedDifficulty === "master" ? "advanced" : selectedDifficulty;
+                router.push(`/offline?difficulty=${offlineDifficulty}`);
+              }}
+              style={{ marginTop: spacing.xs }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                <Icon name="lan" size={14} color={colors.text.muted} />
+                <Text style={{ color: colors.text.muted, fontSize: 14 }}>Play offline (no connection needed)</Text>
+              </View>
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => setSelectedDifficulty(null)} style={{ marginTop: spacing.sm }}>
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4 }}>
                 <Icon name="arrow-back" size={14} color={colors.text.muted} />

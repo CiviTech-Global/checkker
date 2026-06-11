@@ -21,13 +21,24 @@ const CONNECTION_TIMEOUT_MS = 10000;
 export default function LanScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { connected, gameState } = useSocket();
+  const {
+    connected,
+    gameState,
+    hostLanGame,
+    cancelLanHost,
+    joinLanGame,
+    onLanGameHosted,
+    onLanJoinResult,
+  } = useSocket();
   const [mode, setMode] = useState<LanMode>("select");
   const [serverAddress, setServerAddress] = useState("");
+  const [gameCode, setGameCode] = useState("");
+  const [hostCode, setHostCode] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const connectingRef = useRef(false);
+  const pendingJoinCodeRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (gameState && "gameId" in gameState) {
@@ -36,15 +47,36 @@ export default function LanScreen() {
   }, [gameState]);
 
   useEffect(() => {
+    onLanGameHosted((data) => setHostCode(data.code));
+    onLanJoinResult((data) => {
+      setConnecting(false);
+      if (!data.success) {
+        setError(data.error ?? "Could not join the game.");
+      }
+    });
+    return () => {
+      onLanGameHosted(null);
+      onLanJoinResult(null);
+    };
+  }, [onLanGameHosted, onLanJoinResult]);
+
+  useEffect(() => {
     if (connectingRef.current && connected) {
       connectingRef.current = false;
-      setConnecting(false);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
+      // Connected to the host's server — now complete the join handshake.
+      const code = pendingJoinCodeRef.current;
+      pendingJoinCodeRef.current = null;
+      if (code) {
+        joinLanGame(code);
+      } else {
+        setConnecting(false);
+      }
     }
-  }, [connected]);
+  }, [connected, joinLanGame]);
 
   useEffect(() => {
     return () => {
@@ -56,7 +88,10 @@ export default function LanScreen() {
 
   const handleHost = useCallback(() => {
     setMode("host");
-  }, []);
+    setHostCode(null);
+    setError(null);
+    hostLanGame("blitz");
+  }, [hostLanGame]);
 
   const handleJoin = useCallback(() => {
     setMode("join");
@@ -65,39 +100,51 @@ export default function LanScreen() {
 
   const handleConnect = useCallback(() => {
     const addr = serverAddress.trim();
+    const code = gameCode.trim();
+    if (!code) {
+      setError("Please enter the host's game code.");
+      return;
+    }
+    setError(null);
     if (!addr) {
-      setError("Please enter the host's IP address.");
+      // Same server (or already connected to the host's) — join directly.
+      setConnecting(true);
+      joinLanGame(code);
       return;
     }
     const fullAddress = addr.startsWith("http://") || addr.startsWith("https://")
       ? addr
       : `http://${addr}:3001`;
     connectingRef.current = true;
+    pendingJoinCodeRef.current = code;
     setConnecting(true);
-    setError(null);
     connectToServer(fullAddress);
     timeoutRef.current = setTimeout(() => {
       if (connectingRef.current) {
         connectingRef.current = false;
+        pendingJoinCodeRef.current = null;
         setConnecting(false);
         setError(
           "Could not connect to the host. Check the IP address and make sure the server is running.",
         );
       }
     }, CONNECTION_TIMEOUT_MS);
-  }, [serverAddress]);
+  }, [serverAddress, gameCode, joinLanGame]);
 
   const handleDisconnect = useCallback(() => {
+    cancelLanHost();
     reconnectToDefault();
     setMode("select");
     setConnecting(false);
     setError(null);
+    setHostCode(null);
     connectingRef.current = false;
+    pendingJoinCodeRef.current = null;
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-  }, []);
+  }, [cancelLanHost]);
 
   const safeStyle = {
     paddingTop: insets.top,
@@ -147,17 +194,18 @@ export default function LanScreen() {
               <ActivityIndicator size="large" color={colors.accent.gold} />
               <Text style={styles.hostStatus}>Waiting for opponent...</Text>
               <Text style={styles.hostHint}>
-                Share this device's IP address with the other player so they can
-                join. The server must be running on your machine at port 3001.
+                Share this game code with the other player. They can join from
+                the same server, or connect to your machine's IP first if you
+                are hosting the server locally.
               </Text>
               <View style={styles.codeBox}>
-                <Text style={styles.codeLabel}>Your Address</Text>
-                <Text style={styles.codeValue}>Check Wi-Fi settings</Text>
+                <Text style={styles.codeLabel}>Game Code</Text>
+                <Text style={styles.codeValue}>{hostCode ?? "..."}</Text>
               </View>
             </View>
             <TouchableOpacity
               style={styles.secondaryBtn}
-              onPress={() => { setMode("select"); setError(null); }}
+              onPress={() => { cancelLanHost(); setHostCode(null); setMode("select"); setError(null); }}
             >
               <Text style={styles.secondaryBtnText}>Cancel Hosting</Text>
             </TouchableOpacity>
@@ -175,12 +223,28 @@ export default function LanScreen() {
         {mode === "join" && (
           <View style={styles.modeContainer}>
             <View style={styles.joinCard}>
-              <Text style={styles.joinLabel}>Host Address</Text>
+              <Text style={styles.joinLabel}>Game Code</Text>
+              <TextInput
+                style={styles.input}
+                value={gameCode}
+                onChangeText={setGameCode}
+                placeholder="e.g. 4821"
+                placeholderTextColor={colors.text.muted}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="number-pad"
+                returnKeyType="go"
+                onSubmitEditing={handleConnect}
+                editable={!connecting}
+                maxLength={4}
+              />
+
+              <Text style={styles.joinLabel}>Host Address (optional)</Text>
               <TextInput
                 style={styles.input}
                 value={serverAddress}
                 onChangeText={setServerAddress}
-                placeholder="e.g. 192.168.1.42"
+                placeholder="e.g. 192.168.1.42 — leave blank if same server"
                 placeholderTextColor={colors.text.muted}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -194,7 +258,9 @@ export default function LanScreen() {
                 <View style={styles.connectingRow}>
                   <ActivityIndicator size="small" color={colors.accent.gold} />
                   <Text style={styles.connectingText}>
-                    Connecting to {serverAddress.trim()}...
+                    {serverAddress.trim()
+                      ? `Connecting to ${serverAddress.trim()}...`
+                      : "Joining game..."}
                   </Text>
                 </View>
               ) : (
@@ -222,6 +288,7 @@ export default function LanScreen() {
               onPress={() => {
                 if (connecting) {
                   connectingRef.current = false;
+                  pendingJoinCodeRef.current = null;
                   setConnecting(false);
                   if (timeoutRef.current) {
                     clearTimeout(timeoutRef.current);

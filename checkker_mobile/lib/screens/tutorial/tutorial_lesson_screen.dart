@@ -11,108 +11,119 @@ const _lessonContent = <int, _LessonData>{
     title: 'Chess Basics',
     body: 'Checkker uses a standard 8x8 chess board with all the traditional chess pieces. '
         'Each player starts with 16 pieces: one king, one queen, two rooks, two bishops, two knights, and eight pawns. '
-        'The goal is still to checkmate your opponent\'s king, but in Checkker you also collect cards and score poker points along the way.',
+        'Checkmating your opponent\'s king is still the biggest prize, but in Checkker you also collect cards into a '
+        'score pile and earn poker points along the way — the player with the higher TOTAL score wins.',
   ),
   2: _LessonData(
     title: 'Card Types',
-    body: 'In Checkker, a standard 52-card deck is used. Each card has a suit (hearts, diamonds, clubs, spades) '
-        'and a rank (2 through Ace). Cards are drawn from a shared deck and dealt to both players. '
-        'You must play a card each turn to authorize your chess move. Different cards allow different pieces to move.',
+    body: 'Checkker uses a standard 52-card deck. Each card has a suit (hearts, diamonds, clubs, spades) '
+        'and a rank (2 through Ace). On your turn you draw 3 cards and must play ONE of them to authorize your chess move — '
+        'the card\'s rank decides which piece you may move. Played cards go to the discard pile, '
+        'unless your move was a capture, in which case the card joins your score pile.',
   ),
   3: _LessonData(
     title: 'Pawn Moves',
     body: 'Pawns move forward one square, or two squares from their starting position. '
-        'They capture diagonally one square forward. In Checkker, pawns are associated with low-rank cards (2-4). '
+        'They capture diagonally one square forward. In Checkker, any card ranked 3 through 9 moves a pawn, '
+        'so pawn cards are by far the most common in the deck. '
         'When a pawn reaches the opposite end of the board it promotes, just like in standard chess.',
   ),
   4: _LessonData(
     title: 'Knight Moves',
     body: 'Knights move in an L-shape: two squares in one direction and one square perpendicular. '
         'They are the only piece that can jump over other pieces. '
-        'Knights are associated with cards ranked 5 and 6 in the Checkker card system.',
+        'In Checkker, the Jack (J) is the knight card — there are only four in the deck, so use them well.',
   ),
   5: _LessonData(
     title: 'Bishop Moves',
     body: 'Bishops move diagonally any number of squares. Each bishop stays on its starting color for the entire game. '
-        'Bishops are associated with cards ranked 7 and 8. '
+        'In Checkker, the 2 is the bishop card. '
         'Having the bishop pair is a strategic advantage in both chess and Checkker.',
   ),
   6: _LessonData(
     title: 'Rook Moves',
     body: 'Rooks move horizontally or vertically any number of squares. '
-        'They are powerful pieces, especially in the endgame. Rooks are associated with cards ranked 9 and 10. '
+        'They are powerful pieces, especially in the endgame. In Checkker, the 10 is the rook card. '
         'Rooks also participate in castling with the king.',
   ),
   7: _LessonData(
     title: 'Queen Moves',
     body: 'The queen combines the power of a rook and bishop, moving any number of squares '
-        'horizontally, vertically, or diagonally. The queen is associated with Jack and Queen cards. '
-        'She is the most powerful piece on the board.',
+        'horizontally, vertically, or diagonally. In Checkker, the Queen (Q) card moves your queen — '
+        'a natural match. She is the most powerful piece on the board.',
   ),
   8: _LessonData(
     title: 'King & Castling',
     body: 'The king moves one square in any direction. Castling is a special move where the king moves '
         'two squares toward a rook, and that rook moves to the other side of the king. '
-        'The king is associated with King and Ace cards. Protecting your king is always the top priority.',
+        'In Checkker, the King (K) card moves your king. The Ace is special: it is a WILD card that can move '
+        'ANY piece — but capturing with an Ace earns no bonus card draw. Protecting your king is always the top priority.',
   ),
   9: _LessonData(
     title: 'Card-Piece Mapping',
-    body: 'Each card rank maps to specific chess pieces you can move:\n\n'
-        '2-4: Pawns\n5-6: Knights\n7-8: Bishops\n9-10: Rooks\nJ-Q: Queen\nK-A: King\n\n'
-        'This mapping is the core mechanic of Checkker. You can only move a piece if you have a matching card in hand.',
+    body: 'Each card rank maps to a chess piece you can move:\n\n'
+        'K: King\nQ: Queen\nJ: Knight\n10: Rook\n2: Bishop\n3-9: Pawns\nA: Wild (any piece)\n\n'
+        'This mapping is the core mechanic of Checkker. You can only move a piece if you have a matching card '
+        '(or an Ace) in hand.',
   ),
   10: _LessonData(
     title: 'Making Moves',
-    body: 'On your turn, select a card from your hand, then make a legal chess move with a matching piece. '
-        'The card is consumed when you play it. After your move, you draw a new card from the deck. '
-        'If you have no valid moves with your current hand, you must pass your turn.',
+    body: 'On your turn, you draw 3 cards, then select one and make a legal chess move with a matching piece. '
+        'The played card is consumed: it goes to the discard pile on a quiet move, or to your SCORE PILE if the move '
+        'captured a piece. Your score pile is what gets scored as poker hands at the end of the game. '
+        'If none of your cards allow a legal move, you discard your hand and draw fresh cards.',
   ),
   11: _LessonData(
     title: 'Captures & Bonus Cards',
-    body: 'When you capture an opponent\'s piece, you earn bonus cards added to your score pile. '
-        'Higher-value captures grant more bonus cards. Your score pile cards are used at the end of the game '
-        'to form poker hands and earn points. Aggressive play is rewarded!',
+    body: 'Capturing does two things. First, the card you played goes to your score pile instead of the discard pile. '
+        'Second, you draw BONUS cards based on what you captured:\n\n'
+        'Pawn: 1 card\nKnight / Bishop / Rook: 2 cards\nQueen: 3 cards\nGiving check: +1 card\n\n'
+        'Captures made with an Ace earn no bonus draw. Aggressive, well-timed captures build both your position '
+        'and your poker hand.',
   ),
   12: _LessonData(
     title: 'Poker Scoring',
-    body: 'At the end of the game, each player\'s score pile is evaluated for poker hands:\n\n'
-        'Royal Flush: 100 pts\nStraight Flush: 75 pts\nFour of a Kind: 50 pts\n'
-        'Full House: 35 pts\nFlush: 30 pts\nStraight: 25 pts\n'
-        'Three of a Kind: 15 pts\nTwo Pair: 10 pts\nOne Pair: 5 pts\n\n'
-        'Chess result points are added to poker points for the final score.',
+    body: 'At game end, your best 5-card poker hand from your score pile is scored:\n\n'
+        'Royal Flush: 25 pts\nStraight Flush: 18 pts\nFour of a Kind: 14 pts\n'
+        'Full House: 10 pts\nFlush: 8 pts\nStraight: 6 pts\n'
+        'Three of a Kind: 4 pts\nTwo Pair: 3 pts\nOne Pair: 1 pt\nHigh Card: 0 pts\n\n'
+        'Chess result points are added on top: Checkmate is worth 30, resignation or timeout gives the winner 25, '
+        'and a draw gives each player 10. Highest total wins.',
   ),
   13: _LessonData(
     title: 'Time Control',
     body: 'Checkker supports four time controls:\n\n'
         'Bullet: 3 minutes per player\nBlitz: 7 minutes per player\n'
         'Rapid: 15 minutes per player\nClassical: 25 minutes per player\n\n'
-        'If your time runs out, you lose the game on time. Choose a time control that suits your play style.',
+        'If your time runs out, your opponent wins 25 points on time. Choose a time control that suits your play style.',
   ),
   14: _LessonData(
     title: 'Strategy Basics',
     body: 'Key strategies in Checkker:\n\n'
-        '1. Hand management: Save high-value cards for critical moments.\n'
-        '2. Capture wisely: Prioritize captures that build strong poker hands.\n'
-        '3. Suit awareness: Track which suits you are collecting.\n'
-        '4. Card counting: Keep track of what has been played from the deck.\n'
-        '5. Balance chess and poker: Sometimes a weaker chess move gives better cards.',
+        '1. Hand management: K, Q, J and 10 cards are scarce — don\'t burn them on moves a pawn card could make.\n'
+        '2. Capture wisely: captures send your played card to the score pile, so capture with cards that build a poker hand.\n'
+        '3. Suit awareness: track which suits you are collecting toward a flush.\n'
+        '4. Card counting: only four of each non-pawn rank exist; remember what has been played.\n'
+        '5. Balance chess and poker: sometimes a slightly weaker chess move scores far better.',
   ),
   15: _LessonData(
     title: 'Advanced Tactics',
     body: 'Advanced Checkker tactics include:\n\n'
-        '- Card trapping: Forcing your opponent to waste high-value cards on defensive moves.\n'
-        '- Suit stacking: Deliberately collecting one suit to build flushes.\n'
-        '- Tempo cards: Using low-value pawn moves to maintain tempo while saving better cards.\n'
-        '- Sacrifice plays: Trading a piece for bonus cards that complete a poker hand.\n'
-        '- Endgame planning: Ensuring you have king/ace cards available for the endgame.',
+        '- Card trapping: forcing your opponent to spend scarce K/Q/J/10 cards on defensive moves.\n'
+        '- Suit stacking: capturing with one suit deliberately to assemble flushes.\n'
+        '- Tempo pawns: using plentiful pawn cards (3-9) to keep the initiative while saving stronger cards.\n'
+        '- Check bonuses: a capture that also gives check draws an extra bonus card.\n'
+        '- Ace discipline: the wild Ace is flexible but earns no bonus draw on capture — spend it on mobility, not greed.\n'
+        '- Endgame planning: keep a King card (or an Ace) in reserve so your king is never stranded.',
   ),
   16: _LessonData(
     title: 'Putting It Together',
     body: 'To master Checkker, combine chess skill with card strategy:\n\n'
-        '1. Open with a plan for both your chess position and card collection.\n'
+        '1. Open with a plan for both your chess position and your card collection.\n'
         '2. In the middlegame, look for captures that serve both chess and poker goals.\n'
         '3. In the endgame, manage your remaining cards carefully.\n'
-        '4. Always consider the trade-off between a strong chess move and a strong poker score.\n\n'
+        '4. Always weigh a strong chess move against a strong poker score — 30 points for checkmate usually wins, '
+        'but a Royal Flush (25) plus a draw (10) beats it.\n\n'
         'Practice against bots at increasing difficulty to hone your skills. Good luck!',
   ),
 };

@@ -41,7 +41,7 @@ const PUZZLE_CATEGORIES: PuzzleCategory[] = [
     count: 50,
   },
   {
-    id: "card_play",
+    id: "card_management",
     title: "Card Management",
     description: "Optimal card selection puzzles",
     symbol: "\u2666",

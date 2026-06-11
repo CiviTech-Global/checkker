@@ -80,14 +80,6 @@ String? _pieceTypeToChessType(PieceType piece) {
 }
 
 String _moveToString(chess_lib.Move m) {
-  final from = _squareName(m.from);
-  final to = _squareName(m.to);
   final promotion = m.promotion != null ? m.promotion!.toLowerCase() : '';
-  return '$from$to$promotion';
-}
-
-String _squareName(int sq) {
-  final file = String.fromCharCode('a'.codeUnitAt(0) + (sq % 16));
-  final rank = '${(sq ~/ 16) + 1}';
-  return '$file$rank';
+  return '${m.fromAlgebraic}${m.toAlgebraic}$promotion';
 }

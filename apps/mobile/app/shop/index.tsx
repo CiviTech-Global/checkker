@@ -6,6 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import Animated, { FadeIn, SlideInUp } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
@@ -31,12 +32,14 @@ function CosmeticCard({
   isEquipped,
   index,
   onEquip,
+  onBuy,
 }: {
   cosmetic: any;
   isOwned: boolean;
   isEquipped: boolean;
   index: number;
   onEquip: () => void;
+  onBuy: () => void;
 }) {
   const { onPressIn, onPressOut, animatedStyle } = useSpringPress();
   const isFree = cosmetic.isDefault || cosmetic.price === 0;
@@ -51,11 +54,10 @@ function CosmeticCard({
       style={animatedStyle}
     >
       <TouchableOpacity
-        onPress={isOwned ? onEquip : undefined}
-        onPressIn={isOwned ? onPressIn : undefined}
-        onPressOut={isOwned ? onPressOut : undefined}
-        activeOpacity={isOwned ? 0.9 : 1}
-        disabled={!isOwned}
+        onPress={isOwned ? onEquip : onBuy}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+        activeOpacity={0.9}
       >
         <View
           style={[
@@ -104,7 +106,7 @@ function CosmeticCard({
                   { color: isFree ? colors.accent.green : colors.text.secondary },
                 ]}
               >
-                {isFree ? "FREE" : `$${cosmetic.price}`}
+                {isFree ? "FREE" : `${cosmetic.price} coins`}
               </Text>
             )}
           </View>
@@ -119,8 +121,11 @@ export default function ShopScreen() {
   const {
     cosmetics,
     userCosmetics,
+    coins,
     getCosmetics,
     equipCosmetic,
+    purchaseCosmetic,
+    onCosmeticPurchased,
   } = useSocket();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -128,6 +133,17 @@ export default function ShopScreen() {
   useEffect(() => {
     getCosmetics();
   }, [getCosmetics]);
+
+  useEffect(() => {
+    onCosmeticPurchased((data) => {
+      if (data.success) {
+        Alert.alert("Purchased!", `Item unlocked. Balance: ${data.coins} coins.`);
+      } else {
+        Alert.alert("Purchase failed", data.error ?? "Something went wrong.");
+      }
+    });
+    return () => onCosmeticPurchased(null);
+  }, [onCosmeticPurchased]);
 
   useEffect(() => {
     if (cosmetics && userCosmetics) {
@@ -151,6 +167,22 @@ export default function ShopScreen() {
     equipCosmetic(id);
   };
 
+  const handleBuy = (item: any) => {
+    const price = item.isDefault ? 0 : item.price;
+    if (price > coins) {
+      Alert.alert("Not enough coins", `${item.name} costs ${price} coins but you have ${coins}. Win games to earn more!`);
+      return;
+    }
+    Alert.alert(
+      "Buy " + item.name + "?",
+      price === 0 ? "This item is free." : `This will cost ${price} coins. You have ${coins}.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Buy", onPress: () => purchaseCosmetic(item.id) },
+      ]
+    );
+  };
+
   return (
     <ScrollView
       style={styles.container}
@@ -166,7 +198,10 @@ export default function ShopScreen() {
           <Icon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Shop</Text>
-        <View style={{ width: 40 }} />
+        <View style={styles.coinBadge}>
+          <Icon name="coin" size={16} color={colors.accent.gold} />
+          <Text style={styles.coinText}>{coins}</Text>
+        </View>
       </Animated.View>
 
       {/* Tab Selector */}
@@ -212,6 +247,7 @@ export default function ShopScreen() {
                 isEquipped={isEquipped(item.id)}
                 index={i}
                 onEquip={() => handleEquip(item.id)}
+                onBuy={() => handleBuy(item)}
               />
             </View>
           ))}
@@ -249,6 +285,22 @@ const styles = StyleSheet.create({
     color: colors.accent.gold,
     textAlign: "center",
     letterSpacing: 2,
+  },
+  coinBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "rgba(212,168,67,0.15)",
+    borderRadius: radius.md,
+    borderWidth: 0.5,
+    borderColor: colors.accent.gold,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 3,
+  },
+  coinText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: colors.accent.goldBright,
   },
   tabRow: {
     flexDirection: "row",

@@ -8,6 +8,7 @@ export type CreatePuzzleInput = {
   difficulty: string;
   category: string;
   rating?: number;
+  cards?: string;
   isDaily?: boolean;
   dailyDate?: Date;
 };
@@ -45,6 +46,39 @@ export const PuzzleRepository = {
         dailyDate: startOfDay,
       },
     });
+  },
+
+  /**
+   * Returns today's daily puzzle, electing one deterministically (day number
+   * modulo puzzle count) if none has been assigned yet. Safe to call from a
+   * scheduler and from request handlers concurrently.
+   */
+  async ensureDaily(date?: Date): Promise<Puzzle | null> {
+    const existing = await this.getDaily(date);
+    if (existing) return existing;
+
+    const target = date ?? new Date();
+    const startOfDay = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+    const count = await getDb().puzzle.count();
+    if (count === 0) return null;
+
+    const dayNumber = Math.floor(startOfDay.getTime() / 86_400_000);
+    const index = dayNumber % count;
+    const [candidate] = await getDb().puzzle.findMany({
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      take: 1,
+      skip: index,
+    });
+    if (!candidate) return null;
+
+    return getDb().puzzle.update({
+      where: { id: candidate.id },
+      data: { isDaily: true, dailyDate: startOfDay },
+    });
+  },
+
+  async count(): Promise<number> {
+    return getDb().puzzle.count();
   },
 
   async getByCategory(category: string, limit = 20, offset = 0): Promise<Puzzle[]> {

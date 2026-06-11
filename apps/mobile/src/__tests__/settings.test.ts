@@ -1,4 +1,4 @@
-import { appSettings } from "../services/SettingsService";
+﻿import { appSettings } from "../services/SettingsService";
 import type { AppSettings } from "../services/SettingsService";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -14,7 +14,8 @@ const MockAsyncStorage =
   require("@react-native-async-storage/async-storage").default;
 
 describe("SettingsService defaults", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await appSettings.clearAllData();
     jest.clearAllMocks();
   });
 
@@ -48,7 +49,8 @@ describe("SettingsService defaults", () => {
 });
 
 describe("SettingsService updates", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await appSettings.clearAllData();
     jest.clearAllMocks();
   });
 
@@ -98,7 +100,8 @@ describe("SettingsService updates", () => {
 });
 
 describe("SettingsService persistence", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await appSettings.clearAllData();
     jest.clearAllMocks();
   });
 

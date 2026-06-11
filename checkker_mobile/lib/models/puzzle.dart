@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 enum PuzzleCategory {
   daily,
   tactics,
@@ -82,6 +84,30 @@ String categoryToServerValue(PuzzleCategory category) {
   }
 }
 
+class PuzzleCard {
+  final String rank;
+  final String suit;
+
+  const PuzzleCard({required this.rank, required this.suit});
+
+  String get suitSymbol {
+    switch (suit) {
+      case 'clubs':
+        return '♣';
+      case 'diamonds':
+        return '♦';
+      case 'hearts':
+        return '♥';
+      case 'spades':
+        return '♠';
+      default:
+        return '';
+    }
+  }
+
+  bool get isRed => suit == 'hearts' || suit == 'diamonds';
+}
+
 class Puzzle {
   final String id;
   final String fen;
@@ -90,6 +116,7 @@ class Puzzle {
   final String difficulty;
   final String category;
   final int rating;
+  final List<PuzzleCard> cards; // card-constrained hand (may be empty)
 
   const Puzzle({
     required this.id,
@@ -99,6 +126,7 @@ class Puzzle {
     required this.difficulty,
     required this.category,
     required this.rating,
+    this.cards = const [],
   });
 
   factory Puzzle.fromJson(Map<String, dynamic> json) {
@@ -111,6 +139,22 @@ class Puzzle {
     } else {
       solution = '';
     }
+    var cards = <PuzzleCard>[];
+    final cardsRaw = json['cards'];
+    if (cardsRaw is String && cardsRaw.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(cardsRaw);
+        if (decoded is List) {
+          cards = decoded
+              .whereType<Map<String, dynamic>>()
+              .map((c) => PuzzleCard(
+                    rank: c['rank'] as String? ?? '',
+                    suit: c['suit'] as String? ?? '',
+                  ))
+              .toList();
+        }
+      } catch (_) {}
+    }
     return Puzzle(
       id: json['id'] as String? ?? '',
       fen: json['fen'] as String? ?? '',
@@ -119,6 +163,7 @@ class Puzzle {
       difficulty: json['difficulty'] as String? ?? 'beginner',
       category: json['category'] as String? ?? 'tactics',
       rating: json['rating'] as int? ?? 1500,
+      cards: cards,
     );
   }
 }

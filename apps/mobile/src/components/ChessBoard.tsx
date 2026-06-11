@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef, useEffect } from "react";
 import { View, Text, StyleSheet, LayoutChangeEvent } from "react-native";
 import ChessSquare from "./ChessSquare";
 import { colors, radius } from "../theme/tokens";
+import { useEquippedTheme } from "../utils/cosmetics";
 
 const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"];
 const RANKS = [8, 7, 6, 5, 4, 3, 2, 1];
@@ -55,6 +56,7 @@ function ChessBoard({
   const [boardWidth, setBoardWidth] = useState(320);
   const coordSize = 20;
   const squareSize = Math.floor((boardWidth - coordSize) / 8);
+  const equippedTheme = useEquippedTheme();
 
   const pieces = useMemo(() => parseFen(fen), [fen]);
   const highlightSet = useMemo(() => new Set(highlightedSquares), [highlightedSquares]);
@@ -182,6 +184,8 @@ function ChessBoard({
                     onPress={interactive ? onSquarePress : () => {}}
                     size={squareSize}
                     animateFrom={animFrom}
+                    boardColors={equippedTheme.board?.board}
+                    pieceColors={equippedTheme.piece?.isDefault ? undefined : equippedTheme.piece?.piece}
                   />
                 );
               })}
