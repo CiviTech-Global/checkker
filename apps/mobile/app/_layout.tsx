@@ -6,7 +6,11 @@ import * as SplashScreen from "expo-router";
 import { colors, typography } from "../src/theme/tokens";
 import { LocalProfileProvider, useLocalProfile } from "../src/context/LocalProfileContext";
 import { useSocket } from "../src/hooks/useSocket";
+import { ErrorBoundary } from "../src/components/ErrorBoundary";
+import { initMonitoring } from "../src/utils/analytics";
 import type { GameResult } from "@checkker/shared";
+
+initMonitoring();
 
 // NOTE: To enable premium Playfair Display font, install @expo-google-fonts/playfair-display
 // and uncomment the useFonts block below. For now we use system serif fallback.
@@ -65,15 +69,17 @@ function GameRecordBridge() {
 
 export default function RootLayout() {
   return (
-    <LocalProfileProvider>
-      <GameRecordBridge />
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.bg.primary },
-        }}
-      />
-    </LocalProfileProvider>
+    <ErrorBoundary>
+      <LocalProfileProvider>
+        <GameRecordBridge />
+        <StatusBar style="light" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.bg.primary },
+          }}
+        />
+      </LocalProfileProvider>
+    </ErrorBoundary>
   );
 }

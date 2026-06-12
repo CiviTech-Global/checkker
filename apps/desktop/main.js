@@ -6,9 +6,54 @@ const { spawn } = require("child_process");
 
 const isDev = !app.isPackaged;
 
+const DEEP_LINK_PROTOCOL = "checkker";
+
 let server;
 let gameServerProcess = null;
 let gameServerUrl = null;
+let mainWindow = null;
+let appBaseUrl = null;
+let pendingDeepLink = null;
+
+/**
+ * Translate a checkker:// deep link into an in-app route and navigate to it.
+ * e.g. checkker://join/1234 -> <base>/join/1234
+ */
+function handleDeepLink(rawUrl) {
+  if (!rawUrl || !rawUrl.startsWith(`${DEEP_LINK_PROTOCOL}://`)) return;
+  if (!mainWindow || !appBaseUrl) {
+    pendingDeepLink = rawUrl;
+    return;
+  }
+  try {
+    const parsed = new URL(rawUrl);
+    const route = `${parsed.host}${parsed.pathname}`.replace(/\/+$/, "");
+    mainWindow.loadURL(`${appBaseUrl}/${route}${parsed.search}`);
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  } catch (err) {
+    console.warn("[deep-link] failed to handle", rawUrl, err.message);
+  }
+}
+
+/**
+ * Auto-update scaffold. Uses electron-updater when available (NSIS builds
+ * published to GitHub releases); silently no-ops for portable builds and
+ * when the module isn't bundled.
+ */
+function setupAutoUpdater() {
+  if (isDev || process.env.PORTABLE_EXECUTABLE_DIR) return;
+  try {
+    // @ts-ignore — optional module, only present in NSIS update builds.
+    const { autoUpdater } = require("electron-updater");
+    autoUpdater.on("error", (err) => {
+      console.warn("[updater]", err.message);
+    });
+    autoUpdater.checkForUpdatesAndNotify();
+  } catch {
+    // electron-updater not packaged — updates handled manually.
+  }
+}
 
 function startLocalServer(webDir) {
   const mime = {
@@ -160,6 +205,12 @@ async function createWindow() {
     },
   });
 
+  mainWindow = win;
+  appBaseUrl = url;
+  win.on("closed", () => {
+    if (mainWindow === win) mainWindow = null;
+  });
+
   win.loadURL(url);
 
   // No post-load patches needed — reanimated fix is injected via server HTML.
@@ -167,9 +218,49 @@ async function createWindow() {
   win.on("page-title-updated", (e) => {
     e.preventDefault();
   });
+
+  if (pendingDeepLink) {
+    const link = pendingDeepLink;
+    pendingDeepLink = null;
+    handleDeepLink(link);
+  }
 }
 
-app.whenReady().then(createWindow);
+// Single instance: deep links from the OS re-launch the exe; forward the
+// URL to the running instance instead of opening a second window.
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on("second-instance", (_event, argv) => {
+    const link = argv.find((a) => a.startsWith(`${DEEP_LINK_PROTOCOL}://`));
+    if (link) handleDeepLink(link);
+    else if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+
+  // macOS delivers deep links via open-url instead of argv.
+  app.on("open-url", (event, url) => {
+    event.preventDefault();
+    handleDeepLink(url);
+  });
+
+  if (!isDev) {
+    app.setAsDefaultProtocolClient(DEEP_LINK_PROTOCOL);
+  }
+
+  app.whenReady().then(async () => {
+    await createWindow();
+    setupAutoUpdater();
+    // Windows passes a deep link in argv on first launch.
+    const link = process.argv.find((a) =>
+      a.startsWith(`${DEEP_LINK_PROTOCOL}://`)
+    );
+    if (link) handleDeepLink(link);
+  });
+}
 
 app.on("window-all-closed", () => {
   if (server) server.close();

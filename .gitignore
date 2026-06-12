@@ -2,6 +2,8 @@
 .expo
 node_modules
 dist
+coverage
+test-results
 agents
 rules
 *.txt

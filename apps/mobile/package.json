@@ -10,6 +10,7 @@
     "web": "expo start --web",
     "build": "echo web ok",
     "typecheck": "tsc --noEmit",
+    "test": "jest",
     "lint": "echo lint ok",
     "export:web": "expo export --platform web",
     "clean": "rm -rf .turbo dist node_modules/.cache"
@@ -39,7 +40,10 @@
     "three": "^0.166.1"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/react": "~18.3.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.11",
     "@types/three": "^0.184.1",
     "typescript": "^5.8.0"
   }

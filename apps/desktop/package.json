@@ -8,13 +8,19 @@
   "scripts": {
     "start": "electron .",
     "build": "electron-builder --win --publish never",
-    "typecheck": "echo ok",
-    "lint": "echo ok",
+    "typecheck": "tsc -p .",
+    "lint": "node --check main.js && node --check preload.js",
     "clean": "rm -rf dist"
   },
   "build": {
     "appId": "com.checkker.desktop",
     "productName": "Checkker",
+    "protocols": [
+      {
+        "name": "Checkker",
+        "schemes": ["checkker"]
+      }
+    ],
     "files": [
       "main.js",
       "preload.js"
@@ -38,7 +44,9 @@
     }
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
     "electron": "42.3.2",
-    "electron-builder": "^26"
+    "electron-builder": "^26",
+    "typescript": "^5.8.0"
   }
 }

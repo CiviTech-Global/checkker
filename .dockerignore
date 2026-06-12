@@ -1,0 +1,14 @@
+**/node_modules
+**/dist
+**/.turbo
+**/build
+.git
+.github
+apps/mobile
+apps/desktop
+checkker_mobile
+plans
+docs
+test-results
+coverage
+*.md

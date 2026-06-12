@@ -1,7 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 import 'router.dart';
+import 'services/analytics_service.dart';
 import 'services/music_service.dart';
 import 'services/settings_service.dart';
 import 'services/sound_service.dart';
@@ -10,6 +13,18 @@ import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Crash reporting: route framework and platform errors through the
+  // analytics service so a backend can be attached in one place.
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    AnalyticsService().recordError(details.exception, details.stack);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    AnalyticsService().recordError(error, stack, fatal: true);
+    return true;
+  };
+
   await WalletService().load();
   await SettingsService().load();
   await SoundService().init();
@@ -19,6 +34,7 @@ Future<void> main() async {
     // Fire and forget — don't block first frame on audio start.
     MusicService().start(volume: settings.musicVolume);
   }
+  AnalyticsService().logEvent('app_start');
   runApp(const ProviderScope(child: CheckkerApp()));
 }
 

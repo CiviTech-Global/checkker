@@ -55,8 +55,10 @@ class ChessBoard extends StatelessWidget {
       valueListenable: equippedVisuals,
       builder: (context, visuals, _) => LayoutBuilder(
       builder: (context, constraints) {
-        final coordSize = (constraints.maxWidth * 0.05).clamp(14.0, 24.0);
-        final squareSize = ((constraints.maxWidth - coordSize) / 8).floorToDouble();
+        // Account for the container's own border (2px) and padding (2px).
+        final innerWidth = constraints.maxWidth - 8;
+        final coordSize = (innerWidth * 0.05).clamp(14.0, 24.0);
+        final squareSize = ((innerWidth - coordSize) / 8).floorToDouble();
 
         return Container(
           decoration: BoxDecoration(

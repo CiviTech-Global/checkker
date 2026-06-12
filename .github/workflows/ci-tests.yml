@@ -1,4 +1,4 @@
-name: CI - Tests
+﻿name: CI - Tests
 
 on:
   push:
@@ -32,31 +32,48 @@ jobs:
         run: npm ci
 
       - name: Run lint
-        continue-on-error: true
         run: npm run lint
 
       - name: Run typecheck
-        continue-on-error: true
         run: npm run typecheck
 
+      # Each workspace runs its own pinned jest binary; a root-level
+      # `npx jest` resolves a different hoisted major version and breaks.
       - name: Run tests - shared package
-        run: npx jest --config packages/shared/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/shared-junit.xml packages/shared || true
+        if: ${{ !cancelled() }}
+        run: npm test -w packages/shared -- --ci --coverage --coverageReporters=text --coverageReporters=lcov --coverageReporters=json-summary --reporters=default --reporters=jest-junit
+        env:
+          JEST_JUNIT_OUTPUT_FILE: ${{ github.workspace }}/test-results/shared-junit.xml
 
       - name: Run tests - poker package
-        run: npx jest --config packages/poker/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/poker-junit.xml packages/poker || true
+        if: ${{ !cancelled() }}
+        run: npm test -w packages/poker -- --ci --coverage --coverageReporters=text --coverageReporters=lcov --coverageReporters=json-summary --reporters=default --reporters=jest-junit
+        env:
+          JEST_JUNIT_OUTPUT_FILE: ${{ github.workspace }}/test-results/poker-junit.xml
 
       - name: Run tests - chess package
-        run: npx jest --config packages/chess/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/chess-junit.xml packages/chess || true
+        if: ${{ !cancelled() }}
+        run: npm test -w packages/chess -- --ci --coverage --coverageReporters=text --coverageReporters=lcov --coverageReporters=json-summary --reporters=default --reporters=jest-junit
+        env:
+          JEST_JUNIT_OUTPUT_FILE: ${{ github.workspace }}/test-results/chess-junit.xml
 
       - name: Run tests - ai-brain package
-        run: npx jest --config packages/ai-brain/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/ai-brain-junit.xml packages/ai-brain || true
+        if: ${{ !cancelled() }}
+        run: npm test -w packages/ai-brain -- --ci --coverage --coverageReporters=text --coverageReporters=lcov --coverageReporters=json-summary --reporters=default --reporters=jest-junit
+        env:
+          JEST_JUNIT_OUTPUT_FILE: ${{ github.workspace }}/test-results/ai-brain-junit.xml
 
       - name: Run tests - server app
-        run: npx jest --config apps/server/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/server-junit.xml apps/server || true
+        if: ${{ !cancelled() }}
+        run: npm test -w apps/server -- --ci --coverage --coverageReporters=text --coverageReporters=lcov --coverageReporters=json-summary --reporters=default --reporters=jest-junit
+        env:
+          JEST_JUNIT_OUTPUT_FILE: ${{ github.workspace }}/test-results/server-junit.xml
 
       - name: Run tests - mobile app
-        if: runner.os == 'macOS'
-        run: npx jest --config apps/mobile/jest.config.js --ci --reporters=default --reporters=jest-junit --outputFile=test-results/mobile-junit.xml apps/mobile || true
+        if: ${{ !cancelled() }}
+        run: npm test -w apps/mobile -- --ci --coverage --coverageReporters=text --coverageReporters=lcov --coverageReporters=json-summary --reporters=default --reporters=jest-junit
+        env:
+          JEST_JUNIT_OUTPUT_FILE: ${{ github.workspace }}/test-results/mobile-junit.xml
 
       - name: Upload test results
         if: always()
@@ -64,6 +81,28 @@ jobs:
         with:
           name: test-results-${{ matrix.os }}
           path: test-results/
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.os }}
+          path: |
+            packages/*/coverage/
+            apps/*/coverage/
+
+      - name: Coverage summary
+        if: ${{ always() && runner.os == 'Linux' }}
+        shell: bash
+        run: |
+          echo "## Coverage (lines)" >> "$GITHUB_STEP_SUMMARY"
+          for file in packages/*/coverage/coverage-summary.json apps/*/coverage/coverage-summary.json; do
+            if [ -f "$file" ]; then
+              name=$(echo "$file" | cut -d/ -f1-2)
+              pct=$(node -p "require('./$file').total.lines.pct")
+              echo "- **$name**: ${pct}%" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
 
       - name: Upload JUnit report
         if: always()

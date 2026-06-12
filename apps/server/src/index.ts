@@ -4,6 +4,9 @@ import { Server } from "socket.io";
 import cors from "cors";
 import { GameServer } from "./GameServer";
 import { initPlayerStoreDb } from "./PlayerStore";
+import { initMonitoring } from "./monitoring";
+
+initMonitoring();
 
 const app = express();
 app.use(cors());
