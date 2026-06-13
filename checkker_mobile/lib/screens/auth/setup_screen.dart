@@ -102,9 +102,18 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     }
 
     final socketService = ref.read(socketServiceProvider);
-    // walletAddress would come from auth state; using placeholder for now
     final authState = socketService.authState;
-    final walletAddress = authState?.walletAddress ?? '';
+    final walletAddress =
+        authState?.walletAddress ?? authState?.profile?.walletAddress ?? '';
+    if (walletAddress.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Not signed in. Connect your wallet first.'),
+          backgroundColor: AppColors.accent.red,
+        ),
+      );
+      return;
+    }
     socketService.setUsername(walletAddress, username, _selectedAvatar);
 
     ScaffoldMessenger.of(context).showSnackBar(

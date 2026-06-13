@@ -61,6 +61,58 @@ class WalletService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Deposit BNB into the escrow contract for a game via the connected wallet
+  /// (eth_sendTransaction). Encodes the `deposit(bytes32)` call.
+  ///
+  /// [gameId] is the escrow game UUID; [amountWei] is the bet amount as a
+  /// decimal wei string (as sent by the server). Returns the transaction hash,
+  /// or null if there's no signing-capable session or the user rejects.
+  Future<String?> deposit(
+    String contractAddress,
+    String gameId,
+    String amountWei,
+  ) async {
+    final address = _address;
+    final modal = _modal;
+    final session = modal?.session;
+    if (address == null || modal == null || session == null || !modal.isConnected) {
+      return null;
+    }
+    try {
+      final chainId = modal.selectedChain?.chainId ?? 'eip155:97';
+
+      // deposit(bytes32) selector + 32-byte gameId (UUID hyphens stripped,
+      // right-padded to 64 hex chars).
+      const selector = 'b214faa5';
+      final gameIdHex = gameId.replaceAll('-', '').padRight(64, '0');
+      final data = '0x$selector$gameIdHex';
+
+      // Wei decimal string → 0x-prefixed hex for the value field.
+      final valueHex = '0x${BigInt.parse(amountWei).toRadixString(16)}';
+
+      final result = await modal.request(
+        topic: session.topic ?? '',
+        chainId: chainId,
+        request: SessionRequestParams(
+          method: 'eth_sendTransaction',
+          params: [
+            {
+              'from': address,
+              'to': contractAddress,
+              'value': valueHex,
+              'data': data,
+            },
+          ],
+        ),
+      );
+      if (result is String && result.isNotEmpty) return result;
+      return null;
+    } catch (e) {
+      debugPrint('Wallet deposit error: $e');
+      return null;
+    }
+  }
+
   /// Sign a message with the connected wallet via WalletConnect
   /// (personal_sign). Returns null if no signing-capable session exists or
   /// the user rejects the request.

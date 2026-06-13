@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
 import '../models/card.dart';
@@ -513,6 +514,37 @@ class SocketService {
   bool _listenersAttached = false;
   String _serverUrl = _defaultServerUrl;
 
+  // Session token: lets the app re-authenticate after a restart/reconnect
+  // without prompting the wallet to sign again. Mirrors useSocket.ts.
+  static const _kSessionTokenKey = 'checkker:sessionToken';
+  String? _sessionToken;
+  bool _sessionHydrated = false;
+
+  Future<void> _hydrateSessionToken() async {
+    if (_sessionHydrated) return;
+    _sessionHydrated = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _sessionToken = prefs.getString(_kSessionTokenKey);
+      if (_sessionToken != null && (_socket?.connected ?? false) && _authState == null) {
+        _socket!.emit('auth_token', {'token': _sessionToken});
+      }
+    } catch (_) {
+      // Storage unavailable — the user signs in manually.
+    }
+  }
+
+  void _storeSessionToken(String? token) {
+    _sessionToken = token;
+    SharedPreferences.getInstance().then((prefs) {
+      if (token != null) {
+        prefs.setString(_kSessionTokenKey, token);
+      } else {
+        prefs.remove(_kSessionTokenKey);
+      }
+    }).catchError((_) {});
+  }
+
   // Internal state
   String? _gameId;
   GameClientState? _gameState;
@@ -633,12 +665,28 @@ class SocketService {
       'transports': ['websocket'],
     });
     _attachListeners(s);
+    _hydrateSessionToken();
     return s;
   }
+
+  String get serverUrl => _serverUrl;
+  static String get defaultServerUrl => _defaultServerUrl;
 
   void setServerUrl(String url) {
     if (_serverUrl == url) return;
     _serverUrl = url;
+  }
+
+  /// Switch servers at runtime (settings screen). An empty string returns to
+  /// the built-in default. Reconnects immediately so dead-looking buttons
+  /// come back to life as soon as the address is fixed.
+  void connectTo(String url) {
+    final target = url.trim().isEmpty ? _defaultServerUrl : url.trim();
+    if (target == _serverUrl && isConnected) return;
+    _serverUrl = target;
+    _authState = null;
+    _authStateController.add(null);
+    reconnect();
   }
 
   void reconnect() {
@@ -656,6 +704,11 @@ class SocketService {
 
     s.on('connect', (_) {
       _connectedController.add(true);
+      // Silent re-auth: a session token from a previous signature login lets
+      // the server restore identity without prompting the wallet again.
+      if (_authState == null && _sessionToken != null) {
+        s.emit('auth_token', {'token': _sessionToken});
+      }
     });
 
     s.on('disconnect', (_) {
@@ -731,8 +784,11 @@ class SocketService {
     });
 
     s.on('auth_success', (data) {
-      _authState = AuthState.fromJson(_toMap(data));
+      final json = _toMap(data);
+      _authState = AuthState.fromJson(json);
       _authStateController.add(_authState);
+      final token = json['sessionToken'] as String?;
+      if (token != null) _storeSessionToken(token);
       // Fetch cosmetics so equipped themes apply without visiting the shop,
       // and notifications so the home badge is current.
       s.emit('get_cosmetics');
@@ -741,6 +797,11 @@ class SocketService {
 
     s.on('auth_error', (data) {
       final json = _toMap(data);
+      if (json['sessionExpired'] == true) {
+        // Stale stored token — drop it quietly; the user signs in again.
+        _storeSessionToken(null);
+        return;
+      }
       _authErrorController.add(json['error'] as String? ?? 'Auth error');
     });
 
@@ -1043,6 +1104,18 @@ class SocketService {
 
   void authVerify(String walletAddress, String signature) {
     socket.emit('auth_verify', {'walletAddress': walletAddress, 'signature': signature});
+  }
+
+  /// Sign out: revoke the server session, drop the stored token and clear
+  /// the local auth state. Wallet disconnect is handled by WalletService.
+  void logout() {
+    if (_socket?.connected ?? false) {
+      socket.emit('auth_logout',
+          _sessionToken != null ? {'token': _sessionToken} : <String, dynamic>{});
+    }
+    _storeSessionToken(null);
+    _authState = null;
+    _authStateController.add(null);
   }
 
   void setUsername(String walletAddress, String username, [String? avatarId]) {

@@ -7,6 +7,7 @@ import 'router.dart';
 import 'services/analytics_service.dart';
 import 'services/music_service.dart';
 import 'services/settings_service.dart';
+import 'services/socket_service.dart';
 import 'services/sound_service.dart';
 import 'services/wallet_service.dart';
 import 'theme/app_theme.dart';
@@ -27,6 +28,12 @@ Future<void> main() async {
 
   await WalletService().load();
   await SettingsService().load();
+  // Apply a custom server address (e.g. another machine's [ip]:port) before
+  // the socket is first used, so the app connects to the right host.
+  final savedUrl = SettingsService().settings.serverUrl;
+  if (savedUrl.isNotEmpty) {
+    SocketService().setServerUrl(savedUrl);
+  }
   await SoundService().init();
   SoundService().enabled = SettingsService().settings.soundEnabled;
   final settings = SettingsService().settings;

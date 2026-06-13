@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../services/music_service.dart';
 import '../../services/settings_service.dart';
+import '../../services/socket_service.dart';
 import '../../services/sound_service.dart';
 import '../../services/wallet_service.dart';
 import '../../theme/tokens.dart';
@@ -141,6 +142,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
           const SizedBox(height: AppSpacing.lg),
+          _buildSectionTitle('Network'),
+          Container(
+            margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+            decoration: BoxDecoration(
+              color: AppColors.bg.secondary,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            child: ListTile(
+              leading: Icon(Icons.dns, color: AppColors.accent.gold),
+              title: Text('Game Server', style: TextStyle(color: AppColors.text.primary)),
+              subtitle: Text(
+                settings.serverUrl.isEmpty
+                    ? 'Default (${SocketService.defaultServerUrl})'
+                    : settings.serverUrl,
+                style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.sm),
+              ),
+              trailing: Icon(Icons.edit, color: AppColors.text.muted, size: 18),
+              onTap: _editServerUrl,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
           _buildSectionTitle('Account'),
           Container(
             margin: const EdgeInsets.only(bottom: AppSpacing.xs),
@@ -209,8 +231,71 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
     if (confirmed != true || !mounted) return;
+    SocketService().logout();
     await WalletService().disconnect();
     if (mounted) context.go('/auth/connect');
+  }
+
+  Future<void> _editServerUrl() async {
+    final controller = TextEditingController(text: _settings.settings.serverUrl);
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.bg.secondary,
+        title: Text('Game Server', style: TextStyle(color: AppColors.text.primary)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Enter the server address shown on the host machine, e.g.\n'
+              'http://192.168.1.20:3001\n\nLeave blank to use the default.',
+              style: TextStyle(color: AppColors.text.secondary, fontSize: AppTypography.sm),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              keyboardType: TextInputType.url,
+              style: TextStyle(color: AppColors.text.primary),
+              decoration: InputDecoration(
+                hintText: SocketService.defaultServerUrl,
+                hintStyle: TextStyle(color: AppColors.text.muted),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.border.subtle),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.accent.gold),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            child: Text('Save & Reconnect', style: TextStyle(color: AppColors.accent.gold)),
+          ),
+        ],
+      ),
+    );
+    if (result == null || !mounted) return;
+    await _settings.setServerUrl(result);
+    SocketService().connectTo(result);
+    if (mounted) {
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.isEmpty
+              ? 'Reconnecting to default server...'
+              : 'Reconnecting to $result...'),
+        ),
+      );
+    }
   }
 
   Future<void> _confirmClearData() async {
@@ -238,6 +323,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (confirmed != true || !mounted) return;
     await _music.stop();
+    SocketService().logout();
     await _settings.clearAllData();
     await WalletService().disconnect();
     if (mounted) {

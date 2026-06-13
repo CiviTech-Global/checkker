@@ -11,6 +11,9 @@ class AppSettings {
   final String pieceTheme;
   final String cardBack;
 
+  /// Game server address. Empty string means "use the built-in default".
+  final String serverUrl;
+
   const AppSettings({
     this.soundEnabled = true,
     this.musicEnabled = false,
@@ -20,6 +23,7 @@ class AppSettings {
     this.boardTheme = 'classic',
     this.pieceTheme = 'default',
     this.cardBack = 'default',
+    this.serverUrl = '',
   });
 
   AppSettings copyWith({
@@ -31,6 +35,7 @@ class AppSettings {
     String? boardTheme,
     String? pieceTheme,
     String? cardBack,
+    String? serverUrl,
   }) {
     return AppSettings(
       soundEnabled: soundEnabled ?? this.soundEnabled,
@@ -41,6 +46,7 @@ class AppSettings {
       boardTheme: boardTheme ?? this.boardTheme,
       pieceTheme: pieceTheme ?? this.pieceTheme,
       cardBack: cardBack ?? this.cardBack,
+      serverUrl: serverUrl ?? this.serverUrl,
     );
   }
 }
@@ -67,6 +73,7 @@ class SettingsService extends ChangeNotifier {
       boardTheme: prefs.getString(_kBoardTheme) ?? 'classic',
       pieceTheme: prefs.getString(_kPieceTheme) ?? 'default',
       cardBack: prefs.getString(_kCardBack) ?? 'default',
+      serverUrl: prefs.getString(_kServerUrl) ?? '',
     );
     _initialized = true;
     notifyListeners();
@@ -82,6 +89,7 @@ class SettingsService extends ChangeNotifier {
     await prefs.setString(_kBoardTheme, newSettings.boardTheme);
     await prefs.setString(_kPieceTheme, newSettings.pieceTheme);
     await prefs.setString(_kCardBack, newSettings.cardBack);
+    await prefs.setString(_kServerUrl, newSettings.serverUrl);
     _settings = newSettings;
     notifyListeners();
   }
@@ -126,6 +134,10 @@ class SettingsService extends ChangeNotifier {
     await update(_settings.copyWith(cardBack: value));
   }
 
+  Future<void> setServerUrl(String value) async {
+    await update(_settings.copyWith(serverUrl: value.trim()));
+  }
+
   static const String _kSoundEnabled = 'sound_enabled';
   static const String _kMusicEnabled = 'music_enabled';
   static const String _kMusicVolume = 'music_volume';
@@ -134,4 +146,5 @@ class SettingsService extends ChangeNotifier {
   static const String _kBoardTheme = 'board_theme';
   static const String _kPieceTheme = 'piece_theme';
   static const String _kCardBack = 'card_back';
+  static const String _kServerUrl = 'server_url';
 }

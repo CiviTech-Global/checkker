@@ -80,6 +80,28 @@ app.post("/admin/seed-puzzles", async (_req, res) => {
   }
 });
 
+// Serve the exported web client when available, so the full game is playable
+// from any machine on the network at http://<host-ip>:<port>. Looks for the
+// Expo web export next to this app (apps/mobile/dist) or at WEB_DIST.
+(() => {
+  const path = require("path") as typeof import("path");
+  const fs = require("fs") as typeof import("fs");
+  const candidates = [
+    process.env.WEB_DIST,
+    path.join(__dirname, "../../mobile/dist"),
+    path.join(process.cwd(), "../mobile/dist"),
+  ].filter((p): p is string => !!p);
+  const webDist = candidates.find((p) => fs.existsSync(path.join(p, "index.html")));
+  if (!webDist) return;
+
+  app.use(express.static(webDist));
+  // SPA fallback for client-side routes (skip API + socket paths).
+  app.get(/^\/(?!socket\.io|health|admin).*/, (_req, res) => {
+    res.sendFile(path.join(webDist, "index.html"));
+  });
+  console.log(`[web] Serving web client from ${webDist}`);
+})();
+
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 
 // LAN discovery beacon: answer UDP broadcasts so mobile clients on the same

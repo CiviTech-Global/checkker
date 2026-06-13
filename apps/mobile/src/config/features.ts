@@ -1,5 +1,35 @@
-/** Server URL for Socket.IO connection */
-export const SERVER_URL = process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:3001";
+/**
+ * Server URL for Socket.IO connection.
+ *
+ * Resolution order:
+ * 1. `window.__CHECKKER_SERVER_URL__` — injected by the desktop shell, which
+ *    spawns the embedded game server on a random port.
+ * 2. `EXPO_PUBLIC_SERVER_URL` — explicit build-time override.
+ * 3. On web, derive from the page's own host so the app works when opened
+ *    from another machine via http://<host-ip>:<port> — same origin when the
+ *    game server serves the page, port 3001 when running the Expo dev server.
+ * 4. Fallback: localhost:3001 (native dev).
+ */
+function resolveServerUrl(): string {
+  if (typeof window !== "undefined") {
+    const injected = (window as any).__CHECKKER_SERVER_URL__;
+    if (injected) return injected;
+  }
+  if (process.env.EXPO_PUBLIC_SERVER_URL) return process.env.EXPO_PUBLIC_SERVER_URL;
+  if (typeof window !== "undefined" && window.location?.hostname) {
+    const { protocol, hostname, port } = window.location;
+    // Expo dev server (8081/19006) serves the page but not the game server.
+    if (port === "8081" || port === "19006") {
+      return `${protocol}//${hostname}:3001`;
+    }
+    if (hostname !== "localhost" && hostname !== "127.0.0.1") {
+      return window.location.origin;
+    }
+  }
+  return "http://localhost:3001";
+}
+
+export const SERVER_URL = resolveServerUrl();
 
 /**
  * Feature flags for the Checkker app.

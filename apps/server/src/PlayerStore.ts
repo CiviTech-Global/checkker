@@ -25,6 +25,15 @@ const sessionCache = new Map<string, PlayerProfile>();
 /** Maps wallet address → socket ID for authenticated users */
 const walletToSocket = new Map<string, string>();
 
+/**
+ * In-memory account store, keyed by lowercased wallet address. Used only when
+ * no database is configured (`DATABASE_URL` unset) so wallet sign-in still
+ * produces a real, persistent-for-the-server's-lifetime profile. This lets
+ * `/friends`, `/notifications`, profile, etc. work for local / cross-machine
+ * testing without standing up Postgres. When a DB is present this is ignored.
+ */
+const memUsers = new Map<string, PlayerProfile>();
+
 class PlayerStore {
   /** Get or create a profile. In DB mode, walletAddress triggers DB lookup. */
   getOrCreate(socketId: string, displayName?: string): PlayerProfile {
@@ -48,9 +57,18 @@ class PlayerStore {
 
   /** Load profile from DB by wallet address and cache it for the socket session */
   async loadFromWallet(socketId: string, walletAddress: string): Promise<PlayerProfile | null> {
-    if (!dbEnabled || !UserRepo) return null;
+    const key = walletAddress.toLowerCase();
 
-    const user = await UserRepo.findByWallet(walletAddress.toLowerCase());
+    if (!dbEnabled || !UserRepo) {
+      // In-memory mode: return the existing account for this wallet, if any.
+      const mem = memUsers.get(key);
+      if (!mem) return null;
+      sessionCache.set(socketId, mem);
+      walletToSocket.set(key, socketId);
+      return mem;
+    }
+
+    const user = await UserRepo.findByWallet(key);
     if (!user) return null;
 
     const profile: PlayerProfile = {
@@ -79,10 +97,31 @@ class PlayerStore {
     username: string,
     avatarId?: string
   ): Promise<PlayerProfile | null> {
-    if (!dbEnabled || !UserRepo) return null;
+    const key = walletAddress.toLowerCase();
+
+    if (!dbEnabled || !UserRepo) {
+      // In-memory mode: create (or overwrite) the account for this wallet.
+      const profile: PlayerProfile = {
+        id: uuid(),
+        displayName: username,
+        rating: 1000,
+        gamesPlayed: 0,
+        wins: 0,
+        losses: 0,
+        draws: 0,
+        currentStreak: 0,
+        bestStreak: 0,
+        walletAddress: key,
+        avatarId,
+      };
+      memUsers.set(key, profile);
+      sessionCache.set(socketId, profile);
+      walletToSocket.set(key, socketId);
+      return profile;
+    }
 
     const user = await UserRepo.create({
-      walletAddress: walletAddress.toLowerCase(),
+      walletAddress: key,
       username,
       avatarId,
     });
@@ -108,7 +147,13 @@ class PlayerStore {
 
   /** Check if a username is available */
   async isUsernameTaken(username: string): Promise<boolean> {
-    if (!dbEnabled || !UserRepo) return false;
+    if (!dbEnabled || !UserRepo) {
+      const lower = username.toLowerCase();
+      for (const p of memUsers.values()) {
+        if (p.displayName.toLowerCase() === lower) return true;
+      }
+      return false;
+    }
     return UserRepo.isUsernameTaken(username);
   }
 

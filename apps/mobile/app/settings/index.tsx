@@ -9,6 +9,8 @@ import {
 } from "../../src/theme/tokens";
 import { appSettings, type AppSettings } from "../../src/services/SettingsService";
 import { syncMusicWithSettings, setMusicVolume } from "../../src/utils/music";
+import { useSocket } from "../../src/hooks/useSocket";
+import { useWallet } from "../../src/hooks/useWallet";
 import Icon from "../../src/components/Icon";
 
 function SectionTitle({ title, delay = 0 }: { title: string; delay?: number }) {
@@ -109,6 +111,8 @@ function ChipSelector({
 export default function SettingsScreen() {
   const router = useRouter();
   const [settings, setSettings] = useState<AppSettings>(appSettings.settings);
+  const { authState, logout } = useSocket();
+  const wallet = useWallet();
 
   useEffect(() => {
     appSettings.load().then(setSettings);
@@ -129,6 +133,25 @@ export default function SettingsScreen() {
     setSettings((prev) => ({ ...prev, [key]: value }));
     if (key === "musicEnabled") syncMusicWithSettings();
     if (key === "musicVolume") setMusicVolume(value as number);
+  };
+
+  const confirmSignOut = () => {
+    Alert.alert(
+      "Sign Out",
+      "Disconnect your wallet and end your session on this device?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Sign Out",
+          style: "destructive",
+          onPress: () => {
+            logout();
+            wallet.disconnect();
+            router.replace("/auth/connect");
+          },
+        },
+      ]
+    );
   };
 
   const confirmClearData = () => {
@@ -259,6 +282,28 @@ export default function SettingsScreen() {
 
       {/* Account */}
       <SectionTitle title="Account" delay={475} />
+
+      {(authState?.profile || wallet.isConnected) && (
+        <Animated.View
+          entering={SlideInUp.duration(300).delay(480).springify().damping(15)}
+          style={styles.tileCard}
+        >
+          <TouchableOpacity onPress={confirmSignOut} style={styles.actionRow} activeOpacity={0.7}>
+            <Icon name="arrow-back" size={22} color={colors.accent.gold} />
+            <View style={styles.switchTextCol}>
+              <Text style={styles.tileTitle}>Sign Out</Text>
+              <Text style={styles.tileSubtitle}>
+                {authState?.profile?.displayName
+                  ? `Signed in as ${authState.profile.displayName}`
+                  : wallet.address
+                    ? `Wallet ${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}`
+                    : "Disconnect wallet and end session"}
+              </Text>
+            </View>
+            <Icon name="chevron-right" size={18} color={colors.text.muted} />
+          </TouchableOpacity>
+        </Animated.View>
+      )}
 
       <Animated.View
         entering={SlideInUp.duration(300).delay(490).springify().damping(15)}

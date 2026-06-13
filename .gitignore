@@ -7,8 +7,19 @@ test-results
 agents
 rules
 *.txt
-*.json
+# Scratch JSON at repo root only — a bare *.json silently drops required
+# sources (tsconfigs, seed data) from git and breaks CI.
+/*.json
+!/package.json
+!/package-lock.json
+!/turbo.json
+!/.mcp.json
 *.py
 /plans
 graphify-out
 .graphify-out
+
+# Secrets — never commit real env files; .env.example is the tracked template.
+.env
+.env.*
+!.env.example

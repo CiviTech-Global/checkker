@@ -59,4 +59,44 @@ export function cleanupExpiredChallenges(): void {
       pendingChallenges.delete(key);
     }
   }
+  for (const [token, session] of sessions) {
+    if (now > session.expiresAt) {
+      sessions.delete(token);
+    }
+  }
+}
+
+/* ── Session tokens ──────────────────────────────────────────────────────
+ * Issued after a successful signature verification so clients can re-auth
+ * on reconnect/page reload without prompting the wallet to sign again.
+ */
+
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+const sessions = new Map<string, { walletAddress: string; expiresAt: number }>();
+
+/** Create a session token for an authenticated wallet. */
+export function createSession(walletAddress: string): string {
+  const token = uuid() + uuid().replace(/-/g, "");
+  sessions.set(token, {
+    walletAddress: walletAddress.toLowerCase(),
+    expiresAt: Date.now() + SESSION_TTL_MS,
+  });
+  return token;
+}
+
+/** Resolve a session token to its wallet address, or null if invalid/expired. */
+export function verifySession(token: string): string | null {
+  const session = sessions.get(token);
+  if (!session) return null;
+  if (Date.now() > session.expiresAt) {
+    sessions.delete(token);
+    return null;
+  }
+  return session.walletAddress;
+}
+
+/** Invalidate a session token (logout). */
+export function revokeSession(token: string): void {
+  sessions.delete(token);
 }

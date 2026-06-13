@@ -185,6 +185,75 @@ const puzzlesListeners = new Set<(v: PuzzlesListData | null) => void>();
 const puzzleResultListeners = new Set<(v: PuzzleResult | null) => void>();
 const dailyPuzzleListeners = new Set<(v: Puzzle | null) => void>();
 
+/* ── Session token persistence (silent re-auth across reloads) ──────── */
+
+const SESSION_TOKEN_KEY = "checkker:sessionToken";
+let _sessionToken: string | null = null;
+
+function getStoredSessionToken(): string | null {
+  if (_sessionToken) return _sessionToken;
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      _sessionToken = window.localStorage.getItem(SESSION_TOKEN_KEY);
+    }
+  } catch {
+    // storage unavailable
+  }
+  return _sessionToken;
+}
+
+function storeSessionToken(token: string | null): void {
+  _sessionToken = token;
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      if (token) window.localStorage.setItem(SESSION_TOKEN_KEY, token);
+      else window.localStorage.removeItem(SESSION_TOKEN_KEY);
+    }
+  } catch {
+    // storage unavailable
+  }
+  // Native: persist via AsyncStorage (fire and forget).
+  try {
+    const AsyncStorage = require("@react-native-async-storage/async-storage").default;
+    if (token) AsyncStorage.setItem(SESSION_TOKEN_KEY, token);
+    else AsyncStorage.removeItem(SESSION_TOKEN_KEY);
+  } catch {
+    // not available (web)
+  }
+}
+
+/**
+ * Sign out: revoke the server session, drop the stored token and clear the
+ * local auth state. The wallet itself is disconnected separately (useWallet).
+ */
+export function logoutSession(): void {
+  const token = getStoredSessionToken();
+  if (socket?.connected) {
+    socket.emit("auth_logout", token ? { token } : {});
+  }
+  storeSessionToken(null);
+  _authState = null;
+  authStateListeners.forEach((fn) => fn(null));
+}
+
+// Hydrate the token from AsyncStorage on native; if the socket is already
+// connected and unauthenticated, re-auth immediately.
+(() => {
+  try {
+    const AsyncStorage = require("@react-native-async-storage/async-storage").default;
+    AsyncStorage.getItem(SESSION_TOKEN_KEY).then((token: string | null) => {
+      if (token && !_sessionToken) {
+        _sessionToken = token;
+        if (socket?.connected && !_authState) {
+          socket.emit("auth_token", { token });
+        }
+      }
+    });
+  } catch {
+    // not available
+  }
+})();
+
 /* ── Attach all socket event listeners (called once) ────────────────── */
 
 function attachListeners(s: Socket) {
@@ -194,6 +263,12 @@ function attachListeners(s: Socket) {
   s.on("connect", () => {
     singletonConnected = true;
     connectedListeners.forEach((fn) => fn(true));
+    // Silent re-auth: a session token from a previous signature login lets
+    // the server restore identity without prompting the wallet again.
+    if (!_authState) {
+      const token = getStoredSessionToken();
+      if (token) s.emit("auth_token", { token });
+    }
   });
 
   s.on("disconnect", () => {
@@ -256,9 +331,10 @@ function attachListeners(s: Socket) {
     _authChallengeCallback?.(data);
   });
 
-  s.on("auth_success", (data: { profile: PlayerProfile | null; isNewUser: boolean; walletAddress?: string }) => {
+  s.on("auth_success", (data: { profile: PlayerProfile | null; isNewUser: boolean; walletAddress?: string; sessionToken?: string }) => {
     _authState = data;
     authStateListeners.forEach((fn) => fn(_authState));
+    if (data.sessionToken) storeSessionToken(data.sessionToken);
     // Load cosmetics so equipped themes apply in-game right away.
     s.emit("get_cosmetics");
     // Fetch in-app notifications and register for push (scaffold no-ops
@@ -269,7 +345,12 @@ function attachListeners(s: Socket) {
     });
   });
 
-  s.on("auth_error", (data: { error: string }) => {
+  s.on("auth_error", (data: { error: string; sessionExpired?: boolean }) => {
+    if (data.sessionExpired) {
+      // Stale stored token — drop it quietly; the user signs in again.
+      storeSessionToken(null);
+      return;
+    }
     _authErrorCallback?.(data.error);
   });
 
@@ -1039,6 +1120,7 @@ export function useSocket() {
     authState,
     authRequest,
     authVerify,
+    logout: logoutSession,
     setUsername,
     checkUsername,
     updateAvatar,

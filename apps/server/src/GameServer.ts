@@ -10,7 +10,7 @@ import { SpectateManager } from "./bot/SpectateManager";
 import { playerStore } from "./PlayerStore";
 import { calculateOdds } from "./odds";
 import { brain } from "./bot/evaluators";
-import { createChallenge, verifyChallenge, cleanupExpiredChallenges } from "./auth/WalletAuth";
+import { createChallenge, verifyChallenge, cleanupExpiredChallenges, createSession, verifySession, revokeSession } from "./auth/WalletAuth";
 import { BetManager } from "./betting/BetManager";
 import type { BetSetup } from "./betting/BetManager";
 import { CONTRACT_ADDRESS, BLOCKCHAIN_ENABLED } from "./blockchain/config";
@@ -127,11 +127,34 @@ export class GameServer {
           userId: profile.id,
         });
         this.userSockets.set(profile.id, socket);
-        socket.emit("auth_success", { profile, isNewUser: false });
+        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress) });
       } else {
         // Wallet verified but no account yet — client should call set_username
-        socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress });
+        socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress, sessionToken: createSession(walletAddress) });
       }
+    });
+
+    // Silent re-auth with a session token from a previous signature login,
+    // so page reloads / reconnects don't prompt the wallet to sign again.
+    socket.on("auth_token", async ({ token }: { token: string }) => {
+      const walletAddress = typeof token === "string" ? verifySession(token) : null;
+      if (!walletAddress) {
+        socket.emit("auth_error", { error: "Session expired", sessionExpired: true });
+        return;
+      }
+      const profile = await playerStore.loadFromWallet(socket.id, walletAddress);
+      if (profile) {
+        authenticatedSockets.set(socket.id, { walletAddress, userId: profile.id });
+        this.userSockets.set(profile.id, socket);
+        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: token });
+      } else {
+        socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress, sessionToken: token });
+      }
+    });
+
+    socket.on("auth_logout", ({ token }: { token?: string } = {}) => {
+      if (token) revokeSession(token);
+      authenticatedSockets.delete(socket.id);
     });
 
     socket.on("set_username", async ({ walletAddress, username, avatarId }: { walletAddress: string; username: string; avatarId?: string }) => {
@@ -157,7 +180,7 @@ export class GameServer {
           userId: profile.id,
         });
         this.userSockets.set(profile.id, socket);
-        socket.emit("auth_success", { profile, isNewUser: false });
+        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress) });
       } else {
         socket.emit("auth_error", { error: "Failed to create account" });
       }

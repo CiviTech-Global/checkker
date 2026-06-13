@@ -1,0 +1,4502 @@
+[
+ {
+  "fen": "8/1P6/1N6/8/8/8/2k2K2/8 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1677
+ },
+ {
+  "fen": "8/5K2/8/8/3B4/8/5p2/7k w - - 0 1",
+  "solution": "d4f2",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 977
+ },
+ {
+  "fen": "8/7P/1k6/8/8/8/8/5K2 w - - 0 1",
+  "solution": "h7h8q",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1496
+ },
+ {
+  "fen": "8/B7/8/7K/8/5k2/8/6Q1 w - - 0 1",
+  "solution": "g1g4",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"diamonds\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "8/3P4/6K1/8/8/1N6/5k2/8 w - - 0 1",
+  "solution": "d7d8q",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1546
+ },
+ {
+  "fen": "8/3P4/4K3/8/8/8/8/6k1 w - - 0 1",
+  "solution": "d7d8q",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1501
+ },
+ {
+  "fen": "7K/8/8/k7/8/8/1B3p2/8 w - - 0 1",
+  "solution": "b2c3",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest bishop move. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 622
+ },
+ {
+  "fen": "8/5P2/5K2/8/pk6/8/8/8 w - - 0 1",
+  "solution": "f7f8q",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1483
+ },
+ {
+  "fen": "6Q1/4K3/7k/5P2/8/8/8/8 w - - 0 1",
+  "solution": "g8g6",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"clubs\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "2k5/8/1K1R4/8/8/1Q6/6p1/8 w - - 0 1",
+  "solution": "b3g8",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"5\",\"suit\":\"diamonds\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "1R6/7k/8/8/1B6/7K/2p5/8 w - - 0 1",
+  "solution": "b8b7",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 1147
+ },
+ {
+  "fen": "5k2/6R1/7Q/7p/8/8/8/3K4 w - - 0 1",
+  "solution": "h6h8",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"hearts\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "8/6K1/8/8/8/7R/6p1/k7 w - - 0 1",
+  "solution": "h3a3",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 572
+ },
+ {
+  "fen": "6k1/2R5/8/8/8/5K2/1p6/8 w - - 0 1",
+  "solution": "c7c8",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"5\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 1049
+ },
+ {
+  "fen": "8/1P6/8/8/2K3k1/8/5p2/8 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1409
+ },
+ {
+  "fen": "8/8/8/8/7k/5R2/2p5/K7 w - - 0 1",
+  "solution": "f3f4",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 1070
+ },
+ {
+  "fen": "8/8/4Q3/k7/2K5/5R2/8/8 w - - 0 1",
+  "solution": "f3a3",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Play a 10 to deliver checkmate with your rook.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "8/8/8/k7/8/3p4/1R1K4/5R2 w - - 0 1",
+  "solution": "f1a1",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Play a 10 to deliver checkmate with your rook.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "6K1/8/8/4N3/8/k7/2p5/8 w - - 0 1",
+  "solution": "e5c4",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest knight move. You'll need a Jack.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 623
+ },
+ {
+  "fen": "8/2K4P/1N6/8/8/6k1/8/8 w - - 0 1",
+  "solution": "h7h8q",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1450
+ },
+ {
+  "fen": "8/5k2/8/K3Qp2/8/8/8/6Q1 w - - 0 1",
+  "solution": "g1g7",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"clubs\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "8/8/8/6B1/2K5/8/2B2p2/4k3 w - - 0 1",
+  "solution": "g5h4",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest bishop move. You'll need a 2.",
+  "difficulty": "master",
+  "category": "endgame",
+  "rating": 1869
+ },
+ {
+  "fen": "3K4/7P/8/5k2/8/8/8/8 w - - 0 1",
+  "solution": "h7h8q",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1419
+ },
+ {
+  "fen": "3N4/2K3k1/8/8/8/8/1p6/4N3 w - - 0 1",
+  "solution": "d8e6",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest knight move. You'll need a Jack.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 536
+ },
+ {
+  "fen": "8/7P/k1K5/8/8/8/8/8 w - - 0 1",
+  "solution": "h7h8q",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1413
+ },
+ {
+  "fen": "8/4P3/8/3k4/8/8/4K3/8 w - - 0 1",
+  "solution": "e7e8q",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1424
+ },
+ {
+  "fen": "8/P7/8/8/B7/3k4/8/5K2 w - - 0 1",
+  "solution": "a7a8q",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1692
+ },
+ {
+  "fen": "8/P5k1/8/8/8/7K/8/8 w - - 0 1",
+  "solution": "a7a8q",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1540
+ },
+ {
+  "fen": "3k4/P2p4/8/8/4K3/2Q5/8/8 w - - 0 1",
+  "solution": "a7a8q",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1693
+ },
+ {
+  "fen": "8/7k/8/8/1P6/7K/7p/8 w - - 0 1",
+  "solution": "h3h2",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"hearts\"}]",
+  "hint": "Your king can win material. You'll need a King.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 559
+ },
+ {
+  "fen": "8/8/8/6p1/8/1K6/6Q1/1k6 w - - 0 1",
+  "solution": "g2h1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "8/1P5p/8/8/8/1K6/8/k7 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1478
+ },
+ {
+  "fen": "8/7P/2k5/8/8/1R6/3K4/8 w - - 0 1",
+  "solution": "h7h8q",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1528
+ },
+ {
+  "fen": "8/6P1/8/7k/8/8/8/4K3 w - - 0 1",
+  "solution": "g7g8q",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1551
+ },
+ {
+  "fen": "8/8/8/8/8/3Q4/5K2/7k w - - 0 1",
+  "solution": "d3h7",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "5k2/3Q4/8/8/pR5K/8/8/8 w - - 0 1",
+  "solution": "b4b8",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"diamonds\"}]",
+  "hint": "Play a 10 to deliver checkmate with your rook.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "8/2P5/8/8/3k4/K7/6B1/8 w - - 0 1",
+  "solution": "c7c8q",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1421
+ },
+ {
+  "fen": "K2B4/8/8/8/8/5R2/2k3p1/8 w - - 0 1",
+  "solution": "f3f2",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 1148
+ },
+ {
+  "fen": "8/3B4/8/1K6/8/8/3p4/7k w - - 0 1",
+  "solution": "d7c6",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest bishop move. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 677
+ },
+ {
+  "fen": "8/1P6/8/5k2/8/4K3/1R6/8 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1528
+ },
+ {
+  "fen": "8/4k3/7K/8/8/8/3p1N1P/8 w - - 0 1",
+  "solution": "f2d1",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest knight move. You'll need a Jack.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 692
+ },
+ {
+  "fen": "2K3k1/8/8/8/4P3/7R/6p1/8 w - - 0 1",
+  "solution": "h3g3",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 1117
+ },
+ {
+  "fen": "8/3P4/8/4k3/8/8/6K1/8 w - - 0 1",
+  "solution": "d7d8q",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1527
+ },
+ {
+  "fen": "6R1/8/8/P1K5/8/5k2/p7/8 w - - 0 1",
+  "solution": "g8f8",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 1080
+ },
+ {
+  "fen": "8/6P1/8/8/k7/3R4/K7/8 w - - 0 1",
+  "solution": "g7g8q",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1586
+ },
+ {
+  "fen": "2k5/8/2K5/5P2/8/4R3/8/8 w - - 0 1",
+  "solution": "e3e8",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"diamonds\"}]",
+  "hint": "Play a 10 to deliver checkmate with your rook.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "8/1R6/5K2/7k/5R2/8/8/8 w - - 0 1",
+  "solution": "b7h7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Play a 10 to deliver checkmate with your rook.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "8/3P4/8/1k6/8/4K3/8/8 w - - 0 1",
+  "solution": "d7d8q",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1480
+ },
+ {
+  "fen": "8/7P/8/4K3/8/8/8/5k2 w - - 0 1",
+  "solution": "h7h8q",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1455
+ },
+ {
+  "fen": "8/8/1K4k1/2R5/8/8/4p3/8 w - - 0 1",
+  "solution": "c5c6",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 1090
+ },
+ {
+  "fen": "3K4/P7/8/5k2/8/8/8/5N2 w - - 0 1",
+  "solution": "a7a8q",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1600
+ },
+ {
+  "fen": "8/3P4/7k/8/8/8/K7/5Q2 w - - 0 1",
+  "solution": "d7d8q",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1470
+ },
+ {
+  "fen": "8/4P3/2k5/5p2/5K2/4N3/8/8 w - - 0 1",
+  "solution": "e7e8q",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1465
+ },
+ {
+  "fen": "K3N3/8/8/8/k7/3R4/6p1/8 w - - 0 1",
+  "solution": "d3d4",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 1001
+ },
+ {
+  "fen": "8/2P5/8/8/1K6/3k4/Q7/8 w - - 0 1",
+  "solution": "c7c8q",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1609
+ },
+ {
+  "fen": "8/1P6/7k/8/8/8/8/2K5 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1569
+ },
+ {
+  "fen": "8/6P1/8/8/5k2/8/B7/3K4 w - - 0 1",
+  "solution": "g7g8q",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1443
+ },
+ {
+  "fen": "8/4P3/8/N7/3k4/8/6K1/8 w - - 0 1",
+  "solution": "e7e8q",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1453
+ },
+ {
+  "fen": "8/1P6/8/8/3K4/8/5k1p/8 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1461
+ },
+ {
+  "fen": "8/2k5/8/4K3/B7/4N3/p7/8 w - - 0 1",
+  "solution": "e3d5",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest knight move. You'll need a Jack.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 685
+ },
+ {
+  "fen": "6k1/P7/8/8/8/8/5Q2/K7 w - - 0 1",
+  "solution": "a7a8q",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1468
+ },
+ {
+  "fen": "2Q5/k3B3/8/7K/8/8/8/8 w - - 0 1",
+  "solution": "e7c5",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Play a 2 to deliver checkmate with your bishop.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "8/5K2/8/3p4/2Q5/4k3/1Q6/8 w - - 0 1",
+  "solution": "b2e2",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"clubs\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "3B4/8/2K5/8/8/8/6p1/k7 w - - 0 1",
+  "solution": "d8f6",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest bishop move. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 605
+ },
+ {
+  "fen": "8/3P4/5K2/k7/8/8/8/5R2 w - - 0 1",
+  "solution": "d7d8q",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1615
+ },
+ {
+  "fen": "8/8/8/1k6/8/4K3/4p3/8 w - - 0 1",
+  "solution": "e3e2",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"}]",
+  "hint": "Your king can win material. You'll need a King.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 609
+ },
+ {
+  "fen": "8/6P1/8/8/1k6/8/6K1/8 w - - 0 1",
+  "solution": "g7g8q",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1507
+ },
+ {
+  "fen": "8/2P5/8/8/6K1/1p6/3k4/8 w - - 0 1",
+  "solution": "c7c8q",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1507
+ },
+ {
+  "fen": "8/1Pp5/2k5/5K2/6R1/8/8/8 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1471
+ },
+ {
+  "fen": "7K/3P4/3k3p/8/8/8/B7/8 w - - 0 1",
+  "solution": "d7d8q",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1457
+ },
+ {
+  "fen": "8/8/5K2/7k/8/8/6Q1/8 w - - 0 1",
+  "solution": "g2g5",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"spades\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "6k1/P7/8/2K5/8/2B5/8/8 w - - 0 1",
+  "solution": "a7a8q",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1681
+ },
+ {
+  "fen": "7R/8/6P1/8/8/4K3/8/4k3 w - - 0 1",
+  "solution": "h8h1",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"diamonds\"}]",
+  "hint": "Play a 10 to deliver checkmate with your rook.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "8/6P1/8/8/5p2/8/8/2K2k2 w - - 0 1",
+  "solution": "g7g8q",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1627
+ },
+ {
+  "fen": "7K/2P5/5p2/8/8/8/8/4B2k w - - 0 1",
+  "solution": "c7c8q",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1598
+ },
+ {
+  "fen": "8/3P4/1K6/8/4k3/8/8/8 w - - 0 1",
+  "solution": "d7d8q",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1506
+ },
+ {
+  "fen": "8/1P6/5k2/8/K7/8/1p6/8 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1545
+ },
+ {
+  "fen": "8/1P6/8/4R3/4K3/8/8/k7 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1462
+ },
+ {
+  "fen": "8/2P5/3p3k/8/5K2/8/8/8 w - - 0 1",
+  "solution": "c7c8q",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1460
+ },
+ {
+  "fen": "8/2P5/8/1R6/3k4/6K1/8/8 w - - 0 1",
+  "solution": "c7c8q",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1653
+ },
+ {
+  "fen": "8/4P3/5p2/8/8/5K2/8/1k6 w - - 0 1",
+  "solution": "e7e8q",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1473
+ },
+ {
+  "fen": "8/1P6/3kB3/8/8/6K1/8/8 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1442
+ },
+ {
+  "fen": "1Q6/7K/5p2/8/8/8/5R2/7k w - - 0 1",
+  "solution": "b8h2",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"hearts\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "7K/8/8/8/8/5P2/8/Nk6 w - - 0 1",
+  "solution": "a1b3",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest knight move. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "endgame",
+  "rating": 2177
+ },
+ {
+  "fen": "8/5k2/8/6B1/2K2B2/8/2p5/8 w - - 0 1",
+  "solution": "f4c1",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest bishop move. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 615
+ },
+ {
+  "fen": "4R3/3P4/3K4/8/8/8/8/k7 w - - 0 1",
+  "solution": "d7d8q",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1654
+ },
+ {
+  "fen": "8/2P5/8/1k6/8/4K3/3Q4/8 w - - 0 1",
+  "solution": "c7c8q",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1691
+ },
+ {
+  "fen": "8/8/8/4k3/8/K7/1p6/5B2 w - - 0 1",
+  "solution": "a3b2",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"diamonds\"}]",
+  "hint": "Your king can win material. You'll need a King.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 955
+ },
+ {
+  "fen": "8/8/8/8/8/4P2K/k6p/8 w - - 0 1",
+  "solution": "h3h2",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Your king can win material. You'll need a King.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 589
+ },
+ {
+  "fen": "8/6k1/8/8/8/8/2RK3p/8 w - - 0 1",
+  "solution": "c2c7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 692
+ },
+ {
+  "fen": "8/4P3/3K4/8/8/8/k7/8 w - - 0 1",
+  "solution": "e7e8q",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1446
+ },
+ {
+  "fen": "8/P5k1/8/8/8/3K4/8/8 w - - 0 1",
+  "solution": "a7a8q",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1412
+ },
+ {
+  "fen": "8/6R1/3K4/8/8/7k/8/2Q5 w - - 0 1",
+  "solution": "c1h6",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "8/8/8/3B4/8/8/1k5p/4K3 w - - 0 1",
+  "solution": "d5h1",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest bishop move. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 597
+ },
+ {
+  "fen": "K7/1P6/7k/8/8/8/8/8 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1661
+ },
+ {
+  "fen": "8/2P5/1k6/8/5p2/8/4P1K1/8 w - - 0 1",
+  "solution": "c7c8q",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1439
+ },
+ {
+  "fen": "8/8/7P/8/4B3/K7/2p5/6k1 w - - 0 1",
+  "solution": "e4c2",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 565
+ },
+ {
+  "fen": "4K3/1P6/7k/8/8/8/p7/8 w - - 0 1",
+  "solution": "b7b8q",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1407
+ },
+ {
+  "fen": "8/P1k5/7p/8/8/6K1/8/8 w - - 0 1",
+  "solution": "a7a8q",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest pawn move. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "endgame",
+  "rating": 1697
+ },
+ {
+  "fen": "8/8/5K1k/8/2p3QP/8/8/8 w - - 0 1",
+  "solution": "g4g6",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"clubs\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 600
+ },
+ {
+  "fen": "rnb1k1nr/p1pp1ppR/1p2p3/2b5/5P2/6P1/PPPPP3/RNBQKB2 b Qkq - 0 6",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 507
+ },
+ {
+  "fen": "1R1qkbnr/4pppp/2p5/3p4/3P4/1P1Q3N/4PPPP/1N2KB1R b Kk - 2 12",
+  "solution": "d8b8",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 572
+ },
+ {
+  "fen": "r4k1r/p1p2ppp/1pB2n2/1q6/4P3/P6N/P1PP2PP/R1BQK2R b KQ - 0 11",
+  "solution": "b5c6",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a Queen is the right spend here — your queen has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 510
+ },
+ {
+  "fen": "r3kbnr/p1pp1ppp/bp6/4p3/8/q1P1P1P1/1P1P1P1P/RNBQK1NR b KQkq - 1 7",
+  "solution": "a3a1",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 666
+ },
+ {
+  "fen": "1nb1k1r1/rppp1ppp/4p3/4N3/1p5q/2P5/PB2PPPR/R2QKBN1 w Q - 0 12",
+  "solution": "h2h4",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 646
+ },
+ {
+  "fen": "rn1k1b2/2p1n1p1/p2pB2r/7Q/1P6/2P5/P2P3N/R1B1K2R b Q - 0 18",
+  "solution": "h6h5",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1166
+ },
+ {
+  "fen": "r1bqkb1r/pppppppp/8/8/6B1/4P3/n1PP1P1P/RN1QK1NR w KQkq - 2 8",
+  "solution": "a1a2",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 1926
+ },
+ {
+  "fen": "R1q1kbn1/2pppppr/2n5/7p/8/2Pb4/3K1PPP/1NB2BNR w - - 0 13",
+  "solution": "a8c8",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 662
+ },
+ {
+  "fen": "rn2k1n1/p5B1/8/5p2/1b6/3P2r1/b3P3/RQ2KB2 w Q - 0 21",
+  "solution": "b1b4",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 658
+ },
+ {
+  "fen": "1n3k2/4n3/pp1rp3/3pP3/6K1/5P2/PP6/R7 w - - 1 26",
+  "solution": "e5d6",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 967
+ },
+ {
+  "fen": "1r5r/p3p1bp/4kn2/8/2p5/6q1/PPK5/R1B5 b - - 1 26",
+  "solution": "g3d3",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"spades\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 600
+ },
+ {
+  "fen": "rn1k1bnr/2p3pp/3p4/Q2P1p2/2b4P/4P3/P3N1P1/RNB1K2R b KQ - 0 17",
+  "solution": "a8a5",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"clubs\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 515
+ },
+ {
+  "fen": "rnb1k1nr/pppp1ppp/8/4p3/6P1/5N2/PbPPPKBP/RNBQ3R w kq - 0 7",
+  "solution": "c1b2",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1135
+ },
+ {
+  "fen": "1nb1k1nr/3p1p1p/q7/r1p1P3/4PBP1/4K2P/1PQ1B3/6NR w k - 1 19",
+  "solution": "e2a6",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 982
+ },
+ {
+  "fen": "rnb1k1r1/pp1p1p1R/4qn2/6P1/8/4bPPN/P1P5/RN1QKB2 b Qq - 1 13",
+  "solution": "f6h7",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a Jack is the right spend here — your knight has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2037
+ },
+ {
+  "fen": "2b2k2/2pn4/1pK5/6p1/1P2p1p1/8/4q3/8 b - - 5 31",
+  "solution": "e2c4",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 600
+ },
+ {
+  "fen": "r2q1b1r/4pk1p/1pB2p1n/6p1/8/N2P4/PPP1PP1P/R2QK2R w KQ - 0 11",
+  "solution": "c6a8",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"clubs\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2128
+ },
+ {
+  "fen": "rn1qkb2/1b1pppp1/1R6/7n/Q1PP4/N7/P3KPPP/5BNR b q - 2 11",
+  "solution": "a8a4",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1117
+ },
+ {
+  "fen": "1nbqk1n1/5p2/r1pp2p1/pN2p3/8/P3PN1P/1BPPQP2/R3KB1R b KQ - 1 12",
+  "solution": "c6b5",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your pawn (a pawn card (3-9)).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1888
+ },
+ {
+  "fen": "rnb1kbnr/p4ppp/1N2p3/2pp4/7P/P4P2/1BPPP1PR/R2QKBN1 b Qkq - 0 8",
+  "solution": "a7b6",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 999
+ },
+ {
+  "fen": "r2qkb1r/ppB1pppp/1n4b1/8/P7/1P4P1/2P1NP1P/1R2KB1R b Kkq - 0 9",
+  "solution": "d8c7",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"diamonds\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1167
+ },
+ {
+  "fen": "rnbqk2r/pppp2pp/7n/2b5/1P1P4/8/P1P1PPPP/RNBQKB1R b KQ - 0 6",
+  "solution": "c5b4",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2021
+ },
+ {
+  "fen": "r1bqkbn1/1B1npp2/8/p1p3P1/7R/2P3P1/PP1PP3/RNB1K1N1 b Qq - 0 12",
+  "solution": "c8b7",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 1062
+ },
+ {
+  "fen": "rnbq3r/1p1k2pp/5p1n/p3p3/8/2N1PPPP/1bP3B1/R1B1K1NR w KQ - 0 11",
+  "solution": "c1b2",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 919
+ },
+ {
+  "fen": "r2qkb1r/p3pp2/P1np2pn/7p/3Q1P2/7P/PP2P1P1/RNB1KBNR b KQkq - 0 10",
+  "solution": "c6d4",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 544
+ },
+ {
+  "fen": "rn3knr/2p5/p3pp2/1p5p/8/8/R1PNP1bP/3QKBNR w K - 0 15",
+  "solution": "f1g2",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 903
+ },
+ {
+  "fen": "rnb2b1r/1ppk1pp1/5n2/p6p/7P/2P1pP2/qP2B1P1/RNB1K1NR w - - 0 11",
+  "solution": "a1a2",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 672
+ },
+ {
+  "fen": "4kb2/3b4/2Q2p2/8/3pP3/3P4/PPP5/RN1K1B2 b - - 0 19",
+  "solution": "d7c6",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"clubs\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 667
+ },
+ {
+  "fen": "2rqkb1r/Q1p1pp1p/3p4/6N1/8/N3K3/Pp3PPP/R1B3R1 b k - 1 13",
+  "solution": "b2a1q",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your pawn (a pawn card (3-9)).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1410
+ },
+ {
+  "fen": "r1b1kbnr/p1pp1ppp/2n5/1N2p3/P7/8/1PPPPP2/R1BQKBqR w KQkq - 0 7",
+  "solution": "h1g1",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 585
+ },
+ {
+  "fen": "rnbqkbnr/p1p1p2N/1p1p2p1/5p2/8/2N5/PPPPPPPP/R1BQKBR1 b Qkq - 0 5",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 1834
+ },
+ {
+  "fen": "r1b1k1nr/1ppp1p1p/n3p1pB/8/8/5P2/2P1P1PP/RN1QKBNR b KQkq - 1 8",
+  "solution": "g8h6",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1951
+ },
+ {
+  "fen": "2b3n1/4k3/r1p5/8/1P1P1p1r/2P4R/PQ4P1/1R2K3 w - - 2 29",
+  "solution": "h3h4",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"diamonds\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1695
+ },
+ {
+  "fen": "1nb2bnr/1p2pkp1/2p5/p2p3p/Pr3P1P/1NP5/RP1PP1P1/2BQKBqR w K - 0 15",
+  "solution": "h1g1",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 906
+ },
+ {
+  "fen": "1n2k1n1/r3pp2/1qpp4/pp6/5b2/2P2KNP/PB1P4/R4B1R w - - 0 21",
+  "solution": "f3f4",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a King is the right spend here — your king has the strongest move.",
+  "difficulty": "advanced",
+  "category": "card_management",
+  "rating": 1435
+ },
+ {
+  "fen": "rn1qkbnr/1b1ppppp/p7/1pP5/2N4P/8/PPP1PPP1/R1BQKBNR b KQkq - 0 5",
+  "solution": "b5c4",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1809
+ },
+ {
+  "fen": "1nBq1bn1/r3kp1r/p2pp1pp/2p5/5PP1/2N1K2N/PPPPP2P/R1BQ1R2 b - - 0 11",
+  "solution": "d8c8",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1506
+ },
+ {
+  "fen": "r1bqnrk1/2pp1pBp/p1n5/1p2P3/P7/8/1Q2PPPP/1N2KBNR w K - 0 11",
+  "solution": "g7f8",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1872
+ },
+ {
+  "fen": "R2qkbn1/1pp1pp1r/3p3p/3P2P1/2P5/7P/1P3n2/1NBbKRN1 b - - 1 15",
+  "solution": "d8a8",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 971
+ },
+ {
+  "fen": "b1r3nr/p1pqp2p/1pk4R/4p1P1/P1P5/1PN5/5P2/4KB2 b - - 4 20",
+  "solution": "g8h6",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"spades\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1842
+ },
+ {
+  "fen": "r1bqkbnr/p1ppp1pp/5p2/8/2pP1P2/1P6/P1n1PKPP/RNBQ1B1R b kq - 1 7",
+  "solution": "c2a1",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"clubs\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 927
+ },
+ {
+  "fen": "1n5r/k4p1p/8/6p1/4p3/3PnP2/6P1/1NB1KBNR w - - 0 21",
+  "solution": "c1e3",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1676
+ },
+ {
+  "fen": "2bqkbnr/5p1p/n7/p1ppp3/4P1Qp/PPP4N/2RP1PP1/1NB1K2R b Kk - 1 11",
+  "solution": "c8g4",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"9\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 624
+ },
+ {
+  "fen": "r2qkb1r/3pp2p/1p4p1/5p1N/2P4P/B1N5/2QPB1K1/7R b k - 2 19",
+  "solution": "a8a3",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1839
+ },
+ {
+  "fen": "r1q1kbnr/pppnpp1R/3p2p1/1B6/1P6/4P3/P1PP1P2/RNBbK1N1 w Qkq - 1 8",
+  "solution": "h7h8",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1493
+ },
+ {
+  "fen": "1nB1kb1r/3qpp1p/2p3pn/p2p4/8/1P2PP2/P1PP2PP/RNBQ1KNR w k - 0 9",
+  "solution": "c8d7",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 694
+ },
+ {
+  "fen": "7r/8/5p1n/8/1k2P3/6p1/r2P2P1/1K3RN1 w - - 0 28",
+  "solution": "b1a2",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a King is the right spend here — your king has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 960
+ },
+ {
+  "fen": "3k2n1/8/2p2pp1/8/7r/1b2PP2/4B1K1/6NR w - - 0 26",
+  "solution": "h1h4",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 509
+ },
+ {
+  "fen": "1Nbqk1nr/1p1p1ppp/4p3/2b5/4P3/3P4/nPP2PPP/R1BQKBNR w KQk - 0 8",
+  "solution": "a1a2",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 2027
+ },
+ {
+  "fen": "2b1k1r1/r1pp2qp/np2p2n/8/P7/3P1NP1/1BP2P1P/1N1QK1R1 w - - 0 13",
+  "solution": "b2g7",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 919
+ },
+ {
+  "fen": "rnb1kbn1/1pp1pp2/8/p2P2p1/3P2Q1/q3P3/PP1K1PPr/R4BNR w q - 0 10",
+  "solution": "g4c8",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"spades\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "r2qk2r/3pp2B/n4p2/p1pP3p/8/N7/PP1N3P/R1B1K1R1 b kq - 1 16",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2071
+ },
+ {
+  "fen": "rn2k1nr/p2p2p1/8/2b1Pp1p/1P2q3/6PN/3BQP1P/1R2KB1R b Kkq - 0 16",
+  "solution": "e4b1",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1970
+ },
+ {
+  "fen": "rnb1kbn1/pp2ppp1/6N1/3p4/8/N2P4/q1P1B1PP/2BK3R b q - 1 12",
+  "solution": "f7g6",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your pawn (a pawn card (3-9)).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1174
+ },
+ {
+  "fen": "r2qkbnr/2p1p1R1/n2p4/p4p2/p4P2/5N2/1PPPP3/RNBQ1K2 b k - 0 13",
+  "solution": "f8g7",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "advanced",
+  "category": "card_management",
+  "rating": 1506
+ },
+ {
+  "fen": "rnb1kb1r/N1ppqppp/4p3/8/1P4n1/3P4/P1P1PPPP/R1BQKBNR w KQkq - 1 6",
+  "solution": "a7c8",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"diamonds\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1818
+ },
+ {
+  "fen": "rn1qkbn1/ppp1p1pr/7B/3p1p2/P2P4/5PP1/1PP1P3/RN1QKbNR w KQq - 0 8",
+  "solution": "e1f1",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Your king can win material. You'll need a King.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1980
+ },
+ {
+  "fen": "3k4/4bpr1/5np1/3B4/7p/N3K2P/P1PPP2P/2BQ3R b - - 0 17",
+  "solution": "f6d5",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1803
+ },
+ {
+  "fen": "rnbqk1nr/Rpp2p1p/3pp1p1/8/8/2P1P3/1P1P1PPP/1NBQKBNR b Kkq - 0 5",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 505
+ },
+ {
+  "fen": "r2qkbnr/p1ppp1Bp/b1n5/1p3p2/1P6/2N4N/P1PPPPPP/R2QKB1R b KQkq - 2 5",
+  "solution": "f8g7",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1046
+ },
+ {
+  "fen": "1n2kbnr/1p2pppp/2p5/1N6/2B3Q1/1P6/2PK1P1P/R1B3NR w k - 0 12",
+  "solution": "g4c8",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "rnb1k2r/pppp1p1p/3bp2n/6q1/3P3P/1P3P2/P1P1P1P1/RN1QKBNR b KQkq - 0 6",
+  "solution": "d6g3",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"}]",
+  "hint": "Play a 2 to deliver checkmate with your bishop.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "1n3bn1/r3p3/p1k2p2/8/2PP4/Rb2B3/4N3/5K2 w - - 0 26",
+  "solution": "a3b3",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2055
+ },
+ {
+  "fen": "2rq4/3kpp2/6n1/p2p4/P7/2N1PPP1/1B1P4/b3KBN1 b - - 1 16",
+  "solution": "a1b2",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1483
+ },
+ {
+  "fen": "rnbqk1nr/pp1p3p/5p2/1pb5/4P3/5P1P/PPP3P1/RNB1K1NR w KQkq - 0 8",
+  "solution": "g1e2",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest knight move. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1971
+ },
+ {
+  "fen": "r1bqkbnr/ppp4p/2Bp1p2/4p3/4Pp2/1PP5/P2P2PP/RNBQK1NR b KQkq - 0 7",
+  "solution": "b7c6",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1458
+ },
+ {
+  "fen": "1R1r4/3pkpbp/5np1/8/3p4/6pN/4P2P/B2K1B1R b - - 4 24",
+  "solution": "d8b8",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 520
+ },
+ {
+  "fen": "rnb1k2b/p1ppq3/1p3p2/6p1/1P1PQ3/2P5/P3PPR1/RNB1KB2 w Qq - 3 13",
+  "solution": "e4a8",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1656
+ },
+ {
+  "fen": "r4bnr/2N2kpp/8/2P5/1P2pq2/6P1/P1P4P/R1Bb2K1 b - - 0 18",
+  "solution": "f4c7",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 942
+ },
+ {
+  "fen": "rn1qkb1r/pbpp2p1/5p1n/4p3/6Q1/2N1P3/PPPP1P1P/R1B1K1NR b KQkq - 0 7",
+  "solution": "h6g4",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1124
+ },
+ {
+  "fen": "rnbqkb2/ppp3p1/5n2/3pPp2/8/4P3/PPPP3r/RNBK1BNR w q - 0 9",
+  "solution": "h1h2",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"9\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 1034
+ },
+ {
+  "fen": "r1bqk1nr/2ppB3/n1p4b/p6p/3P1P2/5p2/PP2B1PP/RN1QK2R w KQ - 0 12",
+  "solution": "e7d8",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1069
+ },
+ {
+  "fen": "rn2k1nB/1b1pp2p/2p3p1/pp6/5P2/5P1N/PPqNB2P/RQ2K2R w q - 0 15",
+  "solution": "b1c2",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 631
+ },
+ {
+  "fen": "3k1b1r/3bpppp/5n2/8/2p2q2/4PP2/1P2K1PP/1N4NR w - - 0 18",
+  "solution": "e3f4",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your pawn (a pawn card (3-9)).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 586
+ },
+ {
+  "fen": "rnbqkbnr/2pp2pp/p3pp2/1p6/2B1PP2/2P3P1/PP1P3P/RNBQK1NR b KQkq - 1 5",
+  "solution": "b5c4",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1416
+ },
+ {
+  "fen": "rn2k2r/6pp/1pp2p2/p2qp2n/3p2P1/NP4BN/P2P3P/R2QK2R b kq - 1 15",
+  "solution": "d5h1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1562
+ },
+ {
+  "fen": "rnbqkb1r/1pp1p2p/p2p1P1B/8/8/3P2P1/PPP1P2P/RN1QKBNR b KQkq - 0 6",
+  "solution": "f8h6",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"spades\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1517
+ },
+ {
+  "fen": "B1bq4/2pppk2/6pb/p7/6R1/1PN1n3/2PP1P2/2BQK1N1 b - - 0 22",
+  "solution": "e3d1",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"clubs\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1500
+ },
+ {
+  "fen": "1r6/p2p1kpp/P1pqp3/8/1pPP2nP/N3P3/5P2/4KB1R b - - 0 20",
+  "solution": "b4a3",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your pawn (a pawn card (3-9)).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 2032
+ },
+ {
+  "fen": "r1b1kbnr/p1pqpppp/n7/1B1p2P1/1P2P3/8/P1PP1P1P/RNBQK1NR b KQkq - 0 5",
+  "solution": "d7b5",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 908
+ },
+ {
+  "fen": "1r2k1nR/1p2qp2/3p4/p3p3/8/2P2P2/P1P1P1P1/2K1RBN1 b - - 1 18",
+  "solution": "e7g5",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"spades\"}]",
+  "hint": "Look for the strongest queen move. You'll need a Queen.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1959
+ },
+ {
+  "fen": "r1bqkbnr/pp1p1p1p/n1p3p1/4p3/1P4P1/P4P2/2PPP2P/RNBQKBNR b KQkq - 0 5",
+  "solution": "d8h4",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "2r1k1nr/ppp1q1p1/n3p2R/3p4/P4P2/P5P1/2PP4/1NB1K1N1 w k - 1 13",
+  "solution": "h6h8",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 932
+ },
+ {
+  "fen": "r1b3n1/1ppp1p1N/p3p2p/5k2/8/NQ1P1PP1/P2KP2q/1R3B1R w - - 0 15",
+  "solution": "h1h2",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 592
+ },
+ {
+  "fen": "2b2knr/r2p1pp1/p1n4p/1p6/5pP1/P1PP1P1q/R2KP3/3Q1BNR b - - 0 14",
+  "solution": "h3h1",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 930
+ },
+ {
+  "fen": "rnb1k2r/1p1p1ppN/2p4n/p3p3/8/BPP5/3PPPPP/RN1QKB1R b KQkq - 0 7",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"clubs\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1835
+ },
+ {
+  "fen": "rn2k1nr/p2p1p2/1pp3pp/P3p3/1Pb1P2K/7P/3P2P1/1NBQ1B2 w kq - 0 16",
+  "solution": "f1c4",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 1929
+ },
+ {
+  "fen": "2b2b1r/p3np2/p2p1k1p/1Rp3p1/P3P3/5N1q/2NP2P1/4KB1R b K - 1 19",
+  "solution": "h3h1",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1430
+ },
+ {
+  "fen": "1nb1kbnr/1p1pp2Q/2p2pp1/q7/8/r3P3/PPPP1PPP/R1B1KBNR w KQk - 1 7",
+  "solution": "h7h8",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 2068
+ },
+ {
+  "fen": "rnb1kbnr/p2p1ppp/1p6/2p5/3P4/4q2N/PP3PPP/RN1QKB1R w KQkq - 0 8",
+  "solution": "f2e3",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 628
+ },
+ {
+  "fen": "rnbqkb1r/1pp1pppp/B2P4/8/8/5P1N/PPnP1KPP/RNBQ3R b kq - 0 7",
+  "solution": "c2a1",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a Jack is the right spend here — your knight has the strongest move.",
+  "difficulty": "advanced",
+  "category": "card_management",
+  "rating": 1491
+ },
+ {
+  "fen": "r1bq1bnr/pp1pkppp/2p1p3/8/1n1P2P1/B4P2/P1P1P2P/RN1QKBNR w KQ - 0 6",
+  "solution": "a3b4",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2125
+ },
+ {
+  "fen": "1nb1k3/1pp5/4p3/2n1pp2/4P3/Nr4PK/2P5/3Q1B1R b - - 0 23",
+  "solution": "b3a3",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2050
+ },
+ {
+  "fen": "rnbqkbnr/N1pp1p2/6pp/8/5p1P/8/PPPPPKP1/R1BQ1BNR b kq - 0 6",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1809
+ },
+ {
+  "fen": "rnb1kbr1/p1p1pppp/1p6/8/2B1n3/P4NP1/1P1N1P1P/R1BQK2R w KQq - 0 8",
+  "solution": "d2e4",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a Jack is the right spend here — your knight has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2060
+ },
+ {
+  "fen": "8/p2k1pp1/5B2/8/7p/7P/P1Q1PPP1/4KB1R b - - 0 29",
+  "solution": "g7f6",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1408
+ },
+ {
+  "fen": "4kbn1/p7/7p/4K3/2p5/P4P2/R1p4P/8 w - - 0 30",
+  "solution": "a2c2",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 517
+ },
+ {
+  "fen": "r1b1k1nr/p2p1N2/np4pp/4pp2/8/8/PPPPPP1P/1RBQKB1R w Kkq - 0 10",
+  "solution": "f7h8",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"clubs\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1588
+ },
+ {
+  "fen": "r1bqkb1r/ppp2ppR/n3p3/3p4/3P4/2P5/PP1BPP2/RN1QKBN1 b Qkq - 0 7",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1103
+ },
+ {
+  "fen": "r1b1kb2/p3pp2/1qpp1nQ1/p7/4P3/1P4P1/P1PPNP1P/RNB1K2R b KQq - 0 10",
+  "solution": "f7g6",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 582
+ },
+ {
+  "fen": "r3qbnr/3npkpp/3p4/8/1p3P2/1b6/P1KPP1PP/RN3BNR w - - 0 15",
+  "solution": "c2b3",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Your king can win material. You'll need a King.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2146
+ },
+ {
+  "fen": "1nb1kbnr/1p2p2p/2p1pQ2/1r6/8/6PB/PPP1PP1P/RN2K2R w KQk - 3 10",
+  "solution": "f6h8",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1093
+ },
+ {
+  "fen": "B2qkbnr/pb1pp2p/1p6/5p2/2P1P3/7p/P1NP1PPP/R1BQK2R w KQk - 2 11",
+  "solution": "d1h5",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "3k1b2/7r/2Rp2P1/1B5p/4p3/2P5/8/1K6 w - - 0 33",
+  "solution": "g6h7",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your pawn (a pawn card (3-9)).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1137
+ },
+ {
+  "fen": "rn1qkb1r/pp2pp1p/8/6B1/2BpP3/5P1b/PP4PP/RN1QK2R w KQkq - 0 10",
+  "solution": "g2h3",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1862
+ },
+ {
+  "fen": "rnb1k2r/p1pp1pbp/1p2Pnp1/8/P3P3/7P/1PPPK3/RNBQ1BqR w kq - 1 9",
+  "solution": "h1g1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 543
+ },
+ {
+  "fen": "rn1qkbnr/pbp1p2p/4N3/1p1p1p2/8/1P6/P1PPPPPP/RNBQKB1R w KQkq - 0 7",
+  "solution": "e6d8",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a Jack is the right spend here — your knight has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 1006
+ },
+ {
+  "fen": "1rb1kb1r/p2p1n2/1pp1p3/7Q/8/B3q3/P1nP2PP/RN3KNR b k - 0 16",
+  "solution": "e3e1",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"spades\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "Bn1qkbnr/2pppp1p/bN6/6p1/2p5/6P1/PP1PPP1P/R1BQK1NR b KQk - 2 7",
+  "solution": "c7b6",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your pawn (a pawn card (3-9)).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1542
+ },
+ {
+  "fen": "rn2k1nr/p1pp2bp/b7/1p2p3/8/1P4q1/P1PPPPP1/RNBQKBR1 w Qkq - 0 8",
+  "solution": "f2g3",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 630
+ },
+ {
+  "fen": "2b3nr/1p1p2kp/3B4/5p2/3P1P2/5r2/PPP1P2P/2RQKB1R w K - 0 15",
+  "solution": "e2f3",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1072
+ },
+ {
+  "fen": "Nn1k1b1r/p3ppp1/2b5/1B6/1P2P2p/8/P1PP1P1R/R1BQK3 w Q - 1 14",
+  "solution": "b5c6",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1943
+ },
+ {
+  "fen": "2bq1b2/4p1p1/1pp5/2nn4/1NP2Pk1/4P2N/3P1KP1/R1B4R b - - 4 17",
+  "solution": "d5b4",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1949
+ },
+ {
+  "fen": "rnbqk1nr/p1pp1p2/3b4/4p1pQ/2p1PP2/B7/P2P2PP/RN2KBNR w KQkq - 0 8",
+  "solution": "h5h8",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1186
+ },
+ {
+  "fen": "r1b2b1r/p2pk1Np/2n5/3n1p2/8/1K1P4/PP2PPPP/R1BQ1B1R b - - 1 11",
+  "solution": "f8g7",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2115
+ },
+ {
+  "fen": "1nb1k1n1/2p3p1/4p2r/1p2N2p/7q/2P1r3/P2P1PPQ/R1B2KR1 b - - 1 15",
+  "solution": "h4h2",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 611
+ },
+ {
+  "fen": "rQbqkb1r/1p1ppp1p/p5p1/2p2n2/8/2PP3N/PP2PPPP/RNB1KB1R b KQkq - 0 6",
+  "solution": "a8b8",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 621
+ },
+ {
+  "fen": "r3kbnr/p4ppp/2p5/2n5/4P3/3q1p1P/PPP1Q3/RNB2KNR b kq - 1 11",
+  "solution": "f3e2",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"5\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 645
+ },
+ {
+  "fen": "1nbqkb1r/1pppp1pp/5n2/8/6p1/5P2/rBPPP2P/RN1QKBNR w KQk - 0 7",
+  "solution": "a1a2",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1135
+ },
+ {
+  "fen": "1nb1kbnr/rp2pp2/3p4/p5Np/7P/5P2/PPqPP1P1/R1BQKB1R w KQk - 0 8",
+  "solution": "d1c2",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"diamonds\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 563
+ },
+ {
+  "fen": "rn3bn1/ppp1p1pr/5pk1/7p/P7/3qNPPb/1PP1P2P/1RBQKBNR w K - 0 9",
+  "solution": "d1d3",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2185
+ },
+ {
+  "fen": "rn1qkbnr/p1pp1p2/bp2p1p1/7Q/P3P3/8/1PPP1PPP/RNB1K1NR w KQkq - 0 6",
+  "solution": "h5h8",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"diamonds\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 967
+ },
+ {
+  "fen": "rnb2knN/p1pp3p/1p2p3/8/2P5/1P1P4/3KPPP1/1NBQ1B1q w - - 0 15",
+  "solution": "c1a3",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 1875
+ },
+ {
+  "fen": "r1b1kbnr/ppqn3p/3pp1p1/5p2/1p3P1P/B3P1P1/P1PP1K2/RN1Q1BNR b kq - 1 9",
+  "solution": "b4a3",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your pawn (a pawn card (3-9)).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 2023
+ },
+ {
+  "fen": "1nb5/3pk3/8/6p1/4P3/P1R5/5P2/3BKR2 w - - 0 38",
+  "solution": "c3c8",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2055
+ },
+ {
+  "fen": "rnbqkbnr/p2pppp1/8/1p5Q/4P3/1PNP4/P1P2PPP/R1B1K1NR w KQkq - 0 7",
+  "solution": "h5h8",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 920
+ },
+ {
+  "fen": "rn1q1bn1/3pkp2/pp6/2p1p1p1/P1P1P3/4P3/1P2NPr1/R1BK1BN1 w - - 0 15",
+  "solution": "f1g2",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 1069
+ },
+ {
+  "fen": "rn1qk1nr/1b1p1pp1/p1p1p3/7p/1R6/3P3N/2P1PPPP/1NBQKBR1 w kq - 2 9",
+  "solution": "b4b7",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"diamonds\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1808
+ },
+ {
+  "fen": "r1bqkb1r/2p1ppp1/p1pp4/6P1/2P5/N2PP1n1/PP3P1P/R3KBNR w KQq - 0 11",
+  "solution": "f2g3",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"hearts\"},{\"rank\":\"9\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your pawn (a pawn card (3-9)).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1486
+ },
+ {
+  "fen": "rnbqkb1r/pp1p1pp1/5n2/2p4p/3p4/P1N3PN/1PP1PP1P/R1BQKB1R b KQkq - 0 6",
+  "solution": "d4c3",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2195
+ },
+ {
+  "fen": "1r2k1nr/1p5p/8/pb3pb1/1nB1P3/5P1P/1PP2KPR/1R4N1 w k - 0 18",
+  "solution": "c4b5",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 1881
+ },
+ {
+  "fen": "2b1kbnr/2p1pppp/Bq6/8/r2P1P2/7N/1PPP1KPP/1RBQ3R w k - 3 13",
+  "solution": "a6c8",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"spades\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1039
+ },
+ {
+  "fen": "4kb2/p2pnpp1/4p2r/2r4p/4P3/B1P5/P2PK1PP/RN3BNR w - - 0 14",
+  "solution": "a3c5",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1181
+ },
+ {
+  "fen": "2bqk1nr/rp1p2p1/p3pp1B/8/3Q2PN/7B/PPP2P1P/R3K1R1 w Qk - 1 15",
+  "solution": "d4a7",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1699
+ },
+ {
+  "fen": "rnb1kb1r/pp1ppppp/2p4B/7P/8/3P4/PPP1PPPR/RN1QKBN1 b Qkq - 0 5",
+  "solution": "g7h6",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1592
+ },
+ {
+  "fen": "1n6/7p/2k4p/5p2/5P2/2r5/7K/2R3N1 w - - 2 28",
+  "solution": "c1c3",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 1186
+ },
+ {
+  "fen": "r1bqkbnr/ppp1p1p1/5p1p/3p1P2/3n4/N7/PPP1P1PP/R1BQKBNR w KQkq - 0 6",
+  "solution": "d1d4",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2050
+ },
+ {
+  "fen": "r1bqkb1r/Rp1pp1pp/2p4n/8/1PP3p1/1P5N/3PPP1P/1NBQKB1R b Kkq - 0 7",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 989
+ },
+ {
+  "fen": "2b1k1n1/3n1Np1/8/3B3p/1b4P1/2K5/2Q1PP1P/6R1 w - - 2 21",
+  "solution": "c3b4",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your king (a King).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1850
+ },
+ {
+  "fen": "rn3bnr/pp1kpp1p/4b3/6P1/8/N1Q5/P1P1P1PP/R1B1KBNR w KQ - 3 9",
+  "solution": "c3h8",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1577
+ },
+ {
+  "fen": "rn3knr/pB6/3P4/8/8/q1P1P3/8/R2K4 w - - 0 23",
+  "solution": "a1a3",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 512
+ },
+ {
+  "fen": "4k3/4r3/n5p1/p7/2P1P1PP/2R5/P4P2/RrB2K2 w - - 0 26",
+  "solution": "a1b1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"diamonds\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 651
+ },
+ {
+  "fen": "rn1qk1nr/p6p/5p2/2p3N1/p2pP1P1/3P4/2P1QP1P/b2K1B1R b kq - 1 15",
+  "solution": "f6g5",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2061
+ },
+ {
+  "fen": "rnb1kbnr/Rp1pppp1/7p/8/8/8/2PPPPPP/2BQKBNR b Kkq - 0 7",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"4\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 625
+ },
+ {
+  "fen": "rnbk4/2pp2p1/7r/pn5p/5P2/8/P1P1P1PP/1R2KB1R w K - 0 15",
+  "solution": "b1b5",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2171
+ },
+ {
+  "fen": "2N1kb1r/rp2pppp/7n/3pP3/8/6P1/P2PP2P/2RQKBNR w Kk - 1 11",
+  "solution": "c8a7",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1064
+ },
+ {
+  "fen": "rnb2k2/p2pn3/2p5/1p4p1/7P/PP2P3/2PqPK2/RNBQ1B1R b - - 1 14",
+  "solution": "d2d1",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a Queen is the right spend here — your queen has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 606
+ },
+ {
+  "fen": "r1b1k1n1/ppp1p3/nN1p1pp1/8/4P3/8/PPP2PPR/R1BK2N1 w q - 1 14",
+  "solution": "b6a8",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1470
+ },
+ {
+  "fen": "r1b1kbnr/1ppp1ppQ/p3p3/3n4/2P5/P6P/RP1KPPP1/1NB2BNR b kq - 0 8",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 515
+ },
+ {
+  "fen": "8/4r1k1/4p3/p1p3B1/4nP2/pP4P1/P1K5/R4BNR w - - 0 30",
+  "solution": "g5e7",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1658
+ },
+ {
+  "fen": "rnb1k3/pppp4/7n/4p3/P7/1PN5/R1P1PP1P/3K1BrR b q - 2 13",
+  "solution": "g1h1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 1068
+ },
+ {
+  "fen": "rnb1kbnR/1pp2pp1/4p3/p2p4/5P2/N5P1/PPPPP3/R1BQKBN1 b Qq - 0 6",
+  "solution": "f8a3",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1906
+ },
+ {
+  "fen": "1r3b2/Rq1k1p2/1ppp1p1p/7B/5P2/6PP/2PP4/1N2K1NR w K - 1 17",
+  "solution": "a7b7",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1484
+ },
+ {
+  "fen": "1nbqkb1r/rpppp3/p4p1p/4N2n/3P4/NP2P3/P1P2PPP/R2QKB1R w KQk - 0 8",
+  "solution": "d1h5",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"diamonds\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "r2qkb1r/ppp2pBp/2np4/4p3/1P6/P2P3b/2P1PPPP/RN1QKB1R b KQkq - 0 6",
+  "solution": "f8g7",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 1823
+ },
+ {
+  "fen": "r1b3n1/pppk1pp1/n2pp3/1N6/7r/5B2/R2BN2R/4K3 w - - 0 21",
+  "solution": "h2h4",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"diamonds\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1132
+ },
+ {
+  "fen": "2k2bnr/8/3pp3/6Np/P3P3/3q2PB/7P/1R2K2R b - - 0 23",
+  "solution": "d3b1",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"hearts\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1067
+ },
+ {
+  "fen": "bn2k2r/P3np1p/4p3/2p3pQ/8/2NPP1P1/2P2P1P/R3K1NR w KQk - 0 15",
+  "solution": "a7b8q",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1508
+ },
+ {
+  "fen": "rn2k2r/p3n3/1p3P1p/8/8/P2P2P1/q3N2P/1R2K2R b kq - 3 21",
+  "solution": "a2b1",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 954
+ },
+ {
+  "fen": "rn2kbnr/4Bp1p/1q2p3/6P1/P7/6P1/2P1P2P/1N1QK1Nb w kq - 0 14",
+  "solution": "e7f8",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2188
+ },
+ {
+  "fen": "r1bqk1r1/p1ppppbN/7n/3P4/2P5/4PP2/P1Q3PP/RNB2RK1 b - - 2 13",
+  "solution": "g7a1",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 961
+ },
+ {
+  "fen": "rnbr4/ppppk1pN/7n/4p1q1/8/2P1P3/PB1P1PPP/R3KB1R w KQ - 1 10",
+  "solution": "h7g5",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 683
+ },
+ {
+  "fen": "1nbq1bn1/1R1ppkp1/2p5/7p/7P/2P2P2/3PPKB1/1NBQ2R1 b - - 0 15",
+  "solution": "c8b7",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 907
+ },
+ {
+  "fen": "rnb1kbnr/p1qpp2p/6p1/1p6/3P2PP/PPN5/2P1PP2/R2QKBNR b KQkq - 0 8",
+  "solution": "c7c3",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 2038
+ },
+ {
+  "fen": "q7/2p2kp1/R1n1p2r/1B1p2P1/8/4b1K1/2P4P/7R w - - 0 26",
+  "solution": "a6a8",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 623
+ },
+ {
+  "fen": "2b1kbr1/n2p1pp1/1p2p3/7p/R6P/3P1PPN/N1PQ4/3K1B1R w - - 0 20",
+  "solution": "a4a7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2006
+ },
+ {
+  "fen": "rnbqk1n1/p1ppp3/1p6/1N4Qp/3B4/1P1P2r1/P1P1PPPP/R3KB1R b KQq - 0 11",
+  "solution": "g3g5",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 579
+ },
+ {
+  "fen": "r1bqk3/2pp1pb1/1p3n2/4p2R/5P2/7N/PPPKP1P1/RN1Q1B2 b q - 1 11",
+  "solution": "f6h5",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1640
+ },
+ {
+  "fen": "2bqkbn1/r1pppp2/p1p5/6pQ/8/P3P2r/1P1PNP2/RNB1K3 b Q - 1 13",
+  "solution": "h3h5",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 624
+ },
+ {
+  "fen": "3q1bnr/r1pkp1pp/8/4Pp2/4b3/2P3PN/PP3P1P/RNBK3R b - - 0 11",
+  "solution": "e4h1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"spades\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1107
+ },
+ {
+  "fen": "r1b2r2/pppp1k2/7n/n3p2p/5B1R/N1PP4/PP2PPP1/R3KBN1 b Q - 1 11",
+  "solution": "e5f4",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1834
+ },
+ {
+  "fen": "2b1qknr/p1pp1ppp/pr6/8/1P2PP2/b1P2N2/P2PQ1PP/R1B1K2R w KQ - 2 11",
+  "solution": "c1a3",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"clubs\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1148
+ },
+ {
+  "fen": "2Rqk1nr/p1p2p1p/3p4/4p1N1/8/P6P/3PPKP1/2BQ1B1R b k - 0 12",
+  "solution": "d8c8",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"hearts\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 546
+ },
+ {
+  "fen": "1n3bnr/rp2p3/3k2p1/2R2p2/3qPP1P/7P/1PP5/2BQKB2 b - - 0 15",
+  "solution": "d4d1",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1519
+ },
+ {
+  "fen": "rnbqk1nr/pppp1ppp/8/8/P7/2N5/R2P1KPP/2Br1BNR w kq - 0 8",
+  "solution": "c3d1",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"4\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a Jack is the right spend here — your knight has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 698
+ },
+ {
+  "fen": "r1bqkb1N/1p1pp1pp/R1p5/7n/8/2PP2P1/1P2PP1P/1NBQKB1R w Kq - 1 10",
+  "solution": "a6a8",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 674
+ },
+ {
+  "fen": "rn2k3/p1pb1pb1/8/4p1q1/1P4n1/P1P1P3/2QP1PPR/RNB1K3 b Qq - 0 11",
+  "solution": "g4h2",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1105
+ },
+ {
+  "fen": "rnb3nr/p1p1pp1p/1pk4b/3p2N1/3P2q1/NP3P2/PBP1P1PP/RQ2KB1R w KQ - 5 9",
+  "solution": "f3g4",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1076
+ },
+ {
+  "fen": "1rb1k2r/pp1p4/2p1p2p/P1n3pP/4P1P1/2N1B1P1/1PP5/3QK3 w - - 1 20",
+  "solution": "e3c5",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 2104
+ },
+ {
+  "fen": "r1b1k1r1/pp1p1pb1/n1p4B/4p2p/3q3P/P1N2N2/1PP1PPP1/R2QKB2 b Qq - 0 10",
+  "solution": "d4d1",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1944
+ },
+ {
+  "fen": "r2qkbnr/pp2p1pp/3p1pN1/2p5/3nP3/7b/PPPP1PP1/RNBQKBR1 w Qkq - 0 7",
+  "solution": "g6h8",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"spades\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1693
+ },
+ {
+  "fen": "r1b1kbnr/pp5p/2Qp4/2p1ppq1/2P5/N5PP/PP1PP3/R1B1KBNR b KQkq - 0 8",
+  "solution": "b7c6",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 572
+ },
+ {
+  "fen": "rnb5/p7/3p3b/k7/8/3P2KN/P7/2q5 w - - 2 33",
+  "solution": "h3f2",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a Jack is the right spend here — your knight has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2077
+ },
+ {
+  "fen": "rnbkqbr1/pQ1p4/4pp2/2p3Pp/7P/1PPP1N2/P3P1P1/RNB1KB1R w KQ - 0 12",
+  "solution": "b7a8",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 965
+ },
+ {
+  "fen": "r2k1b1r/p3pppp/8/1pp3P1/1P3P2/2P1P2b/q3PK1P/RNB4R w - - 0 12",
+  "solution": "a1a2",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 543
+ },
+ {
+  "fen": "1n2k2r/1pp3pp/8/4P1p1/2P5/6Pb/3K2PB/R4B1R w - - 0 21",
+  "solution": "g2h3",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1664
+ },
+ {
+  "fen": "r1bqkb1r/2ppp1pB/2n2p2/pp6/6P1/4P3/PPPP1P1P/RNBQK1NR b KQkq - 0 5",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2058
+ },
+ {
+  "fen": "r1bqk1nr/pp1n1p1p/2pbp3/8/4N3/3P4/PPP1PPPP/RN1QKB1R w KQkq - 0 7",
+  "solution": "e4d6",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2036
+ },
+ {
+  "fen": "r3kb1r/2p1p1pp/p4p2/n4n2/5P2/2P1P1PP/1P1P4/R1B1K1Nq w kq - 0 13",
+  "solution": "a1a5",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1896
+ },
+ {
+  "fen": "rn2kbnr/p3pppp/3p4/2p5/4P1b1/2P5/PP1P2PP/RNBQKBNR w KQkq - 0 7",
+  "solution": "d1g4",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2008
+ },
+ {
+  "fen": "r3kbnr/pBp1pp1p/8/n5p1/8/4P3/bPPN1PPP/R1B1K1NR w KQkq - 0 8",
+  "solution": "b7a8",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 1029
+ },
+ {
+  "fen": "rnkq2nr/2p5/p4ppp/8/4p1PP/P4N2/P2P1P2/R1B1K2R b KQ - 0 13",
+  "solution": "e4f3",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2172
+ },
+ {
+  "fen": "r1n1k2r/p1pp1p2/n7/5p1Q/P3P2p/b2P3P/1PP5/RN2K1NR w kq - 0 14",
+  "solution": "h5h8",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 947
+ },
+ {
+  "fen": "r1bqk2r/2pp1ppp/p7/3np3/2P2BN1/3P1Pn1/P3P2P/RN1QKB1R w KQkq - 0 13",
+  "solution": "f4g3",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 2051
+ },
+ {
+  "fen": "rnb1kbnr/3p1pp1/4p3/pp2q2p/2P2P1P/8/PP1PP1P1/R1BQKBNR w KQkq - 1 7",
+  "solution": "f4e5",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 615
+ },
+ {
+  "fen": "1nbq1b1r/1p2p1pp/r1pp1k2/8/5PQ1/N1N1P3/P1PP4/R1B1KR2 b Q - 0 13",
+  "solution": "c8g4",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 602
+ },
+ {
+  "fen": "rnb1kbnr/1p1ppp1p/p7/1Np3p1/2P5/1P6/P2PPPPq/1RBQKBNR w Kkq - 0 6",
+  "solution": "h1h2",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 668
+ },
+ {
+  "fen": "rnb1kb1r/pp1ppppp/2p5/7n/2P5/8/PP1NPPP1/R1BQKBNR w Qkq - 0 7",
+  "solution": "h1h5",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1848
+ },
+ {
+  "fen": "r2qkbnr/ppp1pppR/2n5/3p4/P2P4/8/1PP1PPb1/RNBQKBN1 b Qkq - 0 5",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1524
+ },
+ {
+  "fen": "r1bqkbnr/Q2ppppp/1pp5/8/2n2P2/N6N/PP1PP1PP/R1B1KB1R b KQkq - 0 6",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 647
+ },
+ {
+  "fen": "r1b1k1nr/ppppq1pp/2n5/4p3/4PpPP/b1PB1K1R/PP1P1P2/1RBQ2N1 w kq - 1 12",
+  "solution": "b2a3",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2046
+ },
+ {
+  "fen": "1nb1k3/5pr1/p3p3/1p6/2P5/RP2P1N1/5K2/4q3 w - - 1 19",
+  "solution": "f2e1",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Your king can win material. You'll need a King.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 622
+ },
+ {
+  "fen": "rnbqk1nr/pQpp4/8/4pppp/P7/3P4/2P1PPPP/RNB1KBNR w KQkq - 0 7",
+  "solution": "b7a8",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a Queen is the right spend here — your queen has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 930
+ },
+ {
+  "fen": "r1bqkb1r/N1ppp1pp/8/5p1P/5P2/5N2/PPP3P1/R1BQK3 b Qkq - 0 13",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1876
+ },
+ {
+  "fen": "4k1nr/5p2/2p5/4p3/R3P1pN/2P5/3P1P2/2B2K2 b k - 0 21",
+  "solution": "h8h4",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"9\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1952
+ },
+ {
+  "fen": "rnbqk1nr/ppp3pp/4pp2/3p1N2/1b3P2/8/P1PPP1PP/RNBQKB1R b KQkq - 1 5",
+  "solution": "e6f5",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1985
+ },
+ {
+  "fen": "rn1qk1nr/p1p1p3/7p/Pp1p2p1/RP3P2/N2P4/3QB1PP/2B1K2R b K - 0 16",
+  "solution": "b5a4",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1645
+ },
+ {
+  "fen": "1r3b1r/p2ppk1p/1pp5/P5p1/2P3PR/8/2P2P2/R3K1N1 b - - 0 18",
+  "solution": "g5h4",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1640
+ },
+ {
+  "fen": "r3kb1r/3nn1p1/1pp2p2/4p2P/1p6/PN2PP1N/R4K1P/2Bb3R w k - 2 21",
+  "solution": "h1d1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1899
+ },
+ {
+  "fen": "rn1qkbnr/2Q1p1pp/3p1p2/p7/5P2/4P3/RPPP2PP/1NB1KBNR b Kkq - 0 6",
+  "solution": "d8c7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 607
+ },
+ {
+  "fen": "rnBk1bnr/p1p1pppp/8/3p4/P7/4P3/1PPP1PPP/RNBQK1NR b KQ - 0 5",
+  "solution": "d8c8",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a King is the right spend here — your king has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2137
+ },
+ {
+  "fen": "1nbqkbn1/2ppp1pr/8/rN3p1p/8/3P1P2/P1PBP1PP/R2QKBNR w KQ - 0 8",
+  "solution": "d2a5",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"spades\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 909
+ },
+ {
+  "fen": "3qk1r1/p1npp3/6p1/5p2/P1r4p/R2P2PN/2P1P2P/1N1Q1RK1 w - - 0 16",
+  "solution": "d3c4",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1453
+ },
+ {
+  "fen": "r1bqk1nr/pppp1ppp/n2b4/8/5pP1/1PP4P/P2PP3/RNBQKBNR b KQkq g3 0 5",
+  "solution": "d8h4",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "1nb1nk1r/2p4p/8/8/5P2/8/5KPP/1R6 w - - 1 21",
+  "solution": "b1b8",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2095
+ },
+ {
+  "fen": "3rkb1r/pb2nppp/2pp4/4NP2/P5P1/1P1P4/R1P4P/1N1QKB1R b Kk - 0 14",
+  "solution": "d6e5",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"hearts\"},{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1655
+ },
+ {
+  "fen": "r1bqkb1r/pppppppp/5n2/B1n5/3P4/1P6/P1P1PPPP/RN1QKBNR w KQk - 7 6",
+  "solution": "d4c5",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2107
+ },
+ {
+  "fen": "5B2/2bnp3/8/1p1k4/8/5K2/1P6/8 b - - 3 34",
+  "solution": "d7f8",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"diamonds\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "endgame",
+  "rating": 1876
+ },
+ {
+  "fen": "rn1k1bnr/1pp1p2p/p7/4N1pP/5R2/P7/1P2KPP1/RNB2B2 w - g6 0 15",
+  "solution": "f4f8",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"diamonds\"}]",
+  "hint": "Play a 10 to deliver checkmate with your rook.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "r1bk1br1/ppp2p1p/n7/4P1p1/P5n1/1PP2K1B/7P/R1B3NR b - - 0 14",
+  "solution": "g4e5",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1939
+ },
+ {
+  "fen": "rnbq1b2/2p1pkp1/1p6/p2p4/8/2N5/PPP1PPPr/R1B1KB1R w KQ - 0 9",
+  "solution": "h1h2",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 995
+ },
+ {
+  "fen": "rnb1kb1r/pp1p1pp1/4p2p/2p5/6nq/3P1P2/PPPKP1PP/RNBQ1BR1 w kq - 0 7",
+  "solution": "f3g4",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1800
+ },
+ {
+  "fen": "rnbqk2r/Nppp1ppp/4p2n/8/2P5/P7/P2PPPPP/R1BQKBNR b KQkq - 0 5",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 989
+ },
+ {
+  "fen": "rnb2bnr/p1Npkppp/2p5/4p3/6P1/7P/PPPPPP2/R1BQKBNR w KQ - 1 6",
+  "solution": "c7a8",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your knight (a Jack).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1059
+ },
+ {
+  "fen": "r3r3/p2p1ppp/nR3k2/4p3/2P1P3/8/P2PNKPP/5B1R b - - 2 16",
+  "solution": "a7b6",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 511
+ },
+ {
+  "fen": "r1b1k2r/1p4bp/2n1pB2/p1p5/1P6/8/P1PKP2P/5RNR w kq - 4 16",
+  "solution": "f6g7",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1907
+ },
+ {
+  "fen": "r1bq4/pp1R4/n1p2n2/4p3/2k5/P6P/RP1PPK2/1NBQ1B2 w - - 0 17",
+  "solution": "d7d8",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 684
+ },
+ {
+  "fen": "r3k1nr/p1qppp1p/1p6/4B1N1/8/NP6/P2PPP1P/R3KbR1 w Qkq - 0 13",
+  "solution": "e5c7",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"clubs\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1526
+ },
+ {
+  "fen": "rn2k3/p7/1pp2B2/8/8/b1P4r/4PP1P/1R2KB1R w Kq - 0 17",
+  "solution": "f1h3",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 942
+ },
+ {
+  "fen": "1rbqk1r1/p1ppp3/n5pb/5pn1/1p1P3P/1P5P/P1PKPP1R/RNBQ1B2 w - - 2 16",
+  "solution": "h4g5",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1891
+ },
+ {
+  "fen": "r1b1k3/p1pp1p2/np5r/3np2p/7q/3P1P2/P1P1P1P1/RN2KBNR w q - 0 12",
+  "solution": "h1h4",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 593
+ },
+ {
+  "fen": "r2qkbnr/p1pp1p1p/1P4p1/4p3/2bP4/5P2/2n1P1PP/RNBQKBNR w Kkq - 0 9",
+  "solution": "d1c2",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"diamonds\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 924
+ },
+ {
+  "fen": "r1bk1bnr/ppp1pppp/2n5/8/4N3/6P1/1PPP1P1P/RqBQKB1R w KQ - 2 7",
+  "solution": "a1b1",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 687
+ },
+ {
+  "fen": "rnbqk1nr/2ppb1p1/1p6/p2Pp3/2P5/4PQ2/PP2KPB1/RNB3qR b kq - 1 11",
+  "solution": "h8h1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"4\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1669
+ },
+ {
+  "fen": "rnbqkbn1/pp1pp1p1/2p5/8/6Q1/N7/PPPP1KPr/R1B2B1R w q - 0 8",
+  "solution": "g4g6",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"hearts\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "r1b1r3/pp1pk2p/8/1N4p1/8/5P2/1PP1B1PP/qQ2KR2 b - - 1 15",
+  "solution": "a1b1",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 550
+ },
+ {
+  "fen": "1nq1kbnr/2p1pp1p/3p2p1/1r6/4b3/1QP1P1PP/P2P1P2/RNB1K1NR w KQk - 0 11",
+  "solution": "b3b5",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 544
+ },
+ {
+  "fen": "rn3b1r/2qppkp1/bP5n/5p1p/p2P1P2/P1P5/1BR1P1PP/1NQ1KBNR w K - 2 13",
+  "solution": "b6c7",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"5\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 652
+ },
+ {
+  "fen": "1nb1kbn1/rp1p1p2/1q5p/p2N2B1/4P3/8/PPP1P2P/R3KB1R w KQ - 1 17",
+  "solution": "d5b6",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your knight (a Jack).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1129
+ },
+ {
+  "fen": "rnb1kbnr/pppp4/4p1p1/P4p1p/8/1PN5/RBPPPPq1/1Q2KBNR w Kkq - 0 9",
+  "solution": "f1g2",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"clubs\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 588
+ },
+ {
+  "fen": "r1bqk1nr/p2p2pp/p1p5/3Q1p2/8/N3P1PP/1PPP4/R1B1K1NR b KQkq - 1 9",
+  "solution": "c6d5",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 516
+ },
+ {
+  "fen": "rnb1kbr1/1ppqppp1/P2p1n2/7p/Q1P5/N2P4/P2BPPPP/R3KBNR b KQ - 2 9",
+  "solution": "d7a4",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 551
+ },
+ {
+  "fen": "2bq2nr/1ppp3p/3bkp2/6N1/3P4/4P3/r1P2PPP/RNBQK2R b KQ - 0 10",
+  "solution": "f6g5",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1821
+ },
+ {
+  "fen": "4k2r/7R/b1p5/1p3p2/5b2/8/4PP2/5KN1 b k - 0 23",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1097
+ },
+ {
+  "fen": "rnbk3r/ppp3pp/4p3/5n2/P2PP3/RP6/2P3PP/4KBNR w K - 0 13",
+  "solution": "e4f5",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1879
+ },
+ {
+  "fen": "3q1b2/p2bpk2/2B2n2/5p2/1P1p4/P2P3P/6P1/RNB1K1NR b KQ - 0 16",
+  "solution": "d7c6",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1827
+ },
+ {
+  "fen": "r2q1b1r/p2kp1pp/nR3p1n/8/P1p1P3/P5P1/2PPN2P/2BQK2R w K - 0 15",
+  "solution": "b6a6",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2153
+ },
+ {
+  "fen": "rn2k2r/5p1p/2pp4/p3p1p1/4P1b1/N4P2/1PQPN3/1RB1KB2 w kq - 0 18",
+  "solution": "f3g4",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1607
+ },
+ {
+  "fen": "2b1kb1r/rpp1nppp/8/4p3/7P/2PB1N1R/5PP1/1qBK4 b k - 3 14",
+  "solution": "b1d3",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1963
+ },
+ {
+  "fen": "rnbqkb2/p1p1pppr/1N3n1p/3p4/8/4P2P/PPPP1PP1/R1BQKBNR w KQq - 1 6",
+  "solution": "b6a8",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"spades\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1471
+ },
+ {
+  "fen": "rnbqkb2/pp1pppp1/8/2p5/2n5/4P3/PP3PP1/RNB1KBNR w Qq - 0 12",
+  "solution": "f1c4",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "advanced",
+  "category": "card_management",
+  "rating": 1542
+ },
+ {
+  "fen": "rnbqkbnr/p1p5/1p1pp1p1/5p1Q/1P3P2/N3P3/P1PP2PP/1RB1KBNR w Kkq - 0 7",
+  "solution": "h5h8",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"clubs\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1567
+ },
+ {
+  "fen": "rn1qkbnr/2pppp2/b7/pp4p1/8/3BP2Q/PPPP1PPP/RNB1K1NR b KQkq - 1 5",
+  "solution": "h8h3",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 960
+ },
+ {
+  "fen": "rnb2b1r/1pp1kp1p/p4p2/3p4/6n1/P1N1BPPP/1PP1P3/R2QKBNR b KQ - 0 9",
+  "solution": "g4e3",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your knight (a Jack).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 2045
+ },
+ {
+  "fen": "1nbk2n1/1p1p2R1/4p3/3p4/8/R2P1P2/1b4K1/1N6 w - - 0 22",
+  "solution": "g7g8",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 999
+ },
+ {
+  "fen": "r2qkbnr/1b1ppp1p/pp4p1/2Q5/1P3P2/P7/R2KP1PP/1NB2BNR b kq - 0 9",
+  "solution": "b6c5",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 689
+ },
+ {
+  "fen": "rnbq1bn1/Q2p1kp1/4pp2/2p5/1P1P4/P1P2P2/4P1Pr/RN2KBNR b KQ - 0 9",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1531
+ },
+ {
+  "fen": "rn2kb1r/ppp3pp/5n2/4q3/4PB2/1P1B3P/P1P2K1P/RN4NR w kq - 1 11",
+  "solution": "f4e5",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 662
+ },
+ {
+  "fen": "2b5/1pp5/1q2p1k1/2BpK2R/n4P2/N1P2N2/2P3r1/8 w - - 6 31",
+  "solution": "c5b6",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1069
+ },
+ {
+  "fen": "r1bqkb1r/p1p1pppp/2np4/1p6/6n1/PPP3P1/3PPPBP/RNBQK1NR w KQkq - 0 6",
+  "solution": "g2c6",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1551
+ },
+ {
+  "fen": "rnbqkb1r/2pppppp/p7/1N3n2/7P/5N2/PPPPPPP1/R1BQKB1R b KQkq - 0 5",
+  "solution": "a6b5",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1949
+ },
+ {
+  "fen": "r1bqkbn1/pBpppp1r/8/n7/P3P3/N7/1PPP1PP1/R1B1K1N1 w Qq - 1 10",
+  "solution": "b7a8",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1131
+ },
+ {
+  "fen": "4k1nr/5p1p/6p1/2n1p3/1P4P1/4P3/5P2/1b3K2 w - - 0 30",
+  "solution": "b4c5",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"4\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2002
+ },
+ {
+  "fen": "1n6/7p/p4n2/k3NP2/7r/PQ6/PB1P1K2/1R3R2 w - - 0 28",
+  "solution": "b3b8",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1812
+ },
+ {
+  "fen": "rnb1kb1r/Qpq1pppp/5n2/3p4/2PP4/8/PP2PPPP/R1B1KBNR b KQkq - 0 8",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 686
+ },
+ {
+  "fen": "rnbq2k1/1ppp1pp1/p7/B3p2r/2P5/8/P1Q1PP2/RN2KBNR w KQ - 0 11",
+  "solution": "h1h5",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 557
+ },
+ {
+  "fen": "r1b1kb1r/ppqp2pp/n7/2p1pp2/6n1/PPP2P2/1B1PPKPP/RNQ2BNR w kq - 6 8",
+  "solution": "f3g4",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2166
+ },
+ {
+  "fen": "r2qk1nr/p1ppp2p/2B3Pb/8/4P3/2N5/PPPP1P1P/R1BQK1NR b KQkq - 0 8",
+  "solution": "d7c6",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1917
+ },
+ {
+  "fen": "rn1qkbn1/ppp1Bpp1/8/1P6/P7/7r/2PPPP2/RN1QKB2 w Qq - 1 11",
+  "solution": "e7d8",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1491
+ },
+ {
+  "fen": "1n2k1nr/1pq2p1p/2pp3b/r3p1P1/p6N/2PP4/PP2K2P/RNBQ1B1R w k - 1 12",
+  "solution": "g5h6",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2054
+ },
+ {
+  "fen": "r1b4r/1ppp3p/n3pk2/pN3pp1/3PR3/5P2/PPP1PKP1/R2Q1BN1 b - - 3 12",
+  "solution": "f5e4",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1089
+ },
+ {
+  "fen": "2b1k3/2p5/6p1/7p/1P1r2n1/6K1/2P1P2P/2BR4 w - - 0 26",
+  "solution": "d1d4",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"diamonds\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1171
+ },
+ {
+  "fen": "r2qk1nr/p1p1p1bp/n5p1/2pP4/5Pb1/8/PP1PK3/RNBQ1BNR w kq - 0 10",
+  "solution": "g1f3",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"7\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest knight move. You'll need a Jack.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 949
+ },
+ {
+  "fen": "rn2kbr1/ppp2ppp/3q1n2/4p3/2B3b1/4P1P1/PPPP1P1P/1RBQK1NR b Kq - 1 7",
+  "solution": "g4d1",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 944
+ },
+ {
+  "fen": "rnbqk1nr/pp1p2pp/2p2p2/8/3P4/4P3/PP1BNPPb/RN1QKB1R w KQkq - 0 7",
+  "solution": "h1h2",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 1914
+ },
+ {
+  "fen": "1nbqkb1r/2ppp2p/1p5n/1p1N1pp1/2P5/rQ6/P2PPPPP/2R1KBNR b Kk - 1 8",
+  "solution": "a3b3",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"diamonds\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1103
+ },
+ {
+  "fen": "rn2k1nr/ppp3Qp/3qb3/3pP3/8/5P2/PPPKB2P/RNB4R w kq - 1 10",
+  "solution": "e5d6",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1680
+ },
+ {
+  "fen": "rn1Bkbnr/p2b1ppp/1p1p4/2p5/8/2NP4/PPP1PPPP/R2QKBNR b KQkq - 0 5",
+  "solution": "e8d8",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Your king can win material. You'll need a King.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1527
+ },
+ {
+  "fen": "rn1qkbnr/R2ppppp/2b5/8/7P/2P3P1/1P1PPP2/1NBQKBN1 b kq - 0 7",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 607
+ },
+ {
+  "fen": "3q2nr/2pk1ppR/Bp6/3p4/4Pp2/2P2N2/6P1/3QK3 b - - 1 16",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 654
+ },
+ {
+  "fen": "rn6/4kp2/2p3pp/p3P3/R7/4K2N/2Pr2Q1/1NB2B1R b - - 0 21",
+  "solution": "d2g2",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1043
+ },
+ {
+  "fen": "2b1k3/3rppbr/3p4/p6p/4n2P/5NP1/1B5R/N3K3 w - - 0 23",
+  "solution": "b2g7",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1975
+ },
+ {
+  "fen": "rnb1kb1r/p6p/2p4n/4pp1R/1B6/P3P3/1P3PP1/RN1QKBN1 b Qkq - 1 10",
+  "solution": "f8b4",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 1983
+ },
+ {
+  "fen": "rnbq1knr/pp2p3/6pp/2pp4/2P3P1/N7/PB1PPK1P/R2Q1BNR w - - 0 10",
+  "solution": "b2h8",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1459
+ },
+ {
+  "fen": "rnb1kbn1/pp6/2ppp3/5p1R/1P6/2qP2P1/P2QPP2/RN2KBN1 b Qq - 1 12",
+  "solution": "c3a1",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"diamonds\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1466
+ },
+ {
+  "fen": "r2qkb1r/7p/np5n/4pp2/2PN2p1/4P3/PP1K1PPP/R1BQ1B1R w kq - 0 13",
+  "solution": "d1a4",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest queen move. You'll need a Queen.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2092
+ },
+ {
+  "fen": "r3kbnr/1pp1pR2/2n5/3p4/p3P3/2P5/PP1P1P2/RNBK1B2 b - - 0 13",
+  "solution": "e8f7",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"spades\"},{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a King is the right spend here — your king has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 1023
+ },
+ {
+  "fen": "2bqkb1r/2pp4/Q4p1p/4p3/2P5/N2P4/PP5P/3RKBN1 b k - 0 13",
+  "solution": "c8a6",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"spades\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 693
+ },
+ {
+  "fen": "r3qbk1/p3p3/bppp4/8/P2P4/1PN2P2/r7/2BK2N1 w - - 0 21",
+  "solution": "c3a2",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your knight (a Jack).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 970
+ },
+ {
+  "fen": "r1bqkb2/pp1pp1p1/2p5/5pN1/1nP4r/1P1P1P2/P1N1R3/R1BQKB2 w Qq - 0 14",
+  "solution": "c2b4",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1863
+ },
+ {
+  "fen": "rnb1kb1r/p3N1pp/1p2p2n/2p3p1/1P3P2/8/PBPPP2P/R2QKB1R w KQkq - 0 11",
+  "solution": "e7c8",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a Jack is the right spend here — your knight has the strongest move.",
+  "difficulty": "advanced",
+  "category": "card_management",
+  "rating": 1418
+ },
+ {
+  "fen": "rn2kb2/p2p1p1r/2q1p2n/2P1N1p1/P3P3/7P/1P3PP1/RN1QK2R w Qq - 1 14",
+  "solution": "e5c6",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 990
+ },
+ {
+  "fen": "r1bqk1nr/1p1p4/8/1P2p3/1bP3pp/1P6/3PP1PP/R1BQKBNR b Kkq - 1 15",
+  "solution": "a8a1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"diamonds\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 915
+ },
+ {
+  "fen": "1nb2b1R/rp1k1pp1/3pp2n/p1p5/5P2/1P3N2/PBPPP1P1/RN1QKB2 w Q - 2 9",
+  "solution": "h8f8",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 2123
+ },
+ {
+  "fen": "r2qkbnr/p1p1pp2/2bp2pp/1Q6/8/P1P4P/RP1PPPR1/1NB1KBN1 b kq - 2 9",
+  "solution": "c6b5",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 587
+ },
+ {
+  "fen": "1nb1kbnr/r4ppp/2pp4/pp2p3/4P1PP/P4q1N/1PPP3R/RNBQKB2 w Qk - 0 9",
+  "solution": "d1f3",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 534
+ },
+ {
+  "fen": "1nb1kbn1/rpp1p3/p2p1pp1/3P4/P4BqP/8/1PP1PP1P/RN2KBNR b KQ - 2 10",
+  "solution": "g4f4",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1988
+ },
+ {
+  "fen": "rnb1kbnr/pp1p1ppp/2p1p3/8/8/1P2PqP1/P1PP2BP/RNB1K1NR b KQkq - 0 6",
+  "solution": "f3g2",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"hearts\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1485
+ },
+ {
+  "fen": "1rb1k1nr/p6p/3Bpp2/8/qp6/4PN2/P1PPQPPP/RN3RK1 w k - 0 13",
+  "solution": "d6b8",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1023
+ },
+ {
+  "fen": "1rbqkb1r/Nppppppp/7n/p7/3n4/2P4N/PP1PPPPP/R1BQKB1R w KQk - 7 6",
+  "solution": "c3d4",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"clubs\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2056
+ },
+ {
+  "fen": "rnb1kbnr/pp1p1ppp/2p5/4p2R/6q1/8/PPPPPP2/RNBQKBN1 b Qkq - 1 5",
+  "solution": "g4h5",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1906
+ },
+ {
+  "fen": "r5nr/p1p2pB1/1p2k2p/4p3/6PP/4P3/P1bN1K1R/R5N1 b - - 0 16",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"4\",\"suit\":\"clubs\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1687
+ },
+ {
+  "fen": "rn2kbnr/pNp1pp2/7p/4p3/8/6P1/PPP1bP1P/R2QKB1R w KQkq - 0 10",
+  "solution": "d1d8",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"4\",\"suit\":\"hearts\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "rn1qkbnr/p3pppp/8/2pp4/8/2N5/PPbPP1PP/R1BQKBNR w KQkq - 0 6",
+  "solution": "d1c2",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 596
+ },
+ {
+  "fen": "r1b5/pp1pkp1p/n4B2/1p4p1/8/5NPB/P1PP1P1P/R3K2R b KQ - 0 14",
+  "solution": "e7f6",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"diamonds\"}]",
+  "hint": "Your king can win material. You'll need a King.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1973
+ },
+ {
+  "fen": "r1b1kbnr/p1pqp1pp/3p4/1B3p2/8/P3PQ2/1PPP1PPP/RNB1K1NR w KQkq - 1 6",
+  "solution": "b5d7",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1613
+ },
+ {
+  "fen": "5bn1/pB2pk2/2b5/5p2/2P2Pp1/3K4/8/8 b - - 1 28",
+  "solution": "c6b7",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2029
+ },
+ {
+  "fen": "2bb2kr/r1pp3p/np5n/P7/1B3QP1/7P/1PP2P1R/RN3K2 b - - 2 21",
+  "solution": "a6b4",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1966
+ },
+ {
+  "fen": "1q2kb1r/B1p1pppp/r1p5/pp1B1N2/4b3/3P2P1/P2NPP1P/R3K2R w KQk - 8 14",
+  "solution": "a7b8",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1569
+ },
+ {
+  "fen": "1nbqkbnr/1B1p1p1p/4p3/2p3p1/4PP1P/r7/1PPP2P1/RNBQK1NR b KQk - 0 6",
+  "solution": "a3a1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1494
+ },
+ {
+  "fen": "r3kbnr/1b1p1ppp/2n1p3/p7/8/2NPB3/PP2PPP1/R2QKBNq b Qkq - 3 9",
+  "solution": "h1g1",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a Queen is the right spend here — your queen has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2035
+ },
+ {
+  "fen": "r3kbnr/4p1pp/p2p1p2/1p6/6P1/P2P2B1/1Pq1PP2/RN2KBNR b KQkq - 0 10",
+  "solution": "c2c1",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"spades\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "rn1qkbn1/Bb1ppp2/6p1/3p4/Pp5p/5P1N/1PPQP1PP/RN2KB1R b KQq - 1 10",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1906
+ },
+ {
+  "fen": "rn1qkb1r/pp2pppp/2p5/3p4/1P6/2N4b/P1PPP2P/R1BQKB1R w KQkq - 0 7",
+  "solution": "f1h3",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"4\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your bishop (a 2).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1135
+ },
+ {
+  "fen": "r1bqkb1r/ppppppp1/n7/7p/P7/1P3NP1/2PPPnBP/RNBQK2R w KQkq - 2 6",
+  "solution": "e1f2",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a King is the right spend here — your king has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 517
+ },
+ {
+  "fen": "r3k1nr/p1p1pp1p/np2p1p1/7Q/5b2/NP1P4/P1PPB1bP/R1B1K2R w KQkq - 0 10",
+  "solution": "h5b5",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Look for the strongest queen move. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1010
+ },
+ {
+  "fen": "2b2bn1/rp1pk3/8/pNP1np2/2P4r/3P1P2/P3P1P1/RQ2KBN1 w Q - 0 13",
+  "solution": "b5a7",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1139
+ },
+ {
+  "fen": "rnbqk2r/p1pp1pp1/1p2p3/7Q/5P2/1PnPP1P1/P1P4P/RN2KBR1 w Qkq - 1 10",
+  "solution": "h5h8",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"6\",\"suit\":\"clubs\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 639
+ },
+ {
+  "fen": "3qkbnr/r1p1pp2/6pp/2P5/1P3P1P/3B4/6b1/2B1K1NR w Kk - 0 16",
+  "solution": "d3b5",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a strong move for your bishop (a 2).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 2118
+ },
+ {
+  "fen": "8/8/1p6/p1B1R3/P2N4/3KP1k1/8/8 b - - 1 38",
+  "solution": "b6c5",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "endgame",
+  "rating": 1934
+ },
+ {
+  "fen": "rn1qkr2/pp1bpp1p/2p4n/6B1/2P1P3/2P2K2/PP3PPP/RN3BNR w q - 0 8",
+  "solution": "g5h6",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1986
+ },
+ {
+  "fen": "rn2kNr1/p1p1p1p1/2qp4/1P3p2/2P5/1P1P4/4PPPP/1NBQKR2 w q - 1 13",
+  "solution": "b5c6",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"5\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1087
+ },
+ {
+  "fen": "1nbq2n1/1ppk4/r2p4/4p1b1/3P1p1R/P3P3/1PP1KPP1/RNB5 b - - 0 15",
+  "solution": "g5h4",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "advanced",
+  "category": "card_management",
+  "rating": 1508
+ },
+ {
+  "fen": "rnbqk1nr/pp1pppbR/2p5/8/8/N7/PPPPPPP1/R1BQKBN1 b Qkq - 2 6",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 582
+ },
+ {
+  "fen": "5knr/3R2pp/4p3/1q3p2/8/4P2P/2PN1Pb1/2B1K3 b - - 0 18",
+  "solution": "b5d7",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1196
+ },
+ {
+  "fen": "r3k3/2p1bn2/2nR4/pP6/P1P4Q/5P1P/4N3/5K1R w - - 5 28",
+  "solution": "d6e6",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Look for the strongest rook move. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 952
+ },
+ {
+  "fen": "1n2r3/7p/3k4/1R6/8/5P1P/2P2K2/1r6 b - - 0 27",
+  "solution": "b1b5",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"clubs\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "endgame",
+  "rating": 561
+ },
+ {
+  "fen": "r1bqkbnr/pQp1p3/2np4/5ppp/2P5/N3P3/PP1P1PPP/R1B1KBNR b KQkq - 0 6",
+  "solution": "c8b7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 699
+ },
+ {
+  "fen": "r5nr/ppp2k2/2np3p/4pBp1/8/q1P1PP2/3PQ2P/R1B2KNR b - - 0 16",
+  "solution": "a3a1",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 982
+ },
+ {
+  "fen": "Qn2k1nr/2pp1ppp/p2b4/4p3/2q3P1/3P3N/PPP2P1P/RNB1K2R w KQk - 1 10",
+  "solution": "d3c4",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1080
+ },
+ {
+  "fen": "rn1qkbnr/pP1ppppp/8/8/8/8/P1PPbPPP/RNBQKBNR b KQkq - 1 6",
+  "solution": "e2d1",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "intermediate",
+  "category": "card_management",
+  "rating": 1127
+ },
+ {
+  "fen": "r1b1kbnr/p1p1p3/1pn2ppp/3P4/7P/1Q4P1/PP1P1P2/RNB1KBNR w KQkq - 0 8",
+  "solution": "d5c6",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1854
+ },
+ {
+  "fen": "2rq1b2/1pp2kp1/2n1p3/p7/1P2PPP1/2N5/P1P4r/R1B2KNR b - - 0 15",
+  "solution": "h2h1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"diamonds\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1480
+ },
+ {
+  "fen": "1rb1kbnr/p1p1pppp/1p6/3p4/1n6/B1PQ1N2/P3K2P/RN3B1R b k - 1 11",
+  "solution": "b4d3",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your knight (a Jack).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1035
+ },
+ {
+  "fen": "rnb1k1nr/p1pp1pB1/4p2p/1p4q1/1b6/3P1P2/PPPNP1PP/R2QKBNR b KQkq - 2 6",
+  "solution": "g5g7",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a Queen is the right spend here — your queen has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2043
+ },
+ {
+  "fen": "r1bqk1nr/pB2ppb1/2p3pp/3p4/4P3/N6N/PPPP1PPP/R1BQK2R b Kkq - 0 7",
+  "solution": "c8b7",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1644
+ },
+ {
+  "fen": "rnbqk2r/pppp1ppp/4p3/6B1/4P3/6b1/PPP1BPPP/RN1QK1NR w KQkq - 3 6",
+  "solution": "g5d8",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 938
+ },
+ {
+  "fen": "1nbqkbnr/rp1ppNpp/p7/2p2p2/8/2PP4/PP2PPPP/RNBQKB1R b KQk - 1 5",
+  "solution": "e8f7",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"diamonds\"}]",
+  "hint": "Your king can win material. You'll need a King.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 545
+ },
+ {
+  "fen": "r4b1r/p2Bpknp/n7/2p3p1/2P3N1/P2P3P/R6K/1q6 b - - 1 21",
+  "solution": "b1a2",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1456
+ },
+ {
+  "fen": "rn3b2/p1pk4/b4n2/4ppNQ/q7/2P1PPP1/PP1P3P/R1B3KR b - - 0 17",
+  "solution": "f6h5",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"J\",\"suit\":\"diamonds\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 610
+ },
+ {
+  "fen": "2b3nr/2pk1p1p/4p3/6K1/P2PP2P/P1b2q2/3N1P2/2B5 b - - 0 19",
+  "solution": "f7f6",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"hearts\"},{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"diamonds\"}]",
+  "hint": "Play a pawn card (3-9) to deliver checkmate with your pawn.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 600
+ },
+ {
+  "fen": "r2q1bnr/p1p1pkp1/3p4/n6p/1p2PP1P/3P1N2/bPPB2PR/RN2KB2 w Q - 0 10",
+  "solution": "a1a2",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2041
+ },
+ {
+  "fen": "rn1qkb1r/pp3p1p/6p1/2PQpn2/bP6/R3P1PP/1BP2P2/1N2KBNR b Kkq - 0 11",
+  "solution": "d8d5",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a Queen is the right spend here — your queen has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 671
+ },
+ {
+  "fen": "r1bqkbnr/ppp2p1p/n3p3/3p2B1/6P1/2PP1P2/PP2P2P/RN1QKBNR b KQkq - 0 5",
+  "solution": "d8g5",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1893
+ },
+ {
+  "fen": "rnbk2n1/4pp2/3p4/8/pqp4r/2P1PP2/Rb1P1K2/1NBQ1B2 w - - 0 16",
+  "solution": "c3b4",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 911
+ },
+ {
+  "fen": "rnb1kb1r/ppp1p1pp/3p1p1B/3N4/3q4/8/PPP1PP1P/R2QKBNR w KQkq - 0 7",
+  "solution": "d1d4",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1418
+ },
+ {
+  "fen": "rnbqk1n1/p1pp1pp1/4pb1r/4P2P/1p1P4/7N/PPP2PP1/RN1QKBR1 w Qq - 0 9",
+  "solution": "e5f6",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2098
+ },
+ {
+  "fen": "rnbqkbnr/p1pp1p2/7p/1p2p1p1/1P6/3BPQP1/P1PP1P1P/RNB1K1NR w KQkq - 0 6",
+  "solution": "f3a8",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"diamonds\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1579
+ },
+ {
+  "fen": "1nbqkbnr/r2pp1p1/ppp5/8/6pQ/P1P2P2/1P1PP2P/RNB1KBNR w KQk - 0 8",
+  "solution": "h4h8",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1410
+ },
+ {
+  "fen": "1rbqkbnr/pppppppp/8/8/8/n4P2/P2PPKPP/1RBQ1BNR b k - 1 6",
+  "solution": "a3b1",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1129
+ },
+ {
+  "fen": "r1b2bnr/pp2kp1p/1Np1p3/8/5P1P/P2P4/1P2P1P1/1R2KBNR b K - 1 16",
+  "solution": "a7b6",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1168
+ },
+ {
+  "fen": "r1b1kb1r/pppp1p1p/B7/3P2p1/8/P4N1P/1qPP1PP1/RNBK3R b kq - 1 9",
+  "solution": "b2a1",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1022
+ },
+ {
+  "fen": "2r1k1nr/p2p2p1/4pp2/2pb4/P3P1Qq/2K3R1/1Pn5/2B3NR w k - 0 21",
+  "solution": "h1h4",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1625
+ },
+ {
+  "fen": "1nb2bnr/1pPqpk1p/8/6p1/P5P1/R7/1r1P1P1P/1NB1K1NR w K - 0 11",
+  "solution": "c7b8q",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"8\",\"suit\":\"clubs\"},{\"rank\":\"K\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your pawn (a pawn card (3-9)).",
+  "difficulty": "advanced",
+  "category": "weakness",
+  "rating": 1504
+ },
+ {
+  "fen": "rnbqkb1r/pp1pp1pp/2p4n/5P2/6Q1/N5P1/PPPP1P1P/1RB1KBNR b Kkq - 2 6",
+  "solution": "h6g4",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"clubs\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a Jack is the right spend here — your knight has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 619
+ },
+ {
+  "fen": "rnB1kbn1/p2p1ppr/7p/4p3/8/q1NP4/1P1P1PPP/R1BQKBNR b KQq - 0 10",
+  "solution": "a3a1",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"diamonds\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1059
+ },
+ {
+  "fen": "r1b2k2/p1Bp3p/7n/P3p3/4P3/5r1P/RP6/1N2KBNR w K - 1 20",
+  "solution": "g1f3",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 982
+ },
+ {
+  "fen": "r1b5/Qp2k2p/3p4/5p2/5b1N/4P2P/1Pq5/R3K2R b KQ - 0 17",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1436
+ },
+ {
+  "fen": "2b1k3/p1ppnpB1/6p1/8/4P3/5q2/5K2/8 w - - 0 23",
+  "solution": "f2f3",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your king (a King).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 511
+ },
+ {
+  "fen": "rnbqkb1r/Nppp1ppp/5n2/8/3p4/8/PPPQPPPP/R1B1KBNR b KQkq - 1 5",
+  "solution": "a8a7",
+  "cards": "[{\"rank\":\"A\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"diamonds\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1111
+ },
+ {
+  "fen": "r1b1kb1r/pp1p1ppp/n1p5/4N2n/P3P3/6PP/1PPP1K2/RNBQ1B1R w kq - 0 8",
+  "solution": "d1h5",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"diamonds\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1904
+ },
+ {
+  "fen": "rnb1kB2/p2p1p2/1pp5/8/6QR/3P4/PPP5/RN2KBN1 b Qq - 0 13",
+  "solution": "e8f8",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"K\",\"suit\":\"diamonds\"}]",
+  "hint": "Your king can win material. You'll need a King.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2017
+ },
+ {
+  "fen": "r1b1kbn1/pp1ppp2/nq5r/2P3pp/4N3/7P/PPP1PPP1/1RBQKBNR w Kq - 1 7",
+  "solution": "c5b6",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"3\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 645
+ },
+ {
+  "fen": "1n2k2r/r2b3Q/p1p3p1/1p2pp2/P3P2P/B1N1K1N1/5PP1/5B1R w k - 0 18",
+  "solution": "h7e7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1000
+ },
+ {
+  "fen": "r1bqkb1r/1p1ppp1p/7p/8/p2nN2P/8/PPP1PPP1/R2QKBNR w KQkq - 0 8",
+  "solution": "d1d4",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1641
+ },
+ {
+  "fen": "2b1r3/2p2pp1/3kp2n/2np3p/1p1P1P1P/r2NB3/3KP1P1/RQ3B1R w - - 4 21",
+  "solution": "d4c5",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"diamonds\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1855
+ },
+ {
+  "fen": "r2q1b2/pb2p1k1/p1p5/6n1/1PP5/P7/6P1/RNB1K1N1 w Q - 0 18",
+  "solution": "c1g5",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"diamonds\"},{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 2092
+ },
+ {
+  "fen": "rnb1kbnr/2Q1p1pp/pp3p2/8/8/1P3P1N/P2KP1PP/RNB2B1R b kq - 0 8",
+  "solution": "c8h3",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2134
+ },
+ {
+  "fen": "r1bqkbnr/pp1pp2p/n4p2/2p3N1/6P1/7B/PPPPPP1P/R1BQK2R b KQkq - 0 7",
+  "solution": "f6g5",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"K\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Don't miss it: there is a winning capture for your pawn (a pawn card (3-9)).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1828
+ },
+ {
+  "fen": "r1b3r1/pBpp3p/n2kp1n1/5p1Q/5P2/1PPPP3/P6P/R3K1NR w KQ - 1 15",
+  "solution": "b7a8",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"diamonds\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1616
+ },
+ {
+  "fen": "1Q3r2/3pkp1p/6p1/3Pp3/3p4/7P/3K1PPR/1N3B2 b - - 0 19",
+  "solution": "f8b8",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 657
+ },
+ {
+  "fen": "rnbqkbnr/1p1p1p1Q/p7/2p1p3/2P5/8/PP1PPPPP/RNB1KBNR b KQkq - 1 5",
+  "solution": "h8h7",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 504
+ },
+ {
+  "fen": "rnbqkbnr/pp4p1/3ppp2/2P3B1/P7/2P2P1p/1P2P3/RN1QKBNR b KQkq - 1 8",
+  "solution": "f6g5",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"3\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"spades\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 1846
+ },
+ {
+  "fen": "rn4r1/ppp5/8/2k3Np/2b5/P7/2P4P/RKR5 b - - 5 24",
+  "solution": "g8g5",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 2027
+ },
+ {
+  "fen": "r1bqkbn1/1pp1ppp1/3p4/1N6/pP1P4/7r/PP2PPPP/1R1QKB1R w Kq - 0 9",
+  "solution": "g2h3",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"8\",\"suit\":\"spades\"},{\"rank\":\"6\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1073
+ },
+ {
+  "fen": "r1b1kb1r/1ppp1ppp/p7/4B3/2Pn2nq/3Q4/PP2PPP1/RN2KBNR w KQkq - 0 8",
+  "solution": "h1h4",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"8\",\"suit\":\"diamonds\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1149
+ },
+ {
+  "fen": "1nb5/1p1p1pk1/r1p2p2/p3Q1r1/P2P4/8/1P2PPPP/3RKBNR w K - 2 17",
+  "solution": "e5b8",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"diamonds\"},{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"A\",\"suit\":\"clubs\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2016
+ },
+ {
+  "fen": "r2qk1nN/1p2pp2/2np3b/p7/6b1/p2P3P/P1P1PP2/R2QKB1R w KQq - 0 11",
+  "solution": "h3g4",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"3\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1413
+ },
+ {
+  "fen": "rnb1r3/1k1q1p2/7n/p1pN4/5KP1/3P4/PPP4P/R2Q1BNR b - - 0 18",
+  "solution": "d7d5",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"9\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your queen (a Queen).",
+  "difficulty": "master",
+  "category": "weakness",
+  "rating": 1806
+ },
+ {
+  "fen": "r3k2r/p6p/4bPpn/4p3/P7/3K4/2P2PPP/R1BQ3R w k - 2 16",
+  "solution": "c1h6",
+  "cards": "[{\"rank\":\"8\",\"suit\":\"hearts\"},{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "master",
+  "category": "tactics",
+  "rating": 2182
+ },
+ {
+  "fen": "rn4k1/8/R2p4/1P2p2p/1P4b1/4K3/7B/3q4 b - - 3 33",
+  "solution": "d1d4",
+  "cards": "[{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"diamonds\"},{\"rank\":\"3\",\"suit\":\"hearts\"}]",
+  "hint": "Play a Queen to deliver checkmate with your queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 600
+ },
+ {
+  "fen": "rn1q1b1r/2p1Qpp1/p1k4p/8/2b4P/P7/RP1P1KP1/1NB3NR w - - 1 13",
+  "solution": "e7d8",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"diamonds\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1696
+ },
+ {
+  "fen": "r1bqk1nr/ppp2p2/2n3pp/3pp3/8/1P1P4/PbP1PPPP/1NBQKBNR w Kkq - 0 9",
+  "solution": "c1b2",
+  "cards": "[{\"rank\":\"5\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"hearts\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 1831
+ },
+ {
+  "fen": "r1bqkb2/2p2pp1/3ppn2/2n5/3P2P1/1P2BP2/4P2r/RN2KBN1 w Qq - 0 17",
+  "solution": "a1a8",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"clubs\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1054
+ },
+ {
+  "fen": "rnbqkb1B/1ppp1p1p/4p2n/p5p1/6Q1/1P2P3/P1PP1PPP/RN2KBNR b KQq - 1 5",
+  "solution": "h6g4",
+  "cards": "[{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"diamonds\"}]",
+  "hint": "Your knight can win material. You'll need a Jack.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 626
+ },
+ {
+  "fen": "r1bqkbn1/p1p1pp1r/n2p4/1p4P1/8/2P5/PPQPPPP1/RNB1KBN1 w Qq - 0 6",
+  "solution": "c2h7",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"A\",\"suit\":\"clubs\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1135
+ },
+ {
+  "fen": "rnbqkr2/1B1pp1b1/5p1n/p1p3N1/Q7/2P1P3/PP1P3P/RNB3KR b q - 0 14",
+  "solution": "c8b7",
+  "cards": "[{\"rank\":\"4\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"7\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "advanced",
+  "category": "card_management",
+  "rating": 1592
+ },
+ {
+  "fen": "rnb1kb1r/pp2ppp1/2p2n2/8/3q1Pp1/P7/1PP1P2P/RNBQK1NR w KQkq - 0 7",
+  "solution": "d1d4",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"diamonds\"},{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 537
+ },
+ {
+  "fen": "rn1qkb1r/p1p1pppR/1p1p1n2/8/8/N1P1KP2/bP1PP1P1/R1BQ1BN1 w kq - 0 8",
+  "solution": "h7h8",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"spades\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "intermediate",
+  "category": "weakness",
+  "rating": 1138
+ },
+ {
+  "fen": "rnb1k1nr/1p2p1bp/p1p4p/5p2/3Q1P2/8/PPN1P1PP/R3KBNR w KQkq - 0 9",
+  "solution": "d4g7",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"spades\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1506
+ },
+ {
+  "fen": "r3kBnr/1p1b2pp/5p2/P1q5/P4n2/2P5/4P1PP/RN2KBNR w KQkq - 0 14",
+  "solution": "f8c5",
+  "cards": "[{\"rank\":\"9\",\"suit\":\"hearts\"},{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"2\",\"suit\":\"clubs\"}]",
+  "hint": "Card economy: a 2 is the right spend here — your bishop has the strongest move.",
+  "difficulty": "beginner",
+  "category": "card_management",
+  "rating": 573
+ },
+ {
+  "fen": "r7/k7/p1n4B/2NP4/P6P/3bpP2/4R1B1/R3K1N1 b - - 0 30",
+  "solution": "d3e2",
+  "cards": "[{\"rank\":\"3\",\"suit\":\"clubs\"},{\"rank\":\"2\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "advanced",
+  "category": "tactics",
+  "rating": 1407
+ },
+ {
+  "fen": "1nbqkbnr/1ppp1pp1/8/4p2p/2P5/4PP2/rP1P2PP/R1BQKBNR b KQk - 0 6",
+  "solution": "a2a1",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"hearts\"},{\"rank\":\"J\",\"suit\":\"spades\"},{\"rank\":\"A\",\"suit\":\"hearts\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 1066
+ },
+ {
+  "fen": "r1Q3n1/3nk2r/4p2p/p1P5/8/P1NP1PP1/P6P/R3K1NR b KQ - 0 16",
+  "solution": "a8c8",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 539
+ },
+ {
+  "fen": "rnb1k1n1/pppp1p1r/4p1p1/8/8/1P6/P1PB2PN/RN1QKB2 b Qq - 0 10",
+  "solution": "h7h2",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"clubs\"},{\"rank\":\"4\",\"suit\":\"spades\"},{\"rank\":\"4\",\"suit\":\"spades\"}]",
+  "hint": "Card economy: a 10 is the right spend here — your rook has the strongest move.",
+  "difficulty": "master",
+  "category": "card_management",
+  "rating": 1935
+ },
+ {
+  "fen": "r2qkb1r/p1pbp1pp/5n2/3p1p2/Qp2P3/3P1N2/PPn2PPP/1NBK1B1R b kq - 0 13",
+  "solution": "d7a4",
+  "cards": "[{\"rank\":\"2\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your bishop can win material. You'll need a 2.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 649
+ },
+ {
+  "fen": "8/8/r1R5/5nk1/8/8/5K2/8 b - - 0 48",
+  "solution": "a6c6",
+  "cards": "[{\"rank\":\"7\",\"suit\":\"hearts\"},{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"8\",\"suit\":\"clubs\"}]",
+  "hint": "Your rook can win material. You'll need a 10.",
+  "difficulty": "intermediate",
+  "category": "endgame",
+  "rating": 1074
+ },
+ {
+  "fen": "1nbqkbnr/1p1ppppp/8/2p5/8/1r2PP1N/2PP2PP/R1BQKB1R w KQk - 0 7",
+  "solution": "c2b3",
+  "cards": "[{\"rank\":\"6\",\"suit\":\"clubs\"},{\"rank\":\"7\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"hearts\"}]",
+  "hint": "Your pawn can win material. You'll need a pawn card (3-9).",
+  "difficulty": "intermediate",
+  "category": "tactics",
+  "rating": 922
+ },
+ {
+  "fen": "rQbqkbnr/pp1p2p1/7p/5p2/3P1p2/7N/PB2P1PP/RN2KB1R b KQkq - 0 8",
+  "solution": "a8b8",
+  "cards": "[{\"rank\":\"10\",\"suit\":\"spades\"},{\"rank\":\"10\",\"suit\":\"diamonds\"},{\"rank\":\"9\",\"suit\":\"diamonds\"}]",
+  "hint": "Don't miss it: there is a winning capture for your rook (a 10).",
+  "difficulty": "beginner",
+  "category": "weakness",
+  "rating": 682
+ },
+ {
+  "fen": "r1b1k1nr/pppp1ppp/n3p3/6q1/3P4/6P1/P1PQPP1P/R3KBNR w KQkq - 1 7",
+  "solution": "d2g5",
+  "cards": "[{\"rank\":\"K\",\"suit\":\"spades\"},{\"rank\":\"Q\",\"suit\":\"clubs\"},{\"rank\":\"Q\",\"suit\":\"hearts\"}]",
+  "hint": "Your queen can win material. You'll need a Queen.",
+  "difficulty": "beginner",
+  "category": "tactics",
+  "rating": 672
+ }
+]
