@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/cosmetics_theme.dart';
 import '../theme/tokens.dart';
 import 'chess_square.dart';
+import 'piece_glyph.dart';
 
 const _files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 const _ranks = [8, 7, 6, 5, 4, 3, 2, 1];
@@ -267,17 +268,12 @@ class _ChessBoardState extends State<ChessBoard> with SingleTickerProviderStateM
                                   width: squareSize,
                                   height: squareSize,
                                   child: Center(
-                                    child: Text(
-                                      unicode,
-                                      style: TextStyle(
-                                        fontSize: squareSize * 0.65,
-                                        color: themed != null
-                                            ? (colorName == 'white' ? themed.white : themed.black)
-                                            : null,
-                                        shadows: const [
-                                          Shadow(color: Color(0x80000000), offset: Offset(1, 1), blurRadius: 2),
-                                        ],
-                                      ),
+                                    child: PieceGlyph(
+                                      glyph: unicode,
+                                      size: squareSize,
+                                      fill: colorName == 'white'
+                                          ? (themed?.white ?? kDefaultWhitePiece)
+                                          : (themed?.black ?? kDefaultBlackPiece),
                                     ),
                                   ),
                                 );

@@ -3,7 +3,7 @@ import { io, type Socket } from "socket.io-client";
 import type { ChatMessage, Card, Color, GameResult, ScoredGame, GameOdds, PlayerProfile, BotDifficulty } from "@checkker/shared";
 import type { GameClientState, GameStartPayload, GameUpdatePayload, MoveErrorPayload, GameOverPayload } from "../types/game";
 import type { Puzzle, PuzzleResult, PuzzlesListData } from "../types/puzzle";
-import { SERVER_URL } from "../config/features";
+import { ADDRESS_OF_SERVER } from "../config/features";
 import { setEquippedFromData } from "../utils/cosmetics";
 import { registerForPushNotifications } from "../utils/push";
 
@@ -14,7 +14,7 @@ let listenersAttached = false;
 
 function getSocket(): Socket {
   if (!socket) {
-    socket = io(SERVER_URL, { autoConnect: true });
+    socket = io(ADDRESS_OF_SERVER, { autoConnect: true });
     attachListeners(socket);
   }
   return socket;
@@ -616,7 +616,7 @@ export function connectToServer(url: string) {
 }
 
 export function reconnectToDefault() {
-  connectToServer(SERVER_URL);
+  connectToServer(ADDRESS_OF_SERVER);
 }
 
 export function useSocket() {

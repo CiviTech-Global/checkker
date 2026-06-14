@@ -180,11 +180,22 @@ class AppSizes {
   static bool isTablet(double screenWidth) => screenWidth >= 600;
 }
 
+// Both armies use the SAME solid (filled) chess glyphs (U+265A\u2013U+265F) so every
+// piece shares one consistent silhouette/design. White vs black is conveyed by
+// the fill color (see kDefaultWhitePiece/kDefaultBlackPiece and PieceTheme), not
+// by mixing Unicode's hollow "white" glyphs with the solid "black" ones.
 const Map<String, Map<String, String>> pieceUnicode = {
-  'k': {'white': '\u2654', 'black': '\u265A'},
-  'q': {'white': '\u2655', 'black': '\u265B'},
-  'r': {'white': '\u2656', 'black': '\u265C'},
-  'b': {'white': '\u2657', 'black': '\u265D'},
-  'n': {'white': '\u2658', 'black': '\u265E'},
-  'p': {'white': '\u2659', 'black': '\u265F'},
+  'k': {'white': '\u265A', 'black': '\u265A'},
+  'q': {'white': '\u265B', 'black': '\u265B'},
+  'r': {'white': '\u265C', 'black': '\u265C'},
+  'b': {'white': '\u265D', 'black': '\u265D'},
+  'n': {'white': '\u265E', 'black': '\u265E'},
+  'p': {'white': '\u265F', 'black': '\u265F'},
 };
+
+/// Default piece fill tints used when no cosmetic piece theme is equipped.
+/// Both armies use the same solid glyph (see [pieceUnicode]); only the fill
+/// color differs, so the two sides read clearly without looking like two
+/// different piece sets.
+const Color kDefaultWhitePiece = Color(0xFFF5F2FC);
+const Color kDefaultBlackPiece = Color(0xFF15101F);

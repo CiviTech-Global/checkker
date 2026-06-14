@@ -26,10 +26,10 @@ function resolveServerUrl(): string {
       return window.location.origin;
     }
   }
-  return "http://localhost:3001";
+  return "http://192.168.1.105:3001";
 }
 
-export const SERVER_URL = resolveServerUrl();
+export const ADDRESS_OF_SERVER = resolveServerUrl();
 
 /**
  * Feature flags for the Checkker app.

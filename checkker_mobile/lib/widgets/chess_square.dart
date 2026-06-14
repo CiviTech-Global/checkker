@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/cosmetic_catalog.dart';
 import '../theme/tokens.dart';
+import 'piece_glyph.dart';
 
 class ChessSquare extends StatelessWidget {
   final String square;
@@ -76,23 +77,12 @@ class ChessSquare extends StatelessWidget {
 
             // Piece
             if (unicode != null)
-              Text(
-                unicode,
-                style: TextStyle(
-                  fontSize: size * 0.65,
-                  color: pieceColors != null
-                      ? (pieceColor == 'white'
-                          ? pieceColors!.white
-                          : pieceColors!.black)
-                      : null,
-                  shadows: const [
-                    Shadow(
-                      color: Color(0x80000000),
-                      offset: Offset(1, 1),
-                      blurRadius: 2,
-                    ),
-                  ],
-                ),
+              PieceGlyph(
+                glyph: unicode,
+                size: size,
+                fill: pieceColor == 'white'
+                    ? (pieceColors?.white ?? kDefaultWhitePiece)
+                    : (pieceColors?.black ?? kDefaultBlackPiece),
               ),
 
             // Legal move dot (empty square)

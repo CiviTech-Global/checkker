@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
@@ -11,38 +11,45 @@ import '../models/puzzle.dart';
 import '../models/replay.dart';
 import '../models/cosmetic.dart';
 
-/// Resolves a sane default game-server address per platform so the app
-/// connects out of the box during development. A real device on a LAN still
-/// needs the host's IP, which is editable in Settings, but emulators,
-/// simulators, desktop and web all "just work" without configuration.
+/// The host machine's LAN address — the IPv4 address shown by `ipconfig` on the
+/// computer running the game server. A physical phone must reach the server by
+/// this address over the same Wi-Fi (the Android emulator alias `10.0.2.2` only
+/// works inside the emulator, and `localhost` only works on the host itself).
 ///
-/// Order of precedence: `--dart-define=SERVER_URL=...` > platform default.
+/// 👉 If your server's IP changes, update this one line.
+const String _lanServerUrl = 'http://192.168.1.105:3001';
+
+/// Resolves the default game-server address. A real device on a LAN connects to
+/// the host's IP ([_lanServerUrl]); the value is still overridable at runtime in
+/// Settings → Game Server, or at build time with `--dart-define=SERVER_URL=...`.
+///
+/// Order of precedence: `--dart-define=SERVER_URL=...` > web same-origin > LAN IP.
 String _resolveDefaultServerUrl() {
   const override = String.fromEnvironment('SERVER_URL');
   if (override.isNotEmpty) return override;
 
   if (kIsWeb) {
     // Production web is served by the game server itself (same origin works).
-    // In dev (flutter run -d chrome) the page is on a different port, so fall
-    // back to the loopback server port.
+    // In dev (flutter run -d chrome) the page is on localhost, so fall back to
+    // the host's LAN address.
     final origin = Uri.base.origin;
     if (origin.contains('localhost') || origin.contains('127.0.0.1')) {
-      return 'http://192.168.1.105:3001';
+      return _lanServerUrl;
     }
     return origin;
   }
 
-  switch (defaultTargetPlatform) {
-    case TargetPlatform.android:
-      // Android emulator reaches the host machine via 10.0.2.2.
-      return 'http://10.0.2.2:3001';
-    default:
-      // iOS simulator, macOS, Windows, Linux all reach the host on loopback.
-      return 'http://localhost:3001';
-  }
+  // Native platforms (physical phones, simulators, desktop): use the host's LAN
+  // IP. The server binds to 0.0.0.0, so this address works from a real device on
+  // the same Wi-Fi as well as from the host machine itself.
+  return _lanServerUrl;
 }
 
-final String _defaultServerUrl = _resolveDefaultServerUrl();
+// The single source of truth for the game-server address. Edit the
+// `_resolveDefaultServerUrl` fallbacks (or set --dart-define=SERVER_URL=...) to
+// point the app at your host. Named in SCREAMING_CASE so it is easy to find.
+// ignore: non_constant_identifier_names
+final String ADDRESS_OF_SERVER = _resolveDefaultServerUrl();
 
 // Auth types
 class AuthState {
@@ -541,7 +548,7 @@ class SocketService {
 
   io.Socket? _socket;
   bool _listenersAttached = false;
-  String _serverUrl = _defaultServerUrl;
+  String _serverUrl = ADDRESS_OF_SERVER;
 
   // Session token: lets the app re-authenticate after a restart/reconnect
   // without prompting the wallet to sign again. Mirrors useSocket.ts.
@@ -699,7 +706,7 @@ class SocketService {
   }
 
   String get serverUrl => _serverUrl;
-  static String get defaultServerUrl => _defaultServerUrl;
+  static String get defaultServerUrl => ADDRESS_OF_SERVER;
 
   void setServerUrl(String url) {
     if (_serverUrl == url) return;
@@ -710,7 +717,7 @@ class SocketService {
   /// the built-in default. Reconnects immediately so dead-looking buttons
   /// come back to life as soon as the address is fixed.
   void connectTo(String url) {
-    final target = url.trim().isEmpty ? _defaultServerUrl : url.trim();
+    final target = url.trim().isEmpty ? ADDRESS_OF_SERVER : url.trim();
     if (target == _serverUrl && isConnected) return;
     _serverUrl = target;
     _authState = null;

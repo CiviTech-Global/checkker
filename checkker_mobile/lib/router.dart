@@ -25,10 +25,23 @@ import 'screens/shop/shop_screen.dart';
 import 'screens/friends/friends_screen.dart';
 import 'screens/notifications/notifications_screen.dart';
 import 'screens/offline/offline_game_screen.dart';
+import 'screens/setup/server_setup_screen.dart';
+import 'services/settings_service.dart';
 
 final goRouter = GoRouter(
   initialLocation: '/',
+  // First-run gate: until a server URL/domain has been configured, send the
+  // player to the setup screen before the menu. Once set it is skipped, and the
+  // address stays editable from Settings → Game Server.
+  redirect: (context, state) {
+    final configured = SettingsService().settings.serverUrl.trim().isNotEmpty;
+    final atSetup = state.matchedLocation == '/server-setup';
+    if (!configured && !atSetup) return '/server-setup';
+    if (configured && atSetup) return '/';
+    return null;
+  },
   routes: [
+    GoRoute(path: '/server-setup', builder: (_, _) => const ServerSetupScreen()),
     GoRoute(path: '/', builder: (_, _) => const HomeScreen()),
     GoRoute(path: '/game/casual', builder: (_, _) => const CasualScreen()),
     GoRoute(path: '/game/ranked', builder: (_, _) => const RankedScreen()),
@@ -60,6 +73,7 @@ final goRouter = GoRouter(
     GoRoute(path: '/puzzles/play/:category', builder: (_, state) => PuzzlePlayScreen(category: state.pathParameters['category']!)),
     GoRoute(path: '/replay/:gameId', builder: (_, state) => ReplayScreen(gameId: state.pathParameters['gameId']!)),
     GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+    GoRoute(path: '/settings/server', builder: (_, _) => const ServerSetupScreen(isInitialSetup: false)),
     GoRoute(path: '/spectate', builder: (_, _) => const SpectateBrowseScreen()),
     GoRoute(path: '/spectate/watch', builder: (_, _) => const SpectateWatchScreen()),
     GoRoute(path: '/spectate/:id', builder: (_, state) => SpectateWatchScreen(id: state.pathParameters['id'])),

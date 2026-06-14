@@ -158,8 +158,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     : settings.serverUrl,
                 style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.sm),
               ),
-              trailing: Icon(Icons.edit, color: AppColors.text.muted, size: 18),
-              onTap: _editServerUrl,
+              trailing: Icon(Icons.chevron_right, color: AppColors.text.muted, size: 20),
+              onTap: () async {
+                await context.push('/settings/server');
+                if (mounted) setState(() {});
+              },
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -234,68 +237,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     SocketService().logout();
     await WalletService().disconnect();
     if (mounted) context.go('/auth/connect');
-  }
-
-  Future<void> _editServerUrl() async {
-    final controller = TextEditingController(text: _settings.settings.serverUrl);
-    final result = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.bg.secondary,
-        title: Text('Game Server', style: TextStyle(color: AppColors.text.primary)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Enter the server address shown on the host machine, e.g.\n'
-              'http://192.168.1.20:3001\n\nLeave blank to use the default.',
-              style: TextStyle(color: AppColors.text.secondary, fontSize: AppTypography.sm),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            TextField(
-              controller: controller,
-              autofocus: true,
-              keyboardType: TextInputType.url,
-              style: TextStyle(color: AppColors.text.primary),
-              decoration: InputDecoration(
-                hintText: SocketService.defaultServerUrl,
-                hintStyle: TextStyle(color: AppColors.text.muted),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.border.subtle),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.accent.gold),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
-            child: Text('Save & Reconnect', style: TextStyle(color: AppColors.accent.gold)),
-          ),
-        ],
-      ),
-    );
-    if (result == null || !mounted) return;
-    await _settings.setServerUrl(result);
-    SocketService().connectTo(result);
-    if (mounted) {
-      setState(() {});
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.isEmpty
-              ? 'Reconnecting to default server...'
-              : 'Reconnecting to $result...'),
-        ),
-      );
-    }
   }
 
   Future<void> _confirmClearData() async {
