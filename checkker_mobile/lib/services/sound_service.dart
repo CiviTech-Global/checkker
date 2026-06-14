@@ -29,9 +29,16 @@ class SoundService {
     try {
       for (int i = 0; i < _playerCount; i++) {
         final p = AudioPlayer(playerId: 'sound_pool_$i');
-        await p.setPlayerMode(PlayerMode.mediaPlayer);
-        await p.setReleaseMode(ReleaseMode.stop);
-        await p.setVolume(volume);
+        // Low-latency mode (Android SoundPool) plays short SFX reliably; on
+        // platforms that don't support it the call throws and we keep the
+        // default media player. Config failures must not disable all audio,
+        // so each is best-effort.
+        try {
+          await p.setReleaseMode(ReleaseMode.stop);
+          await p.setPlayerMode(PlayerMode.lowLatency);
+        } catch (e) {
+          debugPrint('[SoundService] player $i config warning: $e');
+        }
         _players.add(p);
         _busy.add(false);
       }
@@ -90,9 +97,13 @@ class SoundService {
       debugPrint('[SoundService] skipped (disabled)');
       return;
     }
+    // Lazily (re)initialize so a startup hiccup never permanently mutes audio.
     if (!_initialized) {
-      debugPrint('[SoundService] skipped (not initialized)');
-      return;
+      await init();
+      if (!_initialized) {
+        debugPrint('[SoundService] skipped (init unavailable)');
+        return;
+      }
     }
 
     final idx = _pickPlayer();
