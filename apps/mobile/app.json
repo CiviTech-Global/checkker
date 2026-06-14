@@ -5,8 +5,20 @@
     "version": "0.1.0",
     "orientation": "default",
     "scheme": "checkker",
+    "icon": "./assets/logo.png",
     "platforms": ["ios", "android", "web"],
+    "splash": {
+      "image": "./assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#14101F"
+    },
     "ios": { "supportsTablet": true },
-    "web": { "bundler": "metro" }
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#14101F"
+      }
+    },
+    "web": { "bundler": "metro", "favicon": "./assets/logo.png" }
   }
 }

@@ -1,11 +1,11 @@
 {
-    "name": "checkker_mobile",
-    "short_name": "checkker_mobile",
+    "name": "Checkker",
+    "short_name": "Checkker",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#1A1A2E",
-    "theme_color": "#1A1A2E",
-    "description": "A new Flutter project.",
+    "background_color": "#14101F",
+    "theme_color": "#14101F",
+    "description": "Checkker - Chess + Poker hybrid strategy game",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -13,7 +13,8 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "typecheck": "tsc --noEmit",
+    "postinstall": "prisma generate",
+    "typecheck": "prisma generate && tsc --noEmit",
     "clean": "rm -rf .turbo node_modules/.prisma"
   },
   "dependencies": {

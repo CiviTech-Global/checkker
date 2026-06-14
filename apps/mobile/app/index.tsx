@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   FadeIn,
@@ -160,9 +160,22 @@ export default function HomeScreen() {
         bounces={false}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Logo */}
+        <Animated.View
+          entering={FadeIn.duration(600).springify().damping(14)}
+          style={styles.logoContainer}
+        >
+          <Image
+            source={require("../assets/logo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+            accessibilityLabel="Checkker logo"
+          />
+        </Animated.View>
+
         {/* Title */}
         <Animated.View
-          entering={FadeIn.duration(500).springify().damping(12)}
+          entering={FadeIn.duration(500).delay(120).springify().damping(12)}
           style={styles.titleContainer}
         >
           <LinearGradient
@@ -354,6 +367,14 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingVertical: spacing.xl,
     paddingHorizontal: spacing.md,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: spacing.sm,
+  },
+  logo: {
+    width: 132,
+    height: 132,
   },
   titleContainer: {
     marginBottom: spacing.xxs,

@@ -27,7 +27,7 @@ String _resolveDefaultServerUrl() {
     // back to the loopback server port.
     final origin = Uri.base.origin;
     if (origin.contains('localhost') || origin.contains('127.0.0.1')) {
-      return 'http://localhost:3001';
+      return 'http://192.168.1.105:3001';
     }
     return origin;
   }
