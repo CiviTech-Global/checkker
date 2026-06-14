@@ -1,49 +1,54 @@
+// ── Dark Violet Esports palette ──────────────────────────────────────────
+// Deep violet-black surfaces, neon-violet brand accent, amber for points and
+// ratings. Keys are intentionally unchanged from the previous casino theme so
+// every component re-skins automatically. Semantic notes kept where a key's
+// meaning maps onto a different hue (e.g. `accent.gold` = amber, not gold leaf).
 export const colors = {
   bg: {
-    primary: "#1a2e22",       // warmer, lighter dark green
-    secondary: "#243d2e",     // proportionally lighter
-    tertiary: "#2e4d38",      // warmer mid-green for card surfaces
-    felt: "#2a6b40",          // warmer felt
-    parchment: "#f0e6d0",     // warm ivory for book/light surfaces
-    parchmentDark: "#e0d4b8", // aged paper
+    primary: "#14101F",       // deep violet-black (app background)
+    secondary: "#1E1830",     // raised panel
+    tertiary: "#2A2240",      // card / chip surface
+    felt: "#221B38",          // board frame
+    parchment: "#EDE9F7",     // light lavender surface (book/light cards)
+    parchmentDark: "#D9D2EC", // dimmed lavender
   },
   text: {
-    primary: "#f5f0e8",       // slightly brighter warm white
-    secondary: "#e5d9bc",     // brighter gold — better readability
-    muted: "#b0bfaa",         // significantly brighter sage
-    dark: "#1a2e22",
-    onParchment: "#2a1a0e",   // dark brown for text on parchment
+    primary: "#F4F1FB",       // near-white lavender
+    secondary: "#C9BEE8",     // soft lavender
+    muted: "#8B82A8",         // muted violet-grey
+    dark: "#14101F",
+    onParchment: "#241C3A",   // deep violet text on light surfaces
   },
   accent: {
-    primary: "#22944f",       // warmer/brighter green
-    secondary: "#18783e",     // proportionally lighter
-    gold: "#d4a843",          // gold leaf
-    goldBright: "#f5d680",    // bright gold
-    green: "#34d058",         // bright emerald (for success/positive)
-    red: "#e04040",           // bright crimson (high contrast)
-    burgundy: "#8b1a2b",      // deep burgundy
-    blue: "#4a9edd",          // bright sapphire (high contrast on dark)
-    bronze: "#cd7f32",        // bronze
-    lapis: "#1a3a6b",         // deep Persian lapis blue
-    terraCotta: "#c46b2a",    // warm orange accent
+    primary: "#A855F7",       // brand violet
+    secondary: "#7C3AED",     // deeper violet
+    gold: "#F0B43C",          // amber (ratings, points, coins)
+    goldBright: "#FFD27A",    // bright amber
+    green: "#34E5A1",         // neon mint (success / positive / white odds)
+    red: "#FF4D6D",           // neon rose (negative / critical)
+    burgundy: "#7A1F3D",      // deep rose
+    blue: "#5BC0FF",          // neon cyan (info / secondary)
+    bronze: "#C77DFF",        // light violet
+    lapis: "#3B2E6E",         // muted indigo
+    terraCotta: "#F0883E",    // warm ember accent
   },
   board: {
-    light: "#c8b078",         // warm tan (lighter for contrast)
-    dark: "#2a6830",          // rich green felt
+    light: "#D7CFEC",         // pale lavender squares
+    dark: "#4B3F77",          // violet squares
   },
   highlight: {
-    legal: "rgba(52,208,88,0.50)",
-    selected: "rgba(212,168,67,0.55)",
-    lastMove: "rgba(245,214,128,0.35)",
+    legal: "rgba(52,229,161,0.45)",
+    selected: "rgba(168,85,247,0.55)",
+    lastMove: "rgba(168,85,247,0.32)",
   },
-  overlay: "rgba(0,0,0,0.82)",
-  cardFace: "#faf5eb",        // ivory
-  cardBack: "#18472a",        // warmer dark green
+  overlay: "rgba(8,6,16,0.86)",
+  cardFace: "#F7F4FE",        // near-white card
+  cardBack: "#3A2E5E",        // violet card back
   border: {
-    gold: "rgba(212,168,67,0.50)",
-    subtle: "rgba(242,237,228,0.14)",
-    lapis: "rgba(26,58,107,0.40)",
-    ornate: "rgba(212,168,67,0.70)",
+    gold: "rgba(168,85,247,0.45)",   // violet glow border (key kept)
+    subtle: "rgba(244,241,251,0.12)",
+    lapis: "rgba(59,46,110,0.45)",
+    ornate: "rgba(168,85,247,0.70)",
   },
 } as const;
 
@@ -68,29 +73,32 @@ export const typography = {
 export const radius = { sm: 4, md: 8, lg: 12, xl: 16, full: 999 } as const;
 
 export const shadows = {
-  sm: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 2 },
-  md: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12, elevation: 6 },
-  lg: { shadowColor: "#000", shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.5, shadowRadius: 24, elevation: 12 },
-  gold: { shadowColor: "#d4a843", shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.45, shadowRadius: 14, elevation: 8 },
+  sm: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.35, shadowRadius: 4, elevation: 2 },
+  md: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.45, shadowRadius: 12, elevation: 6 },
+  lg: { shadowColor: "#000", shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.55, shadowRadius: 24, elevation: 12 },
+  // Neon-violet glow (key kept as `gold` so existing glow usages re-skin).
+  gold: { shadowColor: "#A855F7", shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.55, shadowRadius: 16, elevation: 8 },
+  glow: { shadowColor: "#A855F7", shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 20, elevation: 10 },
 } as const;
 
 export const motion = { fast: 150, normal: 250, slow: 350, pulse: 1000 } as const;
 
 export const gradients: Record<string, [string, string, ...string[]]> = {
-  glass: ["rgba(245,240,232,0.09)", "rgba(245,240,232,0.03)"],
-  accent: ["#22944f", "#18783e"],
-  gold: ["#d4a843", "#cd7f32"],
-  goldToBronze: ["#f5d680", "#cd7f32"],
-  success: ["#34d058", "#1a8a4a"],
-  error: ["#e04040", "#9e2a3a"],
-  crimsonToBlack: ["#e04040", "#1a2e22"],
-  burgundy: ["#8b1a2b", "#4a1018"],
-  casinoGreen: ["#22944f", "#18472a"],
-  velvet: ["#243d2e", "#2e4d38", "#1a2e22"],
-  parchment: ["#f0e6d0", "#e0d4b8"],
-  persian: ["#1a3a6b", "#2a5494"],
-  ornateGold: ["#f5d680", "#d4a843", "#cd7f32"],
-  burgundyDeep: ["#8b1a2b", "#5a1018"],
+  glass: ["rgba(168,85,247,0.12)", "rgba(168,85,247,0.03)"],
+  accent: ["#A855F7", "#7C3AED"],
+  gold: ["#F0B43C", "#C77DFF"],
+  goldToBronze: ["#FFD27A", "#C77DFF"],
+  success: ["#34E5A1", "#0FA968"],
+  error: ["#FF4D6D", "#9E2A3A"],
+  crimsonToBlack: ["#FF4D6D", "#14101F"],
+  burgundy: ["#7A1F3D", "#3A1018"],
+  casinoGreen: ["#A855F7", "#3A2E5E"],
+  velvet: ["#1E1830", "#2A2240", "#14101F"],
+  parchment: ["#EDE9F7", "#D9D2EC"],
+  persian: ["#3B2E6E", "#5B46A8"],
+  ornateGold: ["#FFD27A", "#F0B43C", "#C77DFF"],
+  burgundyDeep: ["#7A1F3D", "#3A1018"],
+  neonViolet: ["#C77DFF", "#A855F7", "#7C3AED"],
 };
 
 export const springConfig = {
@@ -101,9 +109,9 @@ export const springConfig = {
 } as const;
 
 export const glassStyle = {
-  backgroundColor: "rgba(245,240,232,0.08)",
+  backgroundColor: "rgba(168,85,247,0.08)",
   borderWidth: 1,
-  borderColor: "rgba(212,168,67,0.30)",
+  borderColor: "rgba(168,85,247,0.28)",
 } as const;
 
 export const PIECE_UNICODE: Record<string, { white: string; black: string }> = {

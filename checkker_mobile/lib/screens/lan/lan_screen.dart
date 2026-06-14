@@ -257,7 +257,7 @@ class _LanScreenState extends ConsumerState<LanScreen> {
         Container(
           padding: const EdgeInsets.all(AppSpacing.xl),
           decoration: BoxDecoration(
-            color: const Color(0x14F5F0E8),
+            color: const Color(0x14A855F7),
             borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(color: AppColors.border.subtle),
           ),
@@ -353,7 +353,7 @@ class _LanScreenState extends ConsumerState<LanScreen> {
         Container(
           padding: const EdgeInsets.all(AppSpacing.xl),
           decoration: BoxDecoration(
-            color: const Color(0x14F5F0E8),
+            color: const Color(0x14A855F7),
             borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(color: AppColors.border.subtle),
           ),
@@ -539,7 +539,7 @@ class _OptionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: const Color(0x14F5F0E8),
+          color: const Color(0x14A855F7),
           borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: AppColors.border.subtle),
         ),

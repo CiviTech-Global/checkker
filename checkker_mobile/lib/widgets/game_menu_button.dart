@@ -17,7 +17,7 @@ class GameMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: const Color(0x14F5F0E8), border: Border.all(color: AppColors.border.gold), borderRadius: BorderRadius.circular(AppRadius.md)),
+      decoration: BoxDecoration(color: const Color(0x14A855F7), border: Border.all(color: AppColors.border.gold), borderRadius: BorderRadius.circular(AppRadius.md)),
       child: IconButton(
         icon: Icon(Icons.menu, color: AppColors.text.primary, size: 18),
         onPressed: () => _showMenu(context),

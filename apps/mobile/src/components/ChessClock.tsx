@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { colors, spacing, typography, radius, motion } from '../theme/tokens';
+import { useCountdown } from '../hooks/useCountdown';
 
 interface ChessClockProps {
   label: string;
@@ -28,6 +29,7 @@ export default function ChessClock({
   critical = false,
   rating,
 }: ChessClockProps) {
+  const liveMs = useCountdown(timeMs, active);
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -59,14 +61,14 @@ export default function ChessClock({
   return (
     <Animated.View
       style={[styles.bar, { opacity: active ? pulseAnim : 0.6 }]}
-      accessibilityLabel={`${label}, ${formatTime(timeMs)} remaining`}
+      accessibilityLabel={`${label}, ${formatTime(liveMs)} remaining`}
       accessibilityRole="timer"
     >
       <View style={styles.left}>
         <View
           style={[
             styles.sideDot,
-            { backgroundColor: side === 'white' ? '#ffffff' : '#0b1a12' },
+            { backgroundColor: side === 'white' ? '#ffffff' : colors.bg.primary },
           ]}
         />
         <Text style={styles.label}>{label}</Text>
@@ -74,7 +76,7 @@ export default function ChessClock({
 
       <View style={styles.right}>
         <Text style={[styles.time, { color: timeColor, fontWeight: timeWeight }]}>
-          {formatTime(timeMs)}
+          {formatTime(liveMs)}
         </Text>
         <Text
           style={[

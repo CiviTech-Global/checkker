@@ -57,7 +57,7 @@ class PromotionPicker extends StatelessWidget {
                       onTap: () => onSelect(p.piece),
                       child: Container(
                         constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-                        decoration: BoxDecoration(color: const Color(0x14F5F0E8), border: Border.all(color: AppColors.border.gold), borderRadius: BorderRadius.circular(AppRadius.md)),
+                        decoration: BoxDecoration(color: const Color(0x14A855F7), border: Border.all(color: AppColors.border.gold), borderRadius: BorderRadius.circular(AppRadius.md)),
                         padding: const EdgeInsets.all(AppSpacing.md),
                         child: Column(
                           children: [

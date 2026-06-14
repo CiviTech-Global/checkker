@@ -118,10 +118,12 @@ class MoveRecord {
   final PlayerColor color;
   final Map<String, dynamic>? captured;
   final int? bonusCards;
+  final bool check;
+  final bool mate;
 
   const MoveRecord({
     required this.move, required this.card, required this.color,
-    this.captured, this.bonusCards,
+    this.captured, this.bonusCards, this.check = false, this.mate = false,
   });
 
   factory MoveRecord.fromJson(Map<String, dynamic> json) {
@@ -131,6 +133,8 @@ class MoveRecord {
       color: parseColor(json['color'] as String),
       captured: json['captured'] as Map<String, dynamic>?,
       bonusCards: json['bonusCards'] as int?,
+      check: json['check'] as bool? ?? false,
+      mate: json['mate'] as bool? ?? false,
     );
   }
 }

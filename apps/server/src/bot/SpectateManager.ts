@@ -91,7 +91,7 @@ export class SpectateManager {
     this.games.set(gameId, entry);
 
     const state = game.getState();
-    const odds = await calculateOdds(state.fen);
+    const odds = await calculateOdds(game.getOddsInput());
 
     const whiteProfile = playerStore.createBotProfile(whiteDifficulty, BOT_RATINGS[whiteDifficulty]);
     const blackProfile = playerStore.createBotProfile(blackDifficulty, BOT_RATINGS[blackDifficulty]);
@@ -164,7 +164,7 @@ export class SpectateManager {
         };
         entry.moveHistory.push(moveEntry);
 
-        const odds = await calculateOdds(stateAfter.fen);
+        const odds = await calculateOdds(entry.game.getOddsInput());
 
         entry.spectatorSocket.emit("spectate_move", {
           ...moveEntry,
@@ -261,7 +261,7 @@ export class SpectateManager {
       };
       entry.moveHistory.push(moveEntry);
 
-      const odds = await calculateOdds(stateAfter.fen);
+      const odds = await calculateOdds(entry.game.getOddsInput());
 
       entry.spectatorSocket.emit("spectate_move", {
         ...moveEntry,

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { View, Text, StyleSheet, LayoutChangeEvent } from "react-native";
 import ChessSquare from "./ChessSquare";
 import { colors, radius } from "../theme/tokens";
@@ -66,79 +66,66 @@ function ChessBoard({
     return s;
   }, [lastMove]);
 
-  // Track previous FEN to detect piece movement
-  const prevPiecesRef = useRef<string[][] | null>(null);
-  const animatingSquare = useRef<{
-    sq: string;
-    dx: number;
-    dy: number;
-  } | null>(null);
+  // ── Piece movement animation ───────────────────────────────────────────
+  // Previous implementation read the animation offset from a ref that was
+  // written in a useEffect *after* render, so every new position briefly
+  // re-rendered with the PREVIOUS move's offset on the wrong square — the
+  // "last piece jumps and repeats its move" bug. We now derive the moved
+  // piece authoritatively (prefer the `lastMove` prop; fall back to a FEN
+  // diff) inside an effect and publish it as state with a monotonic key, so
+  // each move animates its real destination square exactly once.
+  const [anim, setAnim] = useState<{ sq: string; dx: number; dy: number; key: number } | null>(null);
+  const prevFenRef = useRef<string>(fen);
+  const prevPiecesRef = useRef<string[][]>(pieces);
+  const animSeqRef = useRef(0);
 
-  useEffect(() => {
-    const prev = prevPiecesRef.current;
-    if (prev) {
-      // Find the piece that moved: find a square that lost a piece and one that gained
+  const diffMove = useCallback(
+    (prev: string[][], next: string[][]): { from: string; to: string } | null => {
       let fromSq: string | null = null;
-      let toSq: string | null = null;
       let movedPiece: string | null = null;
-
+      const gained: { sq: string; piece: string }[] = [];
       for (let r = 0; r < 8; r++) {
         for (let f = 0; f < 8; f++) {
           const oldP = prev[r]?.[f] ?? "";
-          const newP = pieces[r]?.[f] ?? "";
-          if (oldP && !newP) {
-            // Piece left this square
-            if (!fromSq) {
-              fromSq = `${FILES[f]}${8 - r}`;
-              movedPiece = oldP;
-            }
+          const newP = next[r]?.[f] ?? "";
+          if (oldP && oldP !== newP) {
+            if (!fromSq) { fromSq = `${FILES[f]}${8 - r}`; movedPiece = oldP; }
           }
-          if (newP && oldP !== newP) {
-            // Piece appeared here (or different piece)
-            if (!toSq && newP === movedPiece) {
-              toSq = `${FILES[f]}${8 - r}`;
-            }
-          }
+          if (newP && oldP !== newP) gained.push({ sq: `${FILES[f]}${8 - r}`, piece: newP });
         }
       }
+      if (!fromSq) return null;
+      const dest =
+        gained.find((g) => g.piece === movedPiece) ?? gained.find((g) => g.sq !== fromSq);
+      return dest ? { from: fromSq, to: dest.sq } : null;
+    },
+    [],
+  );
 
-      // Second pass: if movedPiece was set but toSq wasn't found (e.g. capture),
-      // look for any square that gained movedPiece
-      if (fromSq && movedPiece && !toSq) {
-        for (let r = 0; r < 8; r++) {
-          for (let f = 0; f < 8; f++) {
-            const oldP = prev[r]?.[f] ?? "";
-            const newP = pieces[r]?.[f] ?? "";
-            const sq = `${FILES[f]}${8 - r}`;
-            if (newP === movedPiece && oldP !== newP && sq !== fromSq) {
-              toSq = sq;
-              break;
-            }
-          }
-          if (toSq) break;
-        }
-      }
-
-      if (fromSq && toSq) {
-        const from = sqToIdx(fromSq);
-        const to = sqToIdx(toSq);
-        // Calculate pixel offset (from → to means we animate FROM the old position)
-        const fileDiff = from.file - to.file;
-        const rankDiff = from.rank - to.rank;
-        // Adjust for orientation
-        const signF = orientation === "white" ? 1 : -1;
-        const signR = orientation === "white" ? 1 : -1;
-        animatingSquare.current = {
-          sq: toSq,
-          dx: fileDiff * squareSize * signF,
-          dy: rankDiff * squareSize * signR,
-        };
-      } else {
-        animatingSquare.current = null;
-      }
-    }
+  useEffect(() => {
+    const prevFen = prevFenRef.current;
+    const prevPieces = prevPiecesRef.current;
+    prevFenRef.current = fen;
     prevPiecesRef.current = pieces;
-  }, [pieces, squareSize, orientation]);
+    if (prevFen === fen) return; // unrelated re-render (e.g. clock tick) — keep current anim
+
+    const move =
+      lastMove && lastMove.from && lastMove.to
+        ? { from: lastMove.from, to: lastMove.to }
+        : diffMove(prevPieces, pieces);
+    if (!move) return;
+
+    const from = sqToIdx(move.from);
+    const to = sqToIdx(move.to);
+    const sign = orientation === "white" ? 1 : -1;
+    animSeqRef.current += 1;
+    setAnim({
+      sq: move.to,
+      dx: (from.file - to.file) * squareSize * sign,
+      dy: (from.rank - to.rank) * squareSize * sign,
+      key: animSeqRef.current,
+    });
+  }, [fen, pieces, lastMove, squareSize, orientation, diffMove]);
 
   const onLayout = (e: LayoutChangeEvent) => {
     setBoardWidth(e.nativeEvent.layout.width);
@@ -166,10 +153,8 @@ function ChessBoard({
                 const piece = pieces[boardRi]?.[boardFi] ?? "";
                 const sq = `${file}${rank}`;
 
-                const anim = animatingSquare.current;
-                const animFrom = anim && anim.sq === sq
-                  ? { dx: anim.dx, dy: anim.dy }
-                  : null;
+                const isAnimSq = anim != null && anim.sq === sq;
+                const animFrom = isAnimSq ? { dx: anim!.dx, dy: anim!.dy } : null;
 
                 return (
                   <ChessSquare
@@ -184,6 +169,7 @@ function ChessBoard({
                     onPress={interactive ? onSquarePress : () => {}}
                     size={squareSize}
                     animateFrom={animFrom}
+                    animKey={isAnimSq ? anim!.key : 0}
                     boardColors={equippedTheme.board?.board}
                     pieceColors={equippedTheme.piece?.isDefault ? undefined : equippedTheme.piece?.piece}
                   />

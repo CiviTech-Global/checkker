@@ -54,9 +54,9 @@ class CheckkerApp extends StatelessWidget {
       isDarkMode: true,
       themeData: ReownAppKitModalThemeData(
         darkColors: ReownAppKitModalColors.darkMode.copyWith(
-          accent100: const Color(0xFFD4A843),
-          accent090: const Color(0xFFD4A843),
-          accent080: const Color(0xFFCD7F32),
+          accent100: const Color(0xFFA855F7),
+          accent090: const Color(0xFFA855F7),
+          accent080: const Color(0xFF7C3AED),
         ),
       ),
       child: MaterialApp.router(

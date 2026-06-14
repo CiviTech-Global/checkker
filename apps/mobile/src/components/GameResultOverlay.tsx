@@ -107,12 +107,12 @@ function AnimatedScore({
 /* ── Confetti Particle ──────────────────────────────────────────────── */
 
 const CONFETTI_COLORS = [
+  colors.accent.primary,
   colors.accent.gold,
-  colors.accent.goldBright,
-  colors.accent.burgundy,
+  colors.accent.green,
   colors.accent.bronze,
-  "#f5d680",
-  "#d4a843",
+  colors.accent.goldBright,
+  colors.accent.blue,
 ];
 
 function ConfettiParticle({ index }: { index: number }) {

@@ -191,10 +191,24 @@ export default function GameScreen() {
   const playerProfile = gs?.playerProfile ?? null;
   const opponentProfile = gs?.opponentProfile ?? null;
   const bestMoves = gs?.bestMoves ?? { white: [], black: [] };
+  const liveScores = gs?.liveScores ?? null;
+  const myPoints: number | undefined = liveScores
+    ? (color === "white" ? liveScores.whitePoker : liveScores.blackPoker)
+    : undefined;
+  const opponentPoints: number | undefined = liveScores
+    ? (color === "white" ? liveScores.blackPoker : liveScores.whitePoker)
+    : undefined;
 
   const myBestMoves = bestMoves[color] ?? [];
   const opponentColor: Color = color === "white" ? "black" : "white";
   const opponentBestMoves = bestMoves[opponentColor] ?? [];
+
+  // Authoritative last move (UCI from the server) for the board slide animation.
+  const lastMove = useMemo(() => {
+    const last = moveHistory[moveHistory.length - 1];
+    const mv: string = last?.move ?? "";
+    return mv.length >= 4 ? { from: mv.slice(0, 2), to: mv.slice(2, 4) } : null;
+  }, [moveHistory.length]);
 
   /* ── Sound effects ───────────────────────────────────────────────── */
 
@@ -210,13 +224,17 @@ export default function GameScreen() {
     prevMoveCount.current = moveHistory.length;
     const latest = moveHistory[moveHistory.length - 1];
     if (!latest) return;
-    const san: string = latest.san ?? latest.move ?? "";
+    // Server moves are UCI (e.g. "e2e4"), so capture/check/mate come from the
+    // record's flags; castle/promotion are derived from the move string.
+    const mv: string = latest.move ?? "";
+    const isCastle = mv === "e1g1" || mv === "e1c1" || mv === "e8g8" || mv === "e8c8";
+    const isPromotion = mv.length === 5;
 
-    if (san.includes("#")) playCheckmateSound();
-    else if (san.includes("+")) playCheckSound();
-    else if (san.startsWith("O-O")) playCastleSound();
-    else if (san.includes("=")) playPromotionSound();
-    else if (san.includes("x")) playCaptureSound();
+    if (latest.mate) playCheckmateSound();
+    else if (latest.check) playCheckSound();
+    else if (isPromotion) playPromotionSound();
+    else if (isCastle) playCastleSound();
+    else if (latest.captured) playCaptureSound();
     else playMoveSound();
   }, [moveHistory.length]);
 
@@ -352,6 +370,7 @@ export default function GameScreen() {
               isOpponent={false}
               isActive={turn === color}
               timeMs={myTimeMs}
+              points={myPoints}
               side="left"
               color={color}
               isBotGame={isBotGame}
@@ -380,6 +399,7 @@ export default function GameScreen() {
                   fen={fen}
                   orientation={color}
                   highlightedSquares={highlightedSquares}
+                  lastMove={lastMove}
                   interactive={myTurn}
                   onSquarePress={handleSquarePress}
                 />
@@ -412,6 +432,7 @@ export default function GameScreen() {
               isOpponent={true}
               isActive={turn === opponentColor}
               timeMs={opponentTimeMs}
+              points={opponentPoints}
               side="right"
               color={opponentColor}
               isBotGame={isBotGame}
@@ -467,7 +488,7 @@ export default function GameScreen() {
           </View>
           <OpponentHand cardCount={opponentHandCount} />
           <View style={styles.fullWidthRow}>
-            <ScorePile cards={opponentScorePile} label="Captured" />
+            <ScorePile cards={opponentScorePile} label="Captured" points={opponentPoints} />
           </View>
 
           {/* Board */}
@@ -476,6 +497,7 @@ export default function GameScreen() {
               fen={fen}
               orientation={color}
               highlightedSquares={highlightedSquares}
+              lastMove={lastMove}
               interactive={myTurn}
               onSquarePress={handleSquarePress}
             />
@@ -517,7 +539,7 @@ export default function GameScreen() {
             />
           </View>
           <View style={styles.fullWidthRow}>
-            <ScorePile cards={myScorePile} label="Your Captures" />
+            <ScorePile cards={myScorePile} label="Your Captures" points={myPoints} />
           </View>
 
           {/* Best Moves */}

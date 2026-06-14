@@ -11,10 +11,10 @@ const _suitSymbol = {
 };
 
 const _suitColor = {
-  Suit.clubs: Color(0xFF1A2E22),
-  Suit.diamonds: Color(0xFFE04040),
-  Suit.hearts: Color(0xFFE04040),
-  Suit.spades: Color(0xFF1A2E22),
+  Suit.clubs: Color(0xFF241C3A),    // deep violet-ink (reads on white card)
+  Suit.diamonds: Color(0xFFD22D4E), // rose
+  Suit.hearts: Color(0xFFD22D4E),
+  Suit.spades: Color(0xFF241C3A),
 };
 
 String _pieceTypeLabel(PieceType piece) {

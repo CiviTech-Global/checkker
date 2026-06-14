@@ -39,6 +39,9 @@ class GameClientState {
   final GameOdds? odds;
   final PlayerProfile? playerProfile;
   final PlayerProfile? opponentProfile;
+  /// Live poker points from the server's authoritative score evaluation.
+  final int? whitePokerScore;
+  final int? blackPokerScore;
 
   const GameClientState({
     required this.id, required this.fen, required this.turn, required this.color,
@@ -46,7 +49,12 @@ class GameClientState {
     required this.opponent, required this.drawPileCount, required this.moveHistory,
     this.result, required this.timeControl, this.bestMoves, this.odds,
     this.playerProfile, this.opponentProfile,
+    this.whitePokerScore, this.blackPokerScore,
   });
+
+  /// Poker points for the side this client is playing / viewing as.
+  int? get myPokerScore => color == PlayerColor.white ? whitePokerScore : blackPokerScore;
+  int? get opponentPokerScore => color == PlayerColor.white ? blackPokerScore : whitePokerScore;
 
   GameClientState copyWith({
     String? id,
@@ -65,6 +73,8 @@ class GameClientState {
     GameOdds? odds,
     PlayerProfile? playerProfile,
     PlayerProfile? opponentProfile,
+    int? whitePokerScore,
+    int? blackPokerScore,
   }) {
     return GameClientState(
       id: id ?? this.id,
@@ -83,6 +93,8 @@ class GameClientState {
       odds: odds ?? this.odds,
       playerProfile: playerProfile ?? this.playerProfile,
       opponentProfile: opponentProfile ?? this.opponentProfile,
+      whitePokerScore: whitePokerScore ?? this.whitePokerScore,
+      blackPokerScore: blackPokerScore ?? this.blackPokerScore,
     );
   }
 
@@ -129,6 +141,8 @@ class GameClientState {
       opponentProfile: json['opponentProfile'] != null
           ? PlayerProfile.fromJson(json['opponentProfile'] as Map<String, dynamic>)
           : null,
+      whitePokerScore: (json['liveScores'] as Map<String, dynamic>?)?['whitePoker'] as int?,
+      blackPokerScore: (json['liveScores'] as Map<String, dynamic>?)?['blackPoker'] as int?,
     );
   }
 }

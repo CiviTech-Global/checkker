@@ -21,6 +21,7 @@ interface PlayerPanelProps {
   isOpponent: boolean;
   isActive: boolean;
   timeMs: number;
+  points?: number;
   side: "left" | "right";
   color: Color;
   isBotGame: boolean;
@@ -41,6 +42,7 @@ export default function PlayerPanel({
   isOpponent,
   isActive,
   timeMs,
+  points,
   side,
   color,
   isBotGame,
@@ -80,7 +82,7 @@ export default function PlayerPanel({
         )}
       </View>
 
-      <ScorePile cards={scorePile} label={isOpponent ? "Captured" : "Your Captures"} />
+      <ScorePile cards={scorePile} label={isOpponent ? "Captured" : "Your Captures"} points={points} />
 
       <PlayerMoveHistory moves={moves} color={color} maxMoves={3} />
 

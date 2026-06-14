@@ -23,7 +23,7 @@ class GameInfoBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0x14F5F0E8),
+        color: const Color(0x14A855F7),
         border: Border.all(color: AppColors.border.gold),
         borderRadius: BorderRadius.circular(AppRadius.md),
       ),

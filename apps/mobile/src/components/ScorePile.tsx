@@ -31,6 +31,8 @@ interface ScorePileProps {
   cards: Card[];
   label: string;
   maxVisible?: number;
+  /** Live poker points from the server's authoritative score evaluation. */
+  points?: number;
 }
 
 function MiniCard({ card }: { card: Card }) {
@@ -45,13 +47,18 @@ function MiniCard({ card }: { card: Card }) {
   );
 }
 
-export default function ScorePile({ cards, label, maxVisible = 3 }: ScorePileProps) {
+export default function ScorePile({ cards, label, maxVisible = 3, points }: ScorePileProps) {
   const visible = cards.slice(0, maxVisible);
   const overflow = cards.length - maxVisible;
 
   return (
-    <View style={styles.container} accessibilityLabel={`${label}, ${cards.length} cards`}>
+    <View style={styles.container} accessibilityLabel={`${label}, ${cards.length} cards, ${points ?? 0} points`}>
       <Text style={styles.label}>{label}</Text>
+      {points != null && (
+        <View style={styles.pointsBadge}>
+          <Text style={styles.pointsText}>{points} pts</Text>
+        </View>
+      )}
       {cards.length === 0 ? (
         <Text style={styles.empty}>No captures yet</Text>
       ) : (
@@ -82,6 +89,17 @@ const styles = StyleSheet.create({
     fontSize: typography.size.xs,
     color: colors.text.muted,
     fontWeight: typography.weight.medium,
+  },
+  pointsBadge: {
+    backgroundColor: colors.accent.primary + "33",
+    borderRadius: radius.sm,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+  },
+  pointsText: {
+    fontSize: typography.size.xs,
+    color: colors.accent.gold,
+    fontWeight: typography.weight.bold,
   },
   empty: {
     fontSize: typography.size.xs,

@@ -64,6 +64,10 @@ export interface MoveRecord {
   color: Color;
   captured?: { type: string; color: Color };
   bonusCards?: number;
+  /** Move gave check (but not mate). Lets clients pick the right sound/FX. */
+  check?: boolean;
+  /** Move delivered checkmate. */
+  mate?: boolean;
 }
 
 export interface ScoredGame {

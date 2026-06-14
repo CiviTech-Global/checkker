@@ -1197,7 +1197,7 @@ export class GameServer {
 
     const whiteProfile = playerStore.getOrCreate(p1.id);
     const blackProfile = playerStore.getOrCreate(p2.id);
-    const odds = await calculateOdds(game.getState().fen);
+    const odds = await calculateOdds(game.getOddsInput());
     const bestMoves = await game.getBestMoves();
 
     const whiteExtra: Record<string, any> = {};
@@ -1220,6 +1220,7 @@ export class GameServer {
 
     p1.socket.emit("game_start", {
       ...game.getPublicState("white"),
+      liveScores: game.getLiveScores(),
       color: "white",
       gameId: game.id,
       playerProfile: whiteProfile,
@@ -1232,6 +1233,7 @@ export class GameServer {
 
     p2.socket.emit("game_start", {
       ...game.getPublicState("black"),
+      liveScores: game.getLiveScores(),
       color: "black",
       gameId: game.id,
       playerProfile: blackProfile,
@@ -1248,12 +1250,13 @@ export class GameServer {
     if (!match) return;
     const { game, white, black } = match;
     const bestMoves = game.isOver() ? { white: [], black: [] } : await game.getBestMoves();
-    const odds = await calculateOdds(game.getState().fen);
+    const odds = await calculateOdds(game.getOddsInput());
     const whiteProfile = playerStore.getOrCreate(white.id);
     const blackProfile = playerStore.getOrCreate(black.id);
 
     white.socket.emit("game_update", {
       ...game.getPublicState("white"),
+      liveScores: game.getLiveScores(),
       bestMoves: { white: bestMoves.white, black: [] },
       odds,
       playerProfile: whiteProfile,
@@ -1261,6 +1264,7 @@ export class GameServer {
     });
     black.socket.emit("game_update", {
       ...game.getPublicState("black"),
+      liveScores: game.getLiveScores(),
       bestMoves: { white: [], black: bestMoves.black },
       odds,
       playerProfile: blackProfile,

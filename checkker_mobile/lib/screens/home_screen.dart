@@ -247,7 +247,7 @@ class _MenuButton extends StatelessWidget {
         width: double.infinity,
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.cardFace,
+            color: AppColors.bg.secondary,
             borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(color: AppColors.border.gold, width: 1.5),
           ),
@@ -260,15 +260,22 @@ class _MenuButton extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.md),
                 child: Row(
                   children: [
-                    SizedBox(
-                      width: 36,
-                      child: Icon(icon, size: 24, color: AppColors.text.dark),
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppColors.accent.primary.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        border: Border.all(color: AppColors.border.gold),
+                      ),
+                      child: Icon(icon, size: 22, color: AppColors.accent.primary),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Text(label,
-                        style: TextStyle(color: AppColors.text.dark, fontSize: 15, fontWeight: FontWeight.w600)),
+                        style: TextStyle(color: AppColors.text.primary, fontSize: 15, fontWeight: FontWeight.w600)),
                     ),
+                    Icon(Icons.chevron_right, size: 20, color: AppColors.text.muted),
                   ],
                 ),
               ),

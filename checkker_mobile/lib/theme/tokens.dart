@@ -9,66 +9,69 @@ class AppColors {
   static const board = _Board();
   static const highlight = _Highlight();
 
-  static const Color overlay = Color(0xD1000000);
-  static const Color cardFace = Color(0xFFFAF5EB);
-  static const Color cardBack = Color(0xFF18472A);
+  // Dark Violet Esports palette. Keys unchanged so widgets re-skin
+  // automatically; some semantic names (e.g. `accent.gold` = amber) map onto
+  // a new hue.
+  static const Color overlay = Color(0xDB080610);
+  static const Color cardFace = Color(0xFFF7F4FE);
+  static const Color cardBack = Color(0xFF3A2E5E);
 
   static const border = _Border();
 }
 
 class _Bg {
   const _Bg();
-  Color get primary => const Color(0xFF1A2E22);
-  Color get secondary => const Color(0xFF243D2E);
-  Color get tertiary => const Color(0xFF2E4D38);
-  Color get felt => const Color(0xFF2A6B40);
-  Color get parchment => const Color(0xFFF0E6D0);
-  Color get parchmentDark => const Color(0xFFE0D4B8);
+  Color get primary => const Color(0xFF14101F);
+  Color get secondary => const Color(0xFF1E1830);
+  Color get tertiary => const Color(0xFF2A2240);
+  Color get felt => const Color(0xFF221B38);
+  Color get parchment => const Color(0xFFEDE9F7);
+  Color get parchmentDark => const Color(0xFFD9D2EC);
 }
 
 class _Text {
   const _Text();
-  Color get primary => const Color(0xFFF5F0E8);
-  Color get secondary => const Color(0xFFE5D9BC);
-  Color get muted => const Color(0xFFB0BFAA);
-  Color get dark => const Color(0xFF1A2E22);
-  Color get onParchment => const Color(0xFF2A1A0E);
+  Color get primary => const Color(0xFFF4F1FB);
+  Color get secondary => const Color(0xFFC9BEE8);
+  Color get muted => const Color(0xFF8B82A8);
+  Color get dark => const Color(0xFF14101F);
+  Color get onParchment => const Color(0xFF241C3A);
 }
 
 class _Accent {
   const _Accent();
-  Color get primary => const Color(0xFF22944F);
-  Color get secondary => const Color(0xFF18783E);
-  Color get gold => const Color(0xFFD4A843);
-  Color get goldBright => const Color(0xFFF5D680);
-  Color get green => const Color(0xFF34D058);
-  Color get red => const Color(0xFFE04040);
-  Color get burgundy => const Color(0xFF8B1A2B);
-  Color get blue => const Color(0xFF4A9EDD);
-  Color get bronze => const Color(0xFFCD7F32);
-  Color get lapis => const Color(0xFF1A3A6B);
-  Color get terraCotta => const Color(0xFFC46B2A);
+  Color get primary => const Color(0xFFA855F7); // brand violet
+  Color get secondary => const Color(0xFF7C3AED);
+  Color get gold => const Color(0xFFF0B43C); // amber (ratings, points)
+  Color get goldBright => const Color(0xFFFFD27A);
+  Color get green => const Color(0xFF34E5A1); // neon mint
+  Color get red => const Color(0xFFFF4D6D); // neon rose
+  Color get burgundy => const Color(0xFF7A1F3D);
+  Color get blue => const Color(0xFF5BC0FF); // neon cyan
+  Color get bronze => const Color(0xFFC77DFF);
+  Color get lapis => const Color(0xFF3B2E6E);
+  Color get terraCotta => const Color(0xFFF0883E);
 }
 
 class _Board {
   const _Board();
-  Color get light => const Color(0xFFC8B078);
-  Color get dark => const Color(0xFF2A6830);
+  Color get light => const Color(0xFFD7CFEC);
+  Color get dark => const Color(0xFF4B3F77);
 }
 
 class _Highlight {
   const _Highlight();
-  Color get legal => const Color(0x8034D058);
-  Color get selected => const Color(0x8CD4A843);
-  Color get lastMove => const Color(0x59F5D680);
+  Color get legal => const Color(0x7334E5A1);
+  Color get selected => const Color(0x8CA855F7);
+  Color get lastMove => const Color(0x52A855F7);
 }
 
 class _Border {
   const _Border();
-  Color get gold => const Color(0x80D4A843);
-  Color get subtle => const Color(0x24F2EDE4);
-  Color get lapis => const Color(0x661A3A6B);
-  Color get ornate => const Color(0xB3D4A843);
+  Color get gold => const Color(0x73A855F7); // violet glow
+  Color get subtle => const Color(0x1FF4F1FB);
+  Color get lapis => const Color(0x733B2E6E);
+  Color get ornate => const Color(0xB3A855F7);
 }
 
 class AppSpacing {
@@ -113,25 +116,30 @@ class AppShadows {
   static List<BoxShadow> get lg => [
     BoxShadow(color: Colors.black.withValues(alpha: 0.5), offset: const Offset(0, 8), blurRadius: 24),
   ];
+  // Neon-violet glow (key kept as `gold`).
   static List<BoxShadow> get gold => [
-    BoxShadow(color: AppColors.accent.gold.withValues(alpha: 0.45), blurRadius: 14),
+    BoxShadow(color: AppColors.accent.primary.withValues(alpha: 0.55), blurRadius: 16),
+  ];
+  static List<BoxShadow> get glow => [
+    BoxShadow(color: AppColors.accent.primary.withValues(alpha: 0.6), blurRadius: 22),
   ];
 }
 
 class AppGradients {
   AppGradients._();
 
-  static const glass = [Color(0x17F5F0E8), Color(0x08F5F0E8)];
-  static const accentGreen = [Color(0xFF22944F), Color(0xFF18783E)];
-  static const gold = [Color(0xFFD4A843), Color(0xFFCD7F32)];
-  static const goldToBronze = [Color(0xFFF5D680), Color(0xFFCD7F32)];
-  static const success = [Color(0xFF34D058), Color(0xFF1A8A4A)];
-  static const error = [Color(0xFFE04040), Color(0xFF9E2A3A)];
-  static const casinoGreen = [Color(0xFF22944F), Color(0xFF18472A)];
-  static const velvet = [Color(0xFF243D2E), Color(0xFF2E4D38), Color(0xFF1A2E22)];
-  static const parchment = [Color(0xFFF0E6D0), Color(0xFFE0D4B8)];
-  static const ornateGold = [Color(0xFFF5D680), Color(0xFFD4A843), Color(0xFFCD7F32)];
-  static const burgundyDeep = [Color(0xFF8B1A2B), Color(0xFF5A1018)];
+  static const glass = [Color(0x1FA855F7), Color(0x08A855F7)];
+  static const accentGreen = [Color(0xFFA855F7), Color(0xFF7C3AED)];
+  static const gold = [Color(0xFFF0B43C), Color(0xFFC77DFF)];
+  static const goldToBronze = [Color(0xFFFFD27A), Color(0xFFC77DFF)];
+  static const success = [Color(0xFF34E5A1), Color(0xFF0FA968)];
+  static const error = [Color(0xFFFF4D6D), Color(0xFF9E2A3A)];
+  static const casinoGreen = [Color(0xFFA855F7), Color(0xFF3A2E5E)];
+  static const velvet = [Color(0xFF1E1830), Color(0xFF2A2240), Color(0xFF14101F)];
+  static const parchment = [Color(0xFFEDE9F7), Color(0xFFD9D2EC)];
+  static const ornateGold = [Color(0xFFFFD27A), Color(0xFFF0B43C), Color(0xFFC77DFF)];
+  static const burgundyDeep = [Color(0xFF7A1F3D), Color(0xFF3A1018)];
+  static const neonViolet = [Color(0xFFC77DFF), Color(0xFFA855F7), Color(0xFF7C3AED)];
 }
 
 class AppMotion {
@@ -143,9 +151,9 @@ class AppMotion {
 }
 
 const glassDecoration = BoxDecoration(
-  color: Color(0x14F5F0E8),
+  color: Color(0x14A855F7),
   border: Border.fromBorderSide(
-    BorderSide(color: Color(0x4DD4A843), width: 1),
+    BorderSide(color: Color(0x47A855F7), width: 1),
   ),
 );
 

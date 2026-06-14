@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 
 import '../theme/tokens.dart';
 
+/// A chess clock that visibly counts down while its side is active.
+///
+/// The server only sends a fresh `timeMs` on each move, so the widget anchors
+/// to that authoritative value and decrements locally between moves, re-syncing
+/// whenever a new value (or turn change) arrives. The inactive side shows the
+/// exact server value, frozen.
 class ChessClock extends StatefulWidget {
   final int timeMs;
   final bool active;
@@ -15,6 +21,8 @@ class ChessClock extends StatefulWidget {
 
 class _ChessClockState extends State<ChessClock> {
   late int _displayMs;
+  int _anchorMs = 0;
+  DateTime _anchorAt = DateTime.now();
   Timer? _timer;
   bool _blinkOn = true;
 
@@ -22,29 +30,40 @@ class _ChessClockState extends State<ChessClock> {
   void initState() {
     super.initState();
     _displayMs = widget.timeMs;
+    _reanchor();
     if (widget.active) _startTimer();
   }
 
   @override
   void didUpdateWidget(ChessClock oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _displayMs = widget.timeMs;
-    if (widget.active && !oldWidget.active) {
+    // Re-sync whenever the authoritative value or the active side changes.
+    if (widget.timeMs != oldWidget.timeMs || widget.active != oldWidget.active) {
+      _reanchor();
+      setState(() => _displayMs = widget.timeMs);
+    }
+    if (widget.active && _timer == null) {
       _startTimer();
-    } else if (!widget.active && oldWidget.active) {
+    } else if (!widget.active && _timer != null) {
       _timer?.cancel();
       _timer = null;
     }
   }
 
+  void _reanchor() {
+    _anchorMs = widget.timeMs;
+    _anchorAt = DateTime.now();
+  }
+
   void _startTimer() {
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
-      if (mounted) {
-        setState(() {
-          _blinkOn = !_blinkOn;
-        });
-      }
+    _timer = Timer.periodic(const Duration(milliseconds: 250), (_) {
+      if (!mounted) return;
+      final elapsed = DateTime.now().difference(_anchorAt).inMilliseconds;
+      setState(() {
+        _displayMs = (_anchorMs - elapsed).clamp(0, _anchorMs);
+        _blinkOn = (DateTime.now().millisecondsSinceEpoch ~/ 500).isEven;
+      });
     });
   }
 

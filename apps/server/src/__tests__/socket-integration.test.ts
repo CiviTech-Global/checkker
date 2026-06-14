@@ -88,6 +88,11 @@ describe("GameServer socket integration", () => {
     expect(hostGame.gameId).toBe(guestGame.gameId);
     // One side plays white, the other black.
     expect([hostGame.color, guestGame.color].sort()).toEqual(["black", "white"]);
+
+    // Probable-result odds are present and well-formed (sum to 100).
+    expect(hostGame.odds.whiteWinPct + hostGame.odds.blackWinPct + hostGame.odds.drawPct).toBe(100);
+    // Live poker scores ship with the initial state (both empty at the start).
+    expect(hostGame.liveScores).toEqual({ whitePoker: 0, blackPoker: 0 });
   }, 20000);
 
   it("drops the host code when the host disconnects", async () => {

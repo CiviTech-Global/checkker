@@ -78,11 +78,12 @@ export class BotManager {
 
     const humanProfile = playerStore.getOrCreate(humanSocket.id);
     const botProfile = playerStore.createBotProfile(difficulty, BOT_RATINGS[difficulty]);
-    const odds = await calculateOdds(game.getState().fen);
+    const odds = await calculateOdds(game.getOddsInput());
     const bestMoves = await game.getBestMoves();
 
     humanSocket.emit("game_start", {
       ...game.getPublicState(humanColor),
+      liveScores: game.getLiveScores(),
       color: humanColor,
       gameId,
       playerProfile: humanProfile,
@@ -237,12 +238,13 @@ export class BotManager {
 
     const { game, humanSocket, humanColor, difficulty } = entry;
     const bestMoves = game.isOver() ? { white: [], black: [] } : await game.getBestMoves();
-    const odds = await calculateOdds(game.getState().fen);
+    const odds = await calculateOdds(game.getOddsInput());
     const humanProfile = playerStore.getOrCreate(humanSocket.id);
     const botProfile = playerStore.createBotProfile(difficulty, BOT_RATINGS[difficulty]);
 
     humanSocket.emit("game_update", {
       ...game.getPublicState(humanColor),
+      liveScores: game.getLiveScores(),
       bestMoves,
       odds,
       playerProfile: humanProfile,

@@ -20,33 +20,36 @@ interface ChessSquareProps {
   onPress: (square: string) => void;
   size: number;
   animateFrom?: { dx: number; dy: number } | null;
+  /** Monotonic key that changes once per move this square is the destination of. */
+  animKey?: number;
   boardColors?: { light: string; dark: string };
   pieceColors?: { white: string; black: string };
 }
 
 export default function ChessSquare({
   square, piece, isLight, isHighlighted, isSelected, isLastMove, isCheck,
-  onPress, size, animateFrom, boardColors, pieceColors,
+  onPress, size, animateFrom, animKey = 0, boardColors, pieceColors,
 }: ChessSquareProps) {
   const bg = isLight
     ? (boardColors?.light ?? colors.board.light)
     : (boardColors?.dark ?? colors.board.dark);
 
-  // Piece movement animation
-  const translateX = useSharedValue(animateFrom?.dx ?? 0);
-  const translateY = useSharedValue(animateFrom?.dy ?? 0);
+  // Piece movement animation. Keyed on `animKey` (a per-move sequence number)
+  // so the spring fires exactly once per move and is never reset by unrelated
+  // re-renders (clock ticks, highlights). Squares that aren't a destination
+  // keep translate at 0 and never animate.
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
 
   useEffect(() => {
-    if (animateFrom) {
+    if (animateFrom && animKey > 0) {
       translateX.value = animateFrom.dx;
       translateY.value = animateFrom.dy;
       translateX.value = withSpring(0, springConfig.snappy);
       translateY.value = withSpring(0, springConfig.snappy);
-    } else {
-      translateX.value = 0;
-      translateY.value = 0;
     }
-  }, [animateFrom, translateX, translateY]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animKey]);
 
   const pieceAnimStyle = useAnimatedStyle(() => ({
     transform: [

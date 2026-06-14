@@ -129,7 +129,7 @@ class _PuzzlesScreenState extends ConsumerState<PuzzlesScreen> {
                               width: 1,
                               height: 40,
                               margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                              color: const Color(0xFF1A2E22).withValues(alpha: 0.2),
+                              color: AppColors.text.onParchment.withValues(alpha: 0.2),
                             ),
                             _StreakStat(value: _solved, label: 'Solved'),
                           ],
@@ -190,18 +190,18 @@ class _StreakStat extends StatelessWidget {
       children: [
         Text(
           value.toString(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1A2E22),
+            color: AppColors.text.onParchment,
           ),
         ),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1A2E22),
+            color: AppColors.text.onParchment,
             letterSpacing: 1,
           ),
         ),
@@ -229,7 +229,7 @@ class _CategoryCard extends StatelessWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0x14F5F0E8),
+            color: const Color(0x14A855F7),
             borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(color: AppColors.border.gold, width: 1),
           ),

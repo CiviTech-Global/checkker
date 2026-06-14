@@ -214,6 +214,7 @@ export class GameEngine {
 
     const wasCapture = moveResult.captured !== undefined;
     const isCheckMove = this.chess.isCheck();
+    const isMate = this.chess.isCheckmate();
     let bonusCards = 0;
 
     if (wasCapture) {
@@ -237,6 +238,8 @@ export class GameEngine {
         ? { type: moveResult.captured!, color: this.turn === "white" ? "black" : "white" }
         : undefined,
       bonusCards,
+      check: isCheckMove && !isMate,
+      mate: isMate,
     });
 
     const now = Date.now();
@@ -366,5 +369,34 @@ export class GameEngine {
     const whitePoker = evaluateScorePile(this.white.scorePile);
     const blackPoker = evaluateScorePile(this.black.scorePile);
     return scoreGame(this.result, whitePoker, blackPoker);
+  }
+
+  /** Full context for the poker-aware probable-result model. */
+  getOddsInput(): {
+    fen: string;
+    whiteScorePile: Card[];
+    blackScorePile: Card[];
+    whiteHand: Card[];
+    blackHand: Card[];
+    drawPileCount: number;
+    result: GameResult | null;
+  } {
+    return {
+      fen: this.chess.fen(),
+      whiteScorePile: this.white.scorePile,
+      blackScorePile: this.black.scorePile,
+      whiteHand: this.white.hand,
+      blackHand: this.black.hand,
+      drawPileCount: this.drawPile.length,
+      result: this.result,
+    };
+  }
+
+  /** Live poker totals for both sides (for the in-game score display). */
+  getLiveScores(): { whitePoker: number; blackPoker: number } {
+    return {
+      whitePoker: evaluateScorePile(this.white.scorePile).total,
+      blackPoker: evaluateScorePile(this.black.scorePile).total,
+    };
   }
 }

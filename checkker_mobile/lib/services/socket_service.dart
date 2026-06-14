@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
@@ -10,10 +11,38 @@ import '../models/puzzle.dart';
 import '../models/replay.dart';
 import '../models/cosmetic.dart';
 
-const String _defaultServerUrl = String.fromEnvironment(
-  'SERVER_URL',
-  defaultValue: 'http://192.168.1.105:3001',
-);
+/// Resolves a sane default game-server address per platform so the app
+/// connects out of the box during development. A real device on a LAN still
+/// needs the host's IP, which is editable in Settings, but emulators,
+/// simulators, desktop and web all "just work" without configuration.
+///
+/// Order of precedence: `--dart-define=SERVER_URL=...` > platform default.
+String _resolveDefaultServerUrl() {
+  const override = String.fromEnvironment('SERVER_URL');
+  if (override.isNotEmpty) return override;
+
+  if (kIsWeb) {
+    // Production web is served by the game server itself (same origin works).
+    // In dev (flutter run -d chrome) the page is on a different port, so fall
+    // back to the loopback server port.
+    final origin = Uri.base.origin;
+    if (origin.contains('localhost') || origin.contains('127.0.0.1')) {
+      return 'http://localhost:3001';
+    }
+    return origin;
+  }
+
+  switch (defaultTargetPlatform) {
+    case TargetPlatform.android:
+      // Android emulator reaches the host machine via 10.0.2.2.
+      return 'http://10.0.2.2:3001';
+    default:
+      // iOS simulator, macOS, Windows, Linux all reach the host on loopback.
+      return 'http://localhost:3001';
+  }
+}
+
+final String _defaultServerUrl = _resolveDefaultServerUrl();
 
 // Auth types
 class AuthState {

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../providers/socket_provider.dart';
 import '../../services/socket_service.dart';
+import '../../services/sound_service.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/chess_board.dart';
 import '../../widgets/odds_indicator.dart';
@@ -24,8 +25,17 @@ class _SpectateWatchScreenState extends ConsumerState<SpectateWatchScreen> {
   bool _isPaused = false;
   bool _showResult = false;
 
+  final _sound = SoundService();
+  int _prevMoveCount = 0;
+  int _prevCaptured = 0;
+  bool _gameOverPlayed = false;
+
   StreamSubscription<SpectateGameState?>? _stateSub;
   StreamSubscription<List<SpectateMove>>? _movesSub;
+
+  /// The authoritative game id — prefer the live spectate state, fall back to
+  /// the route param. Controls were silently no-ops when this was null.
+  String? get _gameId => _state?.gameId ?? widget.id;
 
   @override
   void initState() {
@@ -35,21 +45,52 @@ class _SpectateWatchScreenState extends ConsumerState<SpectateWatchScreen> {
     // Initialize with current state if available
     _state = socketService.spectateState;
     _moves = socketService.spectateMoves;
+    _prevMoveCount = _moves.length;
+    _prevCaptured = _capturedCount(_state);
 
     _stateSub = socketService.spectateStateStream.listen((state) {
       if (!mounted) return;
       setState(() {
         _state = state;
-        if (state?.result != null) {
+        if (state?.result != null && !_gameOverPlayed) {
+          _gameOverPlayed = true;
           _showResult = true;
+          _sound.playGameOver();
         }
       });
     });
 
     _movesSub = socketService.spectateMovesStream.listen((moves) {
       if (!mounted) return;
+      // A new bot move arrived — play the right sound. Captures are detected
+      // by a score-pile growing, which is notation-independent.
+      if (moves.length > _prevMoveCount) {
+        final captured = _capturedCount(_state);
+        if (captured > _prevCaptured) {
+          _sound.playCapture();
+        } else {
+          _sound.playMove();
+        }
+        _prevCaptured = captured;
+      }
+      _prevMoveCount = moves.length;
       setState(() => _moves = moves);
     });
+
+    // The server starts the bot-vs-bot loop PAUSED, waiting for the spectator
+    // to begin. Kick it off so moves (and sounds) actually start.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final id = _gameId;
+      if (id != null) {
+        _sound.playGameStart();
+        socketService.spectateResume(id);
+      }
+    });
+  }
+
+  int _capturedCount(SpectateGameState? s) {
+    if (s == null) return 0;
+    return s.whiteScorePile.length + s.blackScorePile.length;
   }
 
   @override
@@ -61,29 +102,34 @@ class _SpectateWatchScreenState extends ConsumerState<SpectateWatchScreen> {
 
   void _pause() {
     final socketService = ref.read(socketServiceProvider);
-    if (widget.id != null) socketService.spectatePause(widget.id!);
+    final id = _gameId;
+    if (id != null) socketService.spectatePause(id);
     setState(() => _isPaused = true);
   }
 
   void _resume() {
     final socketService = ref.read(socketServiceProvider);
-    if (widget.id != null) socketService.spectateResume(widget.id!);
+    final id = _gameId;
+    if (id != null) socketService.spectateResume(id);
     setState(() => _isPaused = false);
   }
 
   void _stepForward() {
     final socketService = ref.read(socketServiceProvider);
-    if (widget.id != null) socketService.spectateStepForward(widget.id!);
+    final id = _gameId;
+    if (id != null) socketService.spectateStepForward(id);
   }
 
   void _stepBackward() {
     final socketService = ref.read(socketServiceProvider);
-    if (widget.id != null) socketService.spectateStepBackward(widget.id!, _moves.length - 1);
+    final id = _gameId;
+    if (id != null) socketService.spectateStepBackward(id, _moves.length - 1);
   }
 
   void _leave() {
     final socketService = ref.read(socketServiceProvider);
-    if (widget.id != null) socketService.spectateLeave(widget.id!);
+    final id = _gameId;
+    if (id != null) socketService.spectateLeave(id);
     if (mounted) context.pop();
   }
 

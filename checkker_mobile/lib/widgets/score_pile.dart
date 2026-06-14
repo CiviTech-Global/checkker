@@ -13,24 +13,48 @@ const _suitSymbol = {
 class ScorePile extends StatelessWidget {
   final List<PlayingCard> cards;
   final String label;
+  /// Live poker points from the server's authoritative score evaluation.
+  final int? points;
 
-  const ScorePile({super.key, required this.cards, this.label = 'Captured'});
+  const ScorePile({super.key, required this.cards, this.label = 'Captured', this.points});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: const Color(0x14F5F0E8), border: Border.all(color: AppColors.border.gold), borderRadius: BorderRadius.circular(AppRadius.md)),
+      decoration: BoxDecoration(color: const Color(0x14A855F7), border: Border.all(color: AppColors.border.gold), borderRadius: BorderRadius.circular(AppRadius.md)),
       padding: const EdgeInsets.all(AppSpacing.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '$label (${cards.length})',
-            style: TextStyle(
-              fontSize: 11,
-              color: AppColors.text.muted,
-              fontWeight: FontWeight.w600,
-            ),
+          Row(
+            children: [
+              Text(
+                '$label (${cards.length})',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: AppColors.text.muted,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              if (points != null) ...[
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.primary.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
+                  child: Text(
+                    '$points pts',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.accent.gold,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
           const SizedBox(height: AppSpacing.xxs),
           if (cards.isEmpty)

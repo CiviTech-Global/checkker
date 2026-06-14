@@ -23,6 +23,25 @@ describe("calculateOdds", () => {
     expect(odds.blackWinPct).toBeGreaterThan(odds.whiteWinPct);
   });
 
+  it("favours the side holding the stronger score pile at an equal position", async () => {
+    const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    const fourKings = [
+      { rank: "K", suit: "S" },
+      { rank: "K", suit: "H" },
+      { rank: "K", suit: "D" },
+      { rank: "K", suit: "C" },
+      { rank: "9", suit: "S" },
+    ] as any;
+    const odds = await calculateOdds({
+      fen: startFen,
+      whiteScorePile: fourKings,
+      blackScorePile: [],
+      drawPileCount: 20,
+    });
+    expect(odds.whiteWinPct).toBeGreaterThan(odds.blackWinPct);
+    expect(odds.whiteWinPct + odds.blackWinPct + odds.drawPct).toBe(100);
+  });
+
   it("always returns valid percentages that sum to 100", async () => {
     const positions = [
       "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",

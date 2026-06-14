@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
   },
   rankBadgeText: {
-    color: "#f0e6d0",
+    color: colors.text.primary,
     fontSize: 14,
     fontWeight: "700",
     letterSpacing: 1,

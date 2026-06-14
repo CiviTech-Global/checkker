@@ -69,7 +69,7 @@ function MenuButton({
       >
         <View style={styles.menuButton}>
           <View style={styles.menuSymbolContainer}>
-            <Icon name={symbol} size={24} color={colors.text.dark} />
+            <Icon name={symbol} size={22} color={colors.accent.primary} />
           </View>
           <Text style={styles.menuLabel}>
             {label}
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   menuButton: {
-    backgroundColor: colors.cardFace,
+    backgroundColor: colors.bg.secondary,
     borderRadius: radius.lg - 1,
     flexDirection: "row",
     alignItems: "center",
@@ -422,11 +422,17 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   menuSymbolContainer: {
-    width: 36,
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: "rgba(168,85,247,0.14)",
+    borderWidth: 1,
+    borderColor: colors.border.gold,
     alignItems: "center",
+    justifyContent: "center",
   },
   menuLabel: {
-    color: colors.text.dark,
+    color: colors.text.primary,
     fontSize: 15,
     fontWeight: "600",
     flex: 1,

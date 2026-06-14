@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import { colors, radius, spacing } from "../theme/tokens";
+import { useCountdown } from "../hooks/useCountdown";
 
 interface GameInfoBarProps {
   label: string;
@@ -18,8 +19,9 @@ function formatTime(ms: number): string {
 }
 
 export default function GameInfoBar({ label, rating, tierLabel, side, timeMs, active }: GameInfoBarProps) {
-  const lowTime = timeMs < 30000;
-  const critical = timeMs < 10000;
+  const liveMs = useCountdown(timeMs, active);
+  const lowTime = liveMs < 30000;
+  const critical = liveMs < 10000;
 
   return (
     <View style={[styles.bar, active && styles.active]}>
@@ -34,7 +36,7 @@ export default function GameInfoBar({ label, rating, tierLabel, side, timeMs, ac
           critical && styles.critical,
           lowTime && !critical && styles.lowTime,
         ]}>
-          {formatTime(timeMs)}
+          {formatTime(liveMs)}
         </Text>
         {rating != null && <Text style={styles.elo}>{rating}{tierLabel ? ` • ${tierLabel}` : ""}</Text>}
       </View>

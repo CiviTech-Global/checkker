@@ -22,7 +22,7 @@ class GlassContainer extends StatelessWidget {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: const Color(0x14F5F0E8),
+        color: const Color(0x14A855F7),
         border: Border.all(
           width: borderWidth,
           color: borderColor ?? AppColors.border.gold,

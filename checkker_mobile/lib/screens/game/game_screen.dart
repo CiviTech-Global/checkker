@@ -186,6 +186,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     }
   }
 
+  /// Authoritative last move (UCI from/to) for the board slide animation.
+  ({String from, String to})? _lastMoveOf(GameClientState gs) {
+    if (gs.moveHistory.isEmpty) return null;
+    final mv = gs.moveHistory.last.move;
+    if (mv.length < 4) return null;
+    return (from: mv.substring(0, 2), to: mv.substring(2, 4));
+  }
+
   List<String> _getHighlightedSquares(GameClientState gs) {
     if (_selectedCardIdx == null || _selectedCardIdx! >= gs.hand.length) return [];
     final card = gs.hand[_selectedCardIdx!];
@@ -208,17 +216,21 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     }
     _prevMoveCount = moveHistory.length;
     final latest = moveHistory.last;
-    final san = latest.move;
+    // Server moves are UCI (e.g. "e2e4"); capture/check/mate come from record
+    // flags, while castle/promotion are derived from the move string.
+    final mv = latest.move;
+    final isCastle = mv == 'e1g1' || mv == 'e1c1' || mv == 'e8g8' || mv == 'e8c8';
+    final isPromotion = mv.length == 5;
 
-    if (san.contains('#')) {
+    if (latest.mate) {
       _sound.playCheckmate();
-    } else if (san.contains('+')) {
+    } else if (latest.check) {
       _sound.playCheck();
-    } else if (san.startsWith('O-O')) {
-      _sound.playCastle();
-    } else if (san.contains('=')) {
+    } else if (isPromotion) {
       _sound.playPromotion();
-    } else if (san.contains('x')) {
+    } else if (isCastle) {
+      _sound.playCastle();
+    } else if (latest.captured != null) {
       _sound.playCapture();
     } else {
       _sound.playMove();
@@ -361,7 +373,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       const SizedBox(height: AppSpacing.xs),
 
                       // Opponent score pile
-                      ScorePile(cards: gs.opponent.scorePile, label: 'Captured'),
+                      ScorePile(cards: gs.opponent.scorePile, label: 'Captured', points: gs.opponentPokerScore),
                       const SizedBox(height: AppSpacing.sm),
 
                       // Chess board
@@ -369,6 +381,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         fen: gs.fen,
                         orientation: colorStr,
                         highlightedSquares: highlightedSquares,
+                        lastMove: _lastMoveOf(gs),
                         interactive: myTurn,
                         onSquarePress: _handleSquarePress,
                       ),
@@ -424,7 +437,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       const SizedBox(height: AppSpacing.xs),
 
                       // Player score pile
-                      ScorePile(cards: gs.scorePile, label: 'Your Captures'),
+                      ScorePile(cards: gs.scorePile, label: 'Your Captures', points: gs.myPokerScore),
                       const SizedBox(height: AppSpacing.sm),
 
                       // Best moves
@@ -544,7 +557,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           disabled: !myTurn,
                         ),
                         const SizedBox(height: AppSpacing.xs),
-                        ScorePile(cards: gs.scorePile, label: 'Your Captures'),
+                        ScorePile(cards: gs.scorePile, label: 'Your Captures', points: gs.myPokerScore),
                         const SizedBox(height: AppSpacing.sm),
                         BestMovesPanel(moves: myBestMoves, visible: myBestMoves.isNotEmpty),
                         const SizedBox(height: AppSpacing.sm),
@@ -581,6 +594,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                               fen: gs.fen,
                               orientation: colorStr,
                               highlightedSquares: highlightedSquares,
+                              lastMove: _lastMoveOf(gs),
                               interactive: myTurn,
                               onSquarePress: _handleSquarePress,
                             ),
@@ -620,7 +634,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         const SizedBox(height: AppSpacing.xs),
                         OpponentHand(cardCount: gs.opponent.handCount),
                         const SizedBox(height: AppSpacing.xs),
-                        ScorePile(cards: gs.opponent.scorePile, label: 'Captured'),
+                        ScorePile(cards: gs.opponent.scorePile, label: 'Captured', points: gs.opponentPokerScore),
                         const SizedBox(height: AppSpacing.sm),
                         PlayerMoveHistory(label: 'Opponent Moves', color: opponentColorStr, moves: gs.moveHistory),
                       ],
@@ -700,7 +714,7 @@ class _BotThinkingIndicatorState extends State<_BotThinkingIndicator>
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
           decoration: BoxDecoration(
-            color: const Color(0x14F5F0E8),
+            color: const Color(0x14A855F7),
             border: Border.all(color: AppColors.border.gold),
             borderRadius: BorderRadius.circular(AppRadius.md),
           ),
