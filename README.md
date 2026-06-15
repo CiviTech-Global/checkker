@@ -173,6 +173,11 @@ Stake real crypto on competitive matches through a trustless smart‑contract es
 - **Automatic payouts** — the winner is paid instantly; draws refund both players in full (no house cut).
 - **BSC Testnet** first; mainnet after audit. Without blockchain env vars the app runs in **free mode**.
 
+> **Set it up:** [`docs/TESTNET_BETTING.md`](docs/TESTNET_BETTING.md) is a full
+> end-to-end guide to deploying the escrow and playing paid games on the BSC
+> testnet. For what's done vs. what's left across the whole project (game +
+> betting), see [`docs/PROJECT_STATUS_AND_REMAINING_WORK.md`](docs/PROJECT_STATUS_AND_REMAINING_WORK.md).
+
 ### ELO rating tiers
 
 | Tier | Rating | Rank |

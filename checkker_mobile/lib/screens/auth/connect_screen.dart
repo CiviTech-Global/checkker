@@ -113,6 +113,8 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
 
     setState(() => _initializing = true);
 
+    _restrictToBscNetworks();
+
     try {
       final appKit = ReownAppKit(
         core: ReownCore(projectId: _projectId, logLevel: LogLevel.nothing),
@@ -147,6 +149,24 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
       debugPrint('WalletConnect init error: $e');
     } finally {
       setState(() => _initializing = false);
+    }
+  }
+
+  /// Restrict the wallet network picker to BNB Smart Chain so a player can't
+  /// accidentally connect or deposit on the wrong chain. This build targets the
+  /// BSC **testnet** (chain 97); add mainnet (56) here once an audited mainnet
+  /// escrow ships. Mutates the global Reown network registry, so it's
+  /// idempotent and best-effort.
+  void _restrictToBscNetworks() {
+    try {
+      final testnet = ReownAppKitModalNetworks.getNetworkInfo('eip155', '97');
+      ReownAppKitModalNetworks.removeSupportedNetworks('eip155');
+      ReownAppKitModalNetworks.removeSupportedNetworks('solana');
+      if (testnet != null) {
+        ReownAppKitModalNetworks.addSupportedNetworks('eip155', [testnet]);
+      }
+    } catch (e) {
+      debugPrint('Network restriction skipped: $e');
     }
   }
 

@@ -91,8 +91,8 @@ export const BetManager = {
       const bets = await repo.findByGame(gameId);
       const bet = bets.find((b: any) => b.userId === userId);
       if (bet) {
-        // Update the depositTxHash and confirm
-        await repo.confirmDeposit(bet.id);
+        // Update the depositTxHash (if the client reported one) and confirm
+        await repo.confirmDeposit(bet.id, depositTxHash || undefined);
       }
     } catch (err) {
       console.error("[BetManager] Failed to confirm deposit:", err);

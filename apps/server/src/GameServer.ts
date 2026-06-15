@@ -3,7 +3,7 @@ import type { Socket } from "socket.io";
 import { v4 as uuid } from "uuid";
 import { GameEngine } from "./GameEngine";
 import type { BotDifficulty, TimeControl, Color, ChatMessage, GameMode } from "@checkker/shared";
-import { isFreeGame, BET_AMOUNTS_USD } from "@checkker/shared";
+import { isFreeGame, BET_AMOUNTS_USD, DEPOSIT_TIMEOUT_MS } from "@checkker/shared";
 import { expectedScore, newRating } from "@checkker/shared";
 import { BotManager } from "./bot/BotManager";
 import { SpectateManager } from "./bot/SpectateManager";
@@ -155,6 +155,47 @@ export class GameServer {
     socket.on("auth_logout", ({ token }: { token?: string } = {}) => {
       if (token) revokeSession(token);
       authenticatedSockets.delete(socket.id);
+    });
+
+    /* ── Betting / escrow deposits ───────────────────────────────────── */
+
+    // Client reports the deposit transaction hash after the wallet broadcasts
+    // it. The game still starts on the on-chain DepositMade event; this just
+    // records the hash on the Bet row so the DB has a complete audit trail.
+    socket.on("deposit_submitted", ({ gameId, txHash }: { gameId?: string; txHash?: string }) => {
+      if (!gameId || !txHash) return;
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) return;
+      BetManager.confirmDeposit(gameId, auth.userId, txHash).catch(() => {});
+    });
+
+    // Re-sync the deposit prompt after a reconnect. If the player's wallet is
+    // part of a bet still awaiting deposits, re-point the stored socket to this
+    // live connection and replay the current deposit state so the Confirm Bet
+    // view reappears instead of being silently dropped.
+    socket.on("request_deposit_status", ({ walletAddress }: { walletAddress?: string } = {}) => {
+      const auth = authenticatedSockets.get(socket.id);
+      const addr = (auth?.walletAddress ?? walletAddress ?? "").toLowerCase();
+      if (!addr) return;
+      for (const [gameId, pending] of this.pendingBets) {
+        const isWhite = pending.white.walletAddress?.toLowerCase() === addr;
+        const isBlack = pending.black.walletAddress?.toLowerCase() === addr;
+        if (!isWhite && !isBlack) continue;
+        if (isWhite) pending.white.socket = socket;
+        if (isBlack) pending.black.socket = socket;
+        socket.emit("awaiting_deposits", {
+          gameId,
+          betAmountWei: pending.betSetup.betAmountWei,
+          betAmountUsd: pending.betSetup.betAmountUsd,
+          contractAddress: CONTRACT_ADDRESS,
+          timeoutMs: DEPOSIT_TIMEOUT_MS,
+        });
+        const mine = isWhite ? pending.whiteDeposited : pending.blackDeposited;
+        const theirs = isWhite ? pending.blackDeposited : pending.whiteDeposited;
+        if (mine) socket.emit("deposit_confirmed", { player: "self" });
+        if (theirs) socket.emit("deposit_confirmed", { player: "opponent" });
+        break;
+      }
     });
 
     socket.on("set_username", async ({ walletAddress, username, avatarId }: { walletAddress: string; username: string; avatarId?: string }) => {
@@ -1101,6 +1142,7 @@ export class GameServer {
           betAmountWei: betSetup.betAmountWei,
           betAmountUsd: betSetup.betAmountUsd,
           contractAddress: CONTRACT_ADDRESS,
+          timeoutMs: DEPOSIT_TIMEOUT_MS,
         };
         p1.socket.emit("awaiting_deposits", depositPayload);
         p2.socket.emit("awaiting_deposits", depositPayload);

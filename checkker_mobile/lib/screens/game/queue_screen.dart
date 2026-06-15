@@ -33,6 +33,11 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
   String? _depositError;
   String? _cancelReason;
 
+  // Deposit-window countdown.
+  Timer? _countdownTimer;
+  DateTime? _depositDeadline;
+  Duration _remaining = Duration.zero;
+
   @override
   void initState() {
     super.initState();
@@ -81,10 +86,15 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
         if (!mounted) return;
         setState(() {
           _deposit = status;
-          if (status != null && status.myDeposit) {
-            // Our deposit confirmed on-chain — clear the pending spinner.
-            _depositSent = true;
-            _depositPending = false;
+          if (status != null) {
+            if (status.myDeposit) {
+              // Our deposit confirmed on-chain — clear the pending spinner.
+              _depositSent = true;
+              _depositPending = false;
+            }
+            _startCountdown(status.timeoutMs);
+          } else {
+            _stopCountdown();
           }
         });
       }),
@@ -97,9 +107,49 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
           _deposit = null;
           _depositSent = false;
           _depositPending = false;
+          _stopCountdown();
         });
       }),
     );
+    // On (re)connect, ask the server to replay any in-progress deposit prompt so
+    // a dropped connection doesn't strand us without the Confirm Bet view.
+    _subs.add(
+      socket.connectedStream.listen((connected) {
+        if (!connected) return;
+        final addr = WalletService().address;
+        if (addr != null) socket.requestDepositStatus(addr);
+      }),
+    );
+  }
+
+  /// Start (or keep) the deposit-window countdown. The deadline is set once on
+  /// the first prompt so reconnects / confirmations don't reset the clock.
+  void _startCountdown(int timeoutMs) {
+    _depositDeadline ??= DateTime.now().add(Duration(milliseconds: timeoutMs));
+    _tickCountdown();
+    _countdownTimer ??= Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _tickCountdown(),
+    );
+  }
+
+  void _tickCountdown() {
+    if (!mounted || _depositDeadline == null) return;
+    final remaining = _depositDeadline!.difference(DateTime.now());
+    setState(() => _remaining = remaining.isNegative ? Duration.zero : remaining);
+  }
+
+  void _stopCountdown() {
+    _countdownTimer?.cancel();
+    _countdownTimer = null;
+    _depositDeadline = null;
+    _remaining = Duration.zero;
+  }
+
+  String _fmtRemaining() {
+    final m = _remaining.inMinutes;
+    final s = _remaining.inSeconds % 60;
+    return '$m:${s.toString().padLeft(2, '0')}';
   }
 
   Future<void> _submitDeposit() async {
@@ -119,8 +169,12 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
       _depositPending = false;
       if (txHash != null) {
         _depositSent = true;
+        // Report the hash so the server records it on the bet (game start still
+        // waits for the on-chain DepositMade event).
+        ref.read(socketServiceProvider).depositSubmitted(status.gameId, txHash);
       } else {
-        _depositError = 'Deposit was rejected or failed. Please try again.';
+        _depositError = WalletService().lastDepositError ??
+            'Deposit was rejected or failed. Please try again.';
       }
     });
   }
@@ -156,6 +210,7 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
 
   @override
   void dispose() {
+    _countdownTimer?.cancel();
     for (final sub in _subs) {
       sub.cancel();
     }
@@ -232,6 +287,19 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
             style: TextStyle(color: AppColors.accent.gold, fontSize: 48, fontWeight: FontWeight.w800)),
           Text('$displayBnb BNB',
             style: TextStyle(color: AppColors.text.muted, fontSize: 14)),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            _remaining == Duration.zero
+                ? 'Deposit window expired'
+                : 'Deposit window ${_fmtRemaining()}',
+            style: TextStyle(
+              color: _remaining.inSeconds <= 30
+                  ? AppColors.accent.red
+                  : AppColors.text.muted,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: AppSpacing.lg),
           _depositRow('Your deposit', status.myDeposit),
           const SizedBox(height: AppSpacing.xs),

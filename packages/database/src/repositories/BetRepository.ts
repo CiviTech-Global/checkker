@@ -22,10 +22,15 @@ export const BetRepository = {
     });
   },
 
-  async confirmDeposit(betId: string): Promise<Bet> {
+  async confirmDeposit(betId: string, depositTxHash?: string): Promise<Bet> {
     return getDb().bet.update({
       where: { id: betId },
-      data: { status: "confirmed" },
+      data: {
+        status: "confirmed",
+        // Only overwrite the tx hash when the client reports a real one; the
+        // on-chain event path confirms without a hash and must not blank it.
+        ...(depositTxHash ? { depositTxHash } : {}),
+      },
     });
   },
 

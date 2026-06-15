@@ -24,6 +24,10 @@ class WalletService extends ChangeNotifier {
   String? get address => _address;
   bool get isConnected => _isConnected;
 
+  /// Human-readable reason the last [deposit] failed (rejection, wrong network,
+  /// insufficient funds…), or null on success. Read by the deposit UI.
+  String? lastDepositError;
+
   /// Whether a live WalletConnect session is available for signing.
   bool get canSign =>
       _modal != null && (_modal!.isConnected) && _modal!.session != null;
@@ -72,15 +76,27 @@ class WalletService extends ChangeNotifier {
     String gameId,
     String amountWei,
   ) async {
+    lastDepositError = null;
     final address = _address;
     final modal = _modal;
     final session = modal?.session;
     if (address == null || modal == null || session == null || !modal.isConnected) {
+      lastDepositError =
+          'No signing wallet connected. Connect a wallet via WalletConnect to deposit.';
       return null;
     }
-    try {
-      final chainId = modal.selectedChain?.chainId ?? 'eip155:97';
 
+    final chainId = modal.selectedChain?.chainId ?? 'eip155:97';
+    // The escrow lives on BNB Smart Chain (testnet 97 / mainnet 56). Depositing
+    // from any other chain would either revert or send funds to the wrong
+    // place, so block it up front with a clear message.
+    if (chainId != 'eip155:97' && chainId != 'eip155:56') {
+      lastDepositError =
+          'Switch your wallet to BNB Smart Chain (testnet) before depositing.';
+      return null;
+    }
+
+    try {
       // deposit(bytes32) selector + 32-byte gameId (UUID hyphens stripped,
       // right-padded to 64 hex chars).
       const selector = 'b214faa5';
@@ -106,11 +122,28 @@ class WalletService extends ChangeNotifier {
         ),
       );
       if (result is String && result.isNotEmpty) return result;
+      lastDepositError = 'The wallet did not return a transaction hash.';
       return null;
     } catch (e) {
       debugPrint('Wallet deposit error: $e');
+      lastDepositError = _depositErrorMessage(e);
       return null;
     }
+  }
+
+  /// Map a raw wallet/RPC error into a short, user-facing deposit message.
+  String _depositErrorMessage(Object e) {
+    final msg = e.toString().toLowerCase();
+    if (msg.contains('reject') || msg.contains('denied') || msg.contains('cancel')) {
+      return 'You rejected the transaction in your wallet.';
+    }
+    if (msg.contains('insufficient')) {
+      return 'Insufficient balance for the stake plus gas. Top up tBNB and retry.';
+    }
+    if (msg.contains('chain') || msg.contains('network')) {
+      return 'Wrong network. Switch your wallet to BNB Smart Chain (testnet).';
+    }
+    return 'Deposit failed. Please try again.';
   }
 
   /// Sign a message with the connected wallet via WalletConnect

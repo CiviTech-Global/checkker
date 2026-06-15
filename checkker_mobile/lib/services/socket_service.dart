@@ -75,6 +75,7 @@ class DepositStatus {
   final String betAmountWei;
   final double betAmountUsd;
   final String contractAddress;
+  final int timeoutMs;
   final bool myDeposit;
   final bool opponentDeposit;
 
@@ -83,6 +84,7 @@ class DepositStatus {
     required this.betAmountWei,
     required this.betAmountUsd,
     required this.contractAddress,
+    this.timeoutMs = 120000,
     this.myDeposit = false,
     this.opponentDeposit = false,
   });
@@ -93,6 +95,7 @@ class DepositStatus {
       betAmountWei: betAmountWei,
       betAmountUsd: betAmountUsd,
       contractAddress: contractAddress,
+      timeoutMs: timeoutMs,
       myDeposit: myDeposit ?? this.myDeposit,
       opponentDeposit: opponentDeposit ?? this.opponentDeposit,
     );
@@ -852,6 +855,7 @@ class SocketService {
         betAmountWei: json['betAmountWei'] as String? ?? '0',
         betAmountUsd: (json['betAmountUsd'] as num?)?.toDouble() ?? 0,
         contractAddress: json['contractAddress'] as String? ?? '',
+        timeoutMs: (json['timeoutMs'] as num?)?.toInt() ?? 120000,
       );
       _depositStatusController.add(_depositStatus);
     });
@@ -1140,6 +1144,25 @@ class SocketService {
 
   void authVerify(String walletAddress, String signature) {
     socket.emit('auth_verify', {'walletAddress': walletAddress, 'signature': signature});
+  }
+
+  // Betting / escrow deposit methods
+
+  /// Report the broadcast deposit transaction hash so the server can record it
+  /// on the bet's DB row (game start still waits for the on-chain event).
+  void depositSubmitted(String gameId, String txHash) {
+    if (_socket?.connected ?? false) {
+      socket.emit('deposit_submitted', {'gameId': gameId, 'txHash': txHash});
+    }
+  }
+
+  /// Ask the server to replay any in-progress deposit prompt for this wallet —
+  /// used on (re)connect so a dropped connection doesn't lose the Confirm Bet
+  /// view.
+  void requestDepositStatus(String walletAddress) {
+    if (_socket?.connected ?? false) {
+      socket.emit('request_deposit_status', {'walletAddress': walletAddress});
+    }
   }
 
   /// Sign out: revoke the server session, drop the stored token and clear
