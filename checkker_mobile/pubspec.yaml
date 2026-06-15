@@ -44,6 +44,12 @@ dependencies:
   # Web3 / WalletConnect
   reown_appkit: ^1.0.0
 
+  # Pin connectivity_plus to 6.x. reown_core pulls it transitively and allows
+  # 7.x, but connectivity_plus 7.x references NWPath.isUltraConstrained — an
+  # iOS/macOS 26 SDK symbol that doesn't exist in the CI Xcode (16.x), which
+  # breaks the iOS/macOS builds. Revisit once the SDK ships in CI.
+  connectivity_plus: ^6.1.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

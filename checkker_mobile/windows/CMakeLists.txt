@@ -32,6 +32,12 @@ set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
 # Use Unicode for all projects.
 add_definitions(-DUNICODE -D_UNICODE)
 
+# Some plugins (e.g. audioplayers_windows via C++/WinRT) still include
+# <experimental/coroutine>, which recent MSVC toolchains promote from a warning
+# to a hard error (STL1011). Silence it project-wide — applied before the plugin
+# subdirectories are added below so they inherit the definition.
+add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+
 # Compilation settings that should be applied to most targets.
 #
 # Be cautious about adding new options here, as plugins use this function by
