@@ -1,5 +1,7 @@
 import { getDb } from "../client";
-import type { Bet } from "@prisma/client";
+import type { Bet, Game } from "@prisma/client";
+
+export type BetWithGame = Bet & { game: Game | null };
 
 export type CreateBetInput = {
   gameId: string;
@@ -27,8 +29,6 @@ export const BetRepository = {
       where: { id: betId },
       data: {
         status: "confirmed",
-        // Only overwrite the tx hash when the client reports a real one; the
-        // on-chain event path confirms without a hash and must not blank it.
         ...(depositTxHash ? { depositTxHash } : {}),
       },
     });
@@ -59,6 +59,44 @@ export const BetRepository = {
     return getDb().bet.update({
       where: { id: betId },
       data: { status: "cancelled" },
+    });
+  },
+
+  /**
+   * Record a settlement failure with retry tracking. Keeps status as
+   * "confirmed" so the startup reconciler will pick it up.
+   */
+  async recordSettlementFailure(betId: string, errorMessage: string): Promise<Bet> {
+    return getDb().bet.update({
+      where: { id: betId },
+      data: {
+        settlementRetries: { increment: 1 },
+        lastSettlementError: errorMessage,
+      },
+    });
+  },
+
+  /**
+   * Mark a bet as settlement_failed after exhausting retries.
+   */
+  async markSettlementFailed(betId: string, errorMessage: string): Promise<Bet> {
+    return getDb().bet.update({
+      where: { id: betId },
+      data: {
+        status: "settlement_failed",
+        lastSettlementError: errorMessage,
+      },
+    });
+  },
+
+  /**
+   * Find all bets with confirmed status (deposited, game over, but not yet
+   * settled on-chain). Used by the startup reconciler.
+   */
+  async findUnsettledConfirmed(): Promise<BetWithGame[]> {
+    return getDb().bet.findMany({
+      where: { status: "confirmed" },
+      include: { game: true },
     });
   },
 

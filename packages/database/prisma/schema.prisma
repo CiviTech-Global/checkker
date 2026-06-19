@@ -125,7 +125,9 @@ model Bet {
   depositTxHash   String   @map("deposit_tx_hash") @db.VarChar(66)
   payoutTxHash    String?  @map("payout_tx_hash") @db.VarChar(66)
   payoutAmountWei String?  @map("payout_amount_wei")
-  status          String   @default("pending") @db.VarChar(16) // pending | confirmed | paid_out | refunded | cancelled
+  status                String   @default("pending") @db.VarChar(24) // pending | confirmed | paid_out | refunded | cancelled | settlement_failed
+  settlementRetries     Int      @default(0) @map("settlement_retries")
+  lastSettlementError   String?  @map("last_settlement_error") @db.Text
   createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt       DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 

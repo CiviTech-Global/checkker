@@ -26,6 +26,8 @@ contract CheckkerEscrow is ReentrancyGuard, Ownable {
         Drawn
     }
 
+    uint256 public constant DEPOSIT_DEADLINE_SECONDS = 600; // 10 minutes
+
     struct Game {
         bytes32 gameId;
         address white;
@@ -36,6 +38,7 @@ contract CheckkerEscrow is ReentrancyGuard, Ownable {
         GameStatus status;
         address winner;
         uint256 createdAt;
+        uint256 depositDeadline; // timestamp after which deposits are no longer accepted
     }
 
     mapping(bytes32 => Game) public games;
@@ -100,7 +103,8 @@ contract CheckkerEscrow is ReentrancyGuard, Ownable {
             blackDeposit: 0,
             status: GameStatus.WaitingForDeposits,
             winner: address(0),
-            createdAt: block.timestamp
+            createdAt: block.timestamp,
+            depositDeadline: block.timestamp + DEPOSIT_DEADLINE_SECONDS
         });
 
         emit GameCreated(_gameId, _white, _black, _betAmount);
@@ -113,6 +117,7 @@ contract CheckkerEscrow is ReentrancyGuard, Ownable {
     function deposit(bytes32 _gameId) external payable gameExists(_gameId) {
         Game storage game = games[_gameId];
         require(game.status == GameStatus.WaitingForDeposits, "Not accepting deposits");
+        require(block.timestamp <= game.depositDeadline, "Deposit deadline passed");
         require(msg.value == game.betAmount, "Wrong deposit amount");
 
         if (msg.sender == game.white) {
@@ -212,6 +217,38 @@ contract CheckkerEscrow is ReentrancyGuard, Ownable {
         }
 
         emit GameCancelled(_gameId);
+    }
+
+    /**
+     * @notice Player reclaims their deposit after the deadline if the game
+     *         hasn't started. Protects against server unavailability where
+     *         the referee cannot call cancelGame.
+     * @param _gameId The game to reclaim from
+     */
+    function claimRefundAfterDeadline(bytes32 _gameId) external nonReentrant gameExists(_gameId) {
+        Game storage game = games[_gameId];
+        require(game.status == GameStatus.WaitingForDeposits, "Game already active or resolved");
+        require(block.timestamp > game.depositDeadline, "Deadline not yet passed");
+
+        uint256 refund = 0;
+        if (msg.sender == game.white && game.whiteDeposit > 0) {
+            refund = game.whiteDeposit;
+            game.whiteDeposit = 0;
+        } else if (msg.sender == game.black && game.blackDeposit > 0) {
+            refund = game.blackDeposit;
+            game.blackDeposit = 0;
+        } else {
+            revert("No deposit to reclaim");
+        }
+
+        payable(msg.sender).sendValue(refund);
+        emit RefundIssued(_gameId, msg.sender, refund);
+
+        // If both deposits have been reclaimed, mark the game cancelled
+        if (game.whiteDeposit == 0 && game.blackDeposit == 0) {
+            game.status = GameStatus.Cancelled;
+            emit GameCancelled(_gameId);
+        }
     }
 
     // ── Admin Functions ─────────────────────────────────────────────────

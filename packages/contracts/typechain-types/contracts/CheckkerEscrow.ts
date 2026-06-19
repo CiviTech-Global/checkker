@@ -34,6 +34,7 @@ export declare namespace CheckkerEscrow {
     status: BigNumberish;
     winner: AddressLike;
     createdAt: BigNumberish;
+    depositDeadline: BigNumberish;
   };
 
   export type GameStructOutput = [
@@ -45,7 +46,8 @@ export declare namespace CheckkerEscrow {
     blackDeposit: bigint,
     status: bigint,
     winner: string,
-    createdAt: bigint
+    createdAt: bigint,
+    depositDeadline: bigint
   ] & {
     gameId: string;
     white: string;
@@ -56,13 +58,16 @@ export declare namespace CheckkerEscrow {
     status: bigint;
     winner: string;
     createdAt: bigint;
+    depositDeadline: bigint;
   };
 }
 
 export interface CheckkerEscrowInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "DEPOSIT_DEADLINE_SECONDS"
       | "cancelGame"
+      | "claimRefundAfterDeadline"
       | "createGame"
       | "deposit"
       | "games"
@@ -95,7 +100,15 @@ export interface CheckkerEscrowInterface extends Interface {
   ): EventFragment;
 
   encodeFunctionData(
+    functionFragment: "DEPOSIT_DEADLINE_SECONDS",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "cancelGame",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "claimRefundAfterDeadline",
     values: [BytesLike]
   ): string;
   encodeFunctionData(
@@ -152,7 +165,15 @@ export interface CheckkerEscrowInterface extends Interface {
     values: [AddressLike]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "DEPOSIT_DEADLINE_SECONDS",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "cancelGame", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "claimRefundAfterDeadline",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "createGame", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "games", data: BytesLike): Result;
@@ -378,7 +399,15 @@ export interface CheckkerEscrow extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  DEPOSIT_DEADLINE_SECONDS: TypedContractMethod<[], [bigint], "view">;
+
   cancelGame: TypedContractMethod<[_gameId: BytesLike], [void], "nonpayable">;
+
+  claimRefundAfterDeadline: TypedContractMethod<
+    [_gameId: BytesLike],
+    [void],
+    "nonpayable"
+  >;
 
   createGame: TypedContractMethod<
     [
@@ -405,6 +434,7 @@ export interface CheckkerEscrow extends BaseContract {
         bigint,
         bigint,
         string,
+        bigint,
         bigint
       ] & {
         gameId: string;
@@ -416,6 +446,7 @@ export interface CheckkerEscrow extends BaseContract {
         status: bigint;
         winner: string;
         createdAt: bigint;
+        depositDeadline: bigint;
       }
     ],
     "view"
@@ -478,7 +509,13 @@ export interface CheckkerEscrow extends BaseContract {
   ): T;
 
   getFunction(
+    nameOrSignature: "DEPOSIT_DEADLINE_SECONDS"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "cancelGame"
+  ): TypedContractMethod<[_gameId: BytesLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "claimRefundAfterDeadline"
   ): TypedContractMethod<[_gameId: BytesLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "createGame"
@@ -509,6 +546,7 @@ export interface CheckkerEscrow extends BaseContract {
         bigint,
         bigint,
         string,
+        bigint,
         bigint
       ] & {
         gameId: string;
@@ -520,6 +558,7 @@ export interface CheckkerEscrow extends BaseContract {
         status: bigint;
         winner: string;
         createdAt: bigint;
+        depositDeadline: bigint;
       }
     ],
     "view"
