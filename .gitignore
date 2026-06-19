@@ -23,3 +23,6 @@ graphify-out
 .env
 .env.*
 !.env.example
+
+# Deployment package (build artifact)
+deploy/
