@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { io, type Socket } from "socket.io-client";
-import type { ChatMessage, Card, Color, GameResult, ScoredGame, GameOdds, PlayerProfile, BotDifficulty } from "@checkker/shared";
+import type { ChatMessage, Card, Color, GameResult, ScoredGame, GameOdds, PlayerProfile, BotDifficulty, BotConfiguration, BotMaturity } from "@checkker/shared";
 import type { GameClientState, GameStartPayload, GameUpdatePayload, MoveErrorPayload, GameOverPayload } from "../types/game";
 import type { Puzzle, PuzzleResult, PuzzlesListData } from "../types/puzzle";
 import { ADDRESS_OF_SERVER } from "../config/features";
@@ -34,6 +34,9 @@ let _coachingTipCallback: ((tip: string) => void) | null = null;
 let _spectatorCommentCallback: ((comment: string) => void) | null = null;
 let _gameOverLocalCallback: ((data: GameOverPayload) => void) | null = null;
 let _rematchRequestedCallback: (() => void) | null = null;
+let _botConfigUpdatedCallback: ((data: { success: boolean }) => void) | null = null;
+let _botDataCallback: ((data: { config: BotConfiguration | null; maturity: BotMaturity | null }) => void) | null = null;
+let _botErrorCallback: ((error: string) => void) | null = null;
 
 /* ── Auth & Betting state ──────────────────────────────────────────── */
 
@@ -305,6 +308,18 @@ function attachListeners(s: Socket) {
 
   s.on("bot_fallback_offer", (data: { tc: string }) => {
     _botFallbackCallback?.(data);
+  });
+
+  s.on("bot_config_updated", (data: { success: boolean }) => {
+    _botConfigUpdatedCallback?.(data);
+  });
+
+  s.on("bot_data", (data: { config: BotConfiguration | null; maturity: BotMaturity | null }) => {
+    _botDataCallback?.(data);
+  });
+
+  s.on("bot_error", (data: { error?: string }) => {
+    _botErrorCallback?.(data.error ?? "Bot sync failed");
   });
 
   s.on("rematch_requested", () => {
@@ -629,6 +644,9 @@ export function useSocket() {
   const coachingTipCbRef = useRef<((tip: string) => void) | null>(null);
   const spectatorCommentCbRef = useRef<((comment: string) => void) | null>(null);
   const rematchRequestedCbRef = useRef<(() => void) | null>(null);
+  const botConfigUpdatedCbRef = useRef<((data: { success: boolean }) => void) | null>(null);
+  const botDataCbRef = useRef<((data: { config: BotConfiguration | null; maturity: BotMaturity | null }) => void) | null>(null);
+  const botErrorCbRef = useRef<((error: string) => void) | null>(null);
 
   useEffect(() => {
     // Initialize socket lazily on first hook mount
@@ -658,6 +676,9 @@ export function useSocket() {
     _coachingTipCallback = (tip: string) => coachingTipCbRef.current?.(tip);
     _spectatorCommentCallback = (comment: string) => spectatorCommentCbRef.current?.(comment);
     _rematchRequestedCallback = () => rematchRequestedCbRef.current?.();
+    _botConfigUpdatedCallback = (data: { success: boolean }) => botConfigUpdatedCbRef.current?.(data);
+    _botDataCallback = (data: { config: BotConfiguration | null; maturity: BotMaturity | null }) => botDataCbRef.current?.(data);
+    _botErrorCallback = (error: string) => botErrorCbRef.current?.(error);
   }, []);
 
   const joinQueue = useCallback((rating: number, tc: string) => {
@@ -719,6 +740,18 @@ export function useSocket() {
 
   const onRematchRequested = useCallback((fn: () => void) => {
     rematchRequestedCbRef.current = fn;
+  }, []);
+
+  const onBotConfigUpdated = useCallback((fn: (data: { success: boolean }) => void) => {
+    botConfigUpdatedCbRef.current = fn;
+  }, []);
+
+  const onBotData = useCallback((fn: (data: { config: BotConfiguration | null; maturity: BotMaturity | null }) => void) => {
+    botDataCbRef.current = fn;
+  }, []);
+
+  const onBotError = useCallback((fn: (error: string) => void) => {
+    botErrorCbRef.current = fn;
   }, []);
 
   const gameOverLocalCbRef = useRef<((data: GameOverPayload) => void) | null>(null);
@@ -784,12 +817,20 @@ export function useSocket() {
     getSocket().emit("update_avatar", { avatarId });
   }, []);
 
-  const joinRanked = useCallback((difficulty: string, tc: string) => {
-    getSocket().emit("join_ranked", { difficulty, tc });
+  const updateBotConfig = useCallback((config: BotConfiguration, maturity: BotMaturity) => {
+    getSocket().emit("update_bot_config", { config, maturity });
   }, []);
 
-  const joinCasualDifficulty = useCallback((difficulty: string, tc: string) => {
-    getSocket().emit("join_casual_difficulty", { difficulty, tc });
+  const getBotData = useCallback(() => {
+    getSocket().emit("get_bot_data");
+  }, []);
+
+  const joinRanked = useCallback((difficulty: string, tc: string, isBot = false) => {
+    getSocket().emit("join_ranked", { difficulty, tc, isBot });
+  }, []);
+
+  const joinCasualDifficulty = useCallback((difficulty: string, tc: string, isBot = false) => {
+    getSocket().emit("join_casual_difficulty", { difficulty, tc, isBot });
   }, []);
 
   const getLeaderboard = useCallback(() => {
@@ -1116,6 +1157,11 @@ export function useSocket() {
     onSpectatorComment,
     onGameOverLocal,
     onRematchRequested,
+    updateBotConfig,
+    getBotData,
+    onBotConfigUpdated,
+    onBotData,
+    onBotError,
     // Auth
     authState,
     authRequest,

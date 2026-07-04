@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../providers/bot_provider.dart';
 import '../../providers/socket_provider.dart';
 import '../../services/socket_service.dart';
 import '../../services/wallet_service.dart';
@@ -11,12 +12,14 @@ class QueueScreen extends ConsumerStatefulWidget {
   final String mode;
   final String difficulty;
   final String tc;
+  final bool isBot;
 
   const QueueScreen({
     super.key,
     required this.mode,
     required this.difficulty,
     required this.tc,
+    this.isBot = false,
   });
 
   @override
@@ -49,10 +52,11 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
 
   void _joinQueue() {
     final socket = ref.read(socketServiceProvider);
+    ref.read(botProvider.notifier).setInBotMatch(widget.isBot);
     if (widget.mode == 'ranked') {
-      socket.joinRanked(widget.difficulty, widget.tc);
+      socket.joinRanked(widget.difficulty, widget.tc, isBot: widget.isBot);
     } else {
-      socket.joinCasualDifficulty(widget.difficulty, widget.tc);
+      socket.joinCasualDifficulty(widget.difficulty, widget.tc, isBot: widget.isBot);
     }
   }
 

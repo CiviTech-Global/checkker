@@ -23,3 +23,9 @@ graphify-out
 .env
 .env.*
 !.env.example
+
+# Deployment package (build artifact)
+deploy/
+
+# Local issue tracking / scratch notes
+issues/

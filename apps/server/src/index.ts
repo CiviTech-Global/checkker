@@ -5,6 +5,10 @@ import cors from "cors";
 import { GameServer } from "./GameServer";
 import { initPlayerStoreDb } from "./PlayerStore";
 import { initMonitoring } from "./monitoring";
+import { parseArgs } from "./cli-args";
+
+const cli = parseArgs();
+const PORT = cli.port ?? (process.env.PORT ? parseInt(process.env.PORT, 10) : 3001);
 
 initMonitoring();
 
@@ -82,27 +86,32 @@ app.post("/admin/seed-puzzles", async (_req, res) => {
 
 // Serve the exported web client when available, so the full game is playable
 // from any machine on the network at http://<host-ip>:<port>. Looks for the
-// Expo web export next to this app (apps/mobile/dist) or at WEB_DIST.
-(() => {
+// Expo web export at WEB_DIST env, --web-dist CLI arg, or relative paths.
+const webDist = resolveWebDist(cli.webDist);
+if (webDist) {
   const path = require("path") as typeof import("path");
-  const fs = require("fs") as typeof import("fs");
-  const candidates = [
-    process.env.WEB_DIST,
-    path.join(__dirname, "../../mobile/dist"),
-    path.join(process.cwd(), "../mobile/dist"),
-  ].filter((p): p is string => !!p);
-  const webDist = candidates.find((p) => fs.existsSync(path.join(p, "index.html")));
-  if (!webDist) return;
-
   app.use(express.static(webDist));
   // SPA fallback for client-side routes (skip API + socket paths).
   app.get(/^\/(?!socket\.io|health|admin).*/, (_req, res) => {
     res.sendFile(path.join(webDist, "index.html"));
   });
   console.log(`[web] Serving web client from ${webDist}`);
-})();
+}
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
+function resolveWebDist(cliPath?: string): string | null {
+  const path = require("path") as typeof import("path");
+  const fs = require("fs") as typeof import("fs");
+  const candidates = [
+    cliPath,
+    process.env.WEB_DIST,
+    path.join(require.main?.path ?? __dirname, "web"),
+    path.join(__dirname, "web"),
+    path.join(process.cwd(), "web"),
+    path.join(__dirname, "../../mobile/dist"),
+    path.join(process.cwd(), "../mobile/dist"),
+  ].filter((p): p is string => !!p);
+  return candidates.find((p) => fs.existsSync(path.join(p, "index.html"))) ?? null;
+}
 
 // LAN discovery beacon: answer UDP broadcasts so mobile clients on the same
 // network can find this server without typing an IP (poor man's mDNS).

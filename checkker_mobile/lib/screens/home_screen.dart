@@ -104,6 +104,7 @@ class HomeScreen extends ConsumerWidget {
                         _MenuButton(label: 'Play Ranked', icon: Icons.emoji_events, onTap: () => context.push('/game/ranked')),
                         _MenuButton(label: 'Find an Opponent', icon: Icons.people, onTap: () => context.push('/game/casual')),
                         _MenuButton(label: 'Play with AI and improve', icon: Icons.smart_toy, onTap: () => context.push('/bot/difficulty')),
+                        _MenuButton(label: 'Delegate Mode (Bot)', icon: Icons.auto_mode, onTap: () => context.push('/bot/mode')),
                         _MenuButton(label: 'Play on your network (LAN)', icon: Icons.wifi, onTap: () => context.push('/lan')),
                         _MenuButton(label: 'Tutorials and trainings', icon: Icons.school, onTap: () => context.push('/tutorial')),
                         _MenuButton(label: 'Puzzles', icon: Icons.extension, onTap: () => context.push('/puzzles')),

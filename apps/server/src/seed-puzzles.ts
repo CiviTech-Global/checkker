@@ -1,4 +1,3 @@
-import { PuzzleRepository } from "@checkker/database";
 import generatedPuzzles from "./puzzle-seed-data.json";
 
 const seedPuzzles = [
@@ -69,6 +68,7 @@ const seedPuzzles = [
 ];
 
 export async function seedPuzzlesIntoDb(): Promise<number> {
+  const { PuzzleRepository } = await import("@checkker/database");
   // Skip if the database already holds the full seed set.
   const existing = await PuzzleRepository.count();
   if (existing >= 500) return 0;

@@ -128,4 +128,18 @@ export const UserRepository = {
       data: { fcmToken: token },
     });
   },
+
+  async updateBotConfig(id: string, configJson: string): Promise<User> {
+    return getDb().user.update({
+      where: { id },
+      data: { botConfig: configJson },
+    });
+  },
+
+  async updateBotMaturity(id: string, maturityJson: string): Promise<User> {
+    return getDb().user.update({
+      where: { id },
+      data: { botMaturity: maturityJson },
+    });
+  },
 };

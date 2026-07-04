@@ -219,6 +219,12 @@ export default function HomeScreen() {
             onPress={() => router.push("/bot/difficulty")}
           />
           <MenuButton
+            label="Delegate Mode (Bot)"
+            symbol="robot"
+            index={3}
+            onPress={() => router.push("/bot/mode")}
+          />
+          <MenuButton
             label="Play on your network (LAN, Hotspot, etc.)"
             symbol="lan"
             index={3}
