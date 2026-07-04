@@ -1,19 +1,35 @@
 import { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { colors, radius, spacing } from "../../src/theme/tokens";
 import { useSocket } from "../../src/hooks/useSocket";
+import { useBot } from "../../src/context/BotContext";
 
 export default function QueueScreen() {
   const router = useRouter();
-  const { connected, joinQueue, gameState, requestBot, onBotFallbackOffer } = useSocket();
+  const params = useLocalSearchParams<{ mode?: string; difficulty?: string; tc?: string; bot?: string }>();
+  const mode = params.mode ?? "ranked";
+  const difficulty = params.difficulty ?? "beginner";
+  const tc = params.tc ?? "blitz";
+  const isBot = params.bot === "true";
+
+  const { connected, joinQueue, joinRanked, joinCasualDifficulty, gameState, requestBot, onBotFallbackOffer } = useSocket();
+  const { setInBotMatch } = useBot();
   const [searching, setSearching] = useState(false);
   const [botOffer, setBotOffer] = useState<{ tc: string } | null>(null);
 
   useEffect(() => {
+    setInBotMatch(isBot);
+  }, [isBot]);
+
+  useEffect(() => {
     if (connected && !searching) {
       setSearching(true);
-      joinQueue(1200, "blitz");
+      if (mode === "casual") {
+        joinCasualDifficulty(difficulty, tc, isBot);
+      } else {
+        joinRanked(difficulty, tc, isBot);
+      }
     }
   }, [connected]);
 
@@ -30,13 +46,14 @@ export default function QueueScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Checkker</Text>
-      <Text style={styles.subtitle}>Ranked Match</Text>
+      <Text style={styles.subtitle}>{mode === "casual" ? "Casual Match" : "Ranked Match"}</Text>
 
       {searching ? (
         <View style={styles.searching}>
           <ActivityIndicator size="large" color={colors.accent.primary} />
           <Text style={styles.searchText}>Searching for opponent...</Text>
-          <Text style={styles.modeText}>Blitz • 7 min</Text>
+          <Text style={styles.modeText}>{difficulty[0].toUpperCase() + difficulty.slice(1)} • {tc}</Text>
+          {isBot && <Text style={styles.botBadge}>🤖 Bot Delegate Active</Text>}
         </View>
       ) : (
         <View style={styles.searching}>
@@ -83,6 +100,7 @@ const styles = StyleSheet.create({
   searching: { alignItems: "center", gap: spacing.sm, padding: spacing.xl },
   searchText: { fontSize: 16, color: colors.text.primary, marginTop: spacing.md },
   modeText: { fontSize: 14, color: colors.text.muted },
+  botBadge: { fontSize: 13, color: colors.accent.gold, fontWeight: "700", marginTop: spacing.xs },
   cancelBtn: { paddingHorizontal: spacing.xl, paddingVertical: spacing.sm, borderRadius: radius.md, backgroundColor: colors.bg.secondary, marginTop: spacing.xl },
   cancelText: { color: colors.text.primary, fontSize: 16, fontWeight: "600" },
   botModal: { position: "absolute", top: "40%", left: spacing.lg, right: spacing.lg, backgroundColor: colors.bg.secondary, borderRadius: radius.lg, padding: spacing.xl, alignItems: "center", gap: spacing.md, zIndex: 100 },

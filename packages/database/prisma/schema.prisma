@@ -21,6 +21,8 @@ model User {
   bestStreak    Int      @default(0) @map("best_streak")
   coins         Int      @default(200)
   fcmToken      String?  @map("fcm_token")
+  botConfig     String?  @map("bot_config")
+  botMaturity   String?  @map("bot_maturity")
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -83,6 +85,8 @@ model Game {
   whiteRatingAfter  Int?      @map("white_rating_after")
   blackRatingAfter  Int?      @map("black_rating_after")
   moveCount         Int       @default(0) @map("move_count")
+  whiteIsBot        Boolean   @default(false) @map("white_is_bot")
+  blackIsBot        Boolean   @default(false) @map("black_is_bot")
   startedAt         DateTime  @default(now()) @map("started_at") @db.Timestamptz()
   endedAt           DateTime? @map("ended_at") @db.Timestamptz()
 

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
+import '../models/bot.dart';
 import '../models/card.dart';
 import '../models/game.dart';
 import '../models/game_client.dart';
@@ -638,6 +639,8 @@ class SocketService {
   final _coinsAwardedController = StreamController<CoinsAwarded>.broadcast();
   final _lanGameHostedController = StreamController<Map<String, dynamic>>.broadcast();
   final _lanJoinResultController = StreamController<Map<String, dynamic>>.broadcast();
+  final _botConfigUpdatedController = StreamController<Map<String, dynamic>>.broadcast();
+  final _botDataController = StreamController<Map<String, dynamic>>.broadcast();
 
   // Public getters
   bool get isConnected => _socket?.connected ?? false;
@@ -686,6 +689,8 @@ class SocketService {
   Stream<CoinsAwarded> get coinsAwardedStream => _coinsAwardedController.stream;
   Stream<Map<String, dynamic>> get lanGameHostedStream => _lanGameHostedController.stream;
   Stream<Map<String, dynamic>> get lanJoinResultStream => _lanJoinResultController.stream;
+  Stream<Map<String, dynamic>> get botConfigUpdatedStream => _botConfigUpdatedController.stream;
+  Stream<Map<String, dynamic>> get botDataStream => _botDataController.stream;
   Stream<Map<String, dynamic>> get friendAcceptedStream => _friendAcceptedController.stream;
   Stream<Map<String, dynamic>> get inviteSentStream => _inviteSentController.stream;
   Stream<Map<String, dynamic>> get privateInviteStream => _privateInviteController.stream;
@@ -881,6 +886,18 @@ class SocketService {
       _depositStatus = null;
       _depositStatusController.add(null);
       _betCancelledController.add(_toMap(data));
+    });
+
+    s.on('bot_config_updated', (data) {
+      _botConfigUpdatedController.add(_toMap(data));
+    });
+
+    s.on('bot_data', (data) {
+      _botDataController.add(_toMap(data));
+    });
+
+    s.on('bot_error', (data) {
+      _moveErrorController.add(_toMap(data)['error'] as String? ?? 'Bot sync failed');
     });
 
     s.on('queue_joined', (data) {
@@ -1194,12 +1211,23 @@ class SocketService {
     socket.emit('update_avatar', {'avatarId': avatarId});
   }
 
-  void joinRanked(String difficulty, String tc) {
-    socket.emit('join_ranked', {'difficulty': difficulty, 'tc': tc});
+  void joinRanked(String difficulty, String tc, {bool isBot = false}) {
+    socket.emit('join_ranked', {'difficulty': difficulty, 'tc': tc, 'isBot': isBot});
   }
 
-  void joinCasualDifficulty(String difficulty, String tc) {
-    socket.emit('join_casual_difficulty', {'difficulty': difficulty, 'tc': tc});
+  void joinCasualDifficulty(String difficulty, String tc, {bool isBot = false}) {
+    socket.emit('join_casual_difficulty', {'difficulty': difficulty, 'tc': tc, 'isBot': isBot});
+  }
+
+  void updateBotConfig(BotConfiguration config, BotMaturity maturity) {
+    socket.emit('update_bot_config', {
+      'config': config.toJson(),
+      'maturity': maturity.toJson(),
+    });
+  }
+
+  void getBotData() {
+    socket.emit('get_bot_data');
   }
 
   void getLeaderboard() {

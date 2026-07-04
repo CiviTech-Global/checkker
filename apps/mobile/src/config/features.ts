@@ -57,6 +57,9 @@ export const features = {
   /** Enable bot personality selection */
   botPersonality: true,
 
+  /** Enable online delegate/bot mode */
+  onlineBotMode: true,
+
   /** Dev-only tools (demo data, etc.) — auto-enabled in dev builds */
   devMode: __DEV__,
 } as const;

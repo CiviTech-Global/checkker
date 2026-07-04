@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../models/bot.dart';
 import '../../models/card.dart';
 import '../../models/game.dart';
 import '../../models/game_client.dart';
+import '../../providers/bot_provider.dart';
 import '../../providers/game_provider.dart';
 import '../../providers/socket_provider.dart';
 import '../../services/chess_service.dart';
+import '../../services/online_bot_engine.dart';
 import '../../services/socket_service.dart';
 import '../../services/sound_service.dart';
 import '../../theme/tokens.dart';
@@ -50,6 +53,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   bool _rematchPending = false;
   bool _opponentWantsRematch = false;
   BetSettledPayload? _betSettlement;
+  bool _botTakeover = false;
+  Timer? _botMoveTimer;
 
   int _prevMoveCount = 0;
   bool _gameStarted = false;
@@ -81,11 +86,20 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       socket.betSettledStream.listen((data) {
         if (mounted) setState(() => _betSettlement = data);
       }),
+      socket.gameStateStream.listen((gs) {
+        if (gs != null && mounted) _maybeScheduleBotMove(gs);
+      }),
+      socket.gameOverStream.listen((payload) {
+        _botMoveTimer?.cancel();
+        _recordBotResult(payload);
+      }),
     ]);
   }
 
   @override
   void dispose() {
+    _botMoveTimer?.cancel();
+    ref.read(botProvider.notifier).setInBotMatch(false);
     for (final sub in _subs) {
       sub.cancel();
     }
@@ -93,6 +107,93 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   bool get _isBotGame => widget.id.startsWith('bot-');
+  bool get _isOnlineBotMatch => ref.read(botProvider).inBotMatch && !_botTakeover;
+
+  Widget _buildBotBanner() {
+    if (!_isOnlineBotMatch) return const SizedBox.shrink();
+    final botState = ref.read(botProvider);
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: AppColors.accent.gold.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.accent.gold),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.auto_mode, color: AppColors.accent.gold, size: 18),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              'Bot is playing for you • ${botState.config.strategy.name}',
+              style: TextStyle(color: AppColors.text.primary, fontWeight: FontWeight.w600),
+            ),
+          ),
+          if (botState.config.allowTakeover)
+            TextButton(
+              onPressed: _takeOver,
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text('Take Over', style: TextStyle(color: AppColors.accent.gold)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _maybeScheduleBotMove(GameClientState gs) {
+    if (!_isOnlineBotMatch) return;
+    if (gs.result != null) return;
+    if (gs.turn != gs.color) return;
+
+    final botState = ref.read(botProvider);
+    final config = botState.config;
+    final effective = applyMaturityToConfig(config, botState.maturity);
+
+    _botMoveTimer?.cancel();
+    _botMoveTimer = Timer(Duration(milliseconds: effective.thinkingDelayMs), () {
+      if (!mounted) return;
+      final currentGs = ref.read(socketServiceProvider).gameState;
+      if (currentGs == null || currentGs.turn != currentGs.color || currentGs.result != null) return;
+
+      final pick = pickOnlineBotMove(
+        fen: currentGs.fen,
+        hand: currentGs.hand,
+        config: config,
+        maturity: botState.maturity,
+        myColor: colorToString(currentGs.color),
+      );
+      if (pick != null) {
+        ref.read(socketServiceProvider).playMove(pick.cardId, pick.move);
+      }
+    });
+  }
+
+  void _recordBotResult(GameOverPayload payload) {
+    final botState = ref.read(botProvider);
+    if (!botState.inBotMatch) return;
+    final myColor = colorToString(ref.read(socketServiceProvider).gameState?.color ?? PlayerColor.white);
+    final result = payload.result;
+    String outcome;
+    if (result.isDraw) {
+      outcome = 'draw';
+    } else if (result.winner != null && colorToString(result.winner!) == myColor) {
+      outcome = 'win';
+    } else {
+      outcome = 'loss';
+    }
+    ref.read(botProvider.notifier).recordGameResult(outcome);
+  }
+
+  void _takeOver() {
+    setState(() => _botTakeover = true);
+    _botMoveTimer?.cancel();
+  }
 
   void _handleCardTap(int idx) {
     final gs = ref.read(socketServiceProvider).gameState;
@@ -293,6 +394,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               _betSettlement = null;
               _gameStarted = false;
               _gameOverSoundPlayed = false;
+              _botTakeover = false;
             });
             context.go('/game/$newGameId');
           });
@@ -367,6 +469,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         rating: gs.opponentProfile?.rating,
                       ),
                       const SizedBox(height: AppSpacing.xs),
+                      _buildBotBanner(),
 
                       // Opponent hand
                       OpponentHand(cardCount: gs.opponent.handCount),
@@ -588,6 +691,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     child: Center(
                       child: Column(
                         children: [
+                          _buildBotBanner(),
                           ConstrainedBox(
                             constraints: BoxConstraints(maxWidth: AppSizes.contentMaxWidth(MediaQuery.of(context).size.width)),
                             child: ChessBoard(

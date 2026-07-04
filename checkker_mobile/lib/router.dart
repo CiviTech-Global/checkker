@@ -5,6 +5,8 @@ import 'screens/game/casual_screen.dart';
 import 'screens/game/ranked_screen.dart';
 import 'screens/game/queue_screen.dart';
 import 'screens/bot/difficulty_screen.dart';
+import 'screens/bot/bot_config_screen.dart';
+import 'screens/bot/bot_mode_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/leaderboard/leaderboard_screen.dart';
 import 'screens/tutorial/tutorial_hub_screen.dart';
@@ -51,10 +53,13 @@ final goRouter = GoRouter(
         mode: state.uri.queryParameters['mode'] ?? 'casual',
         difficulty: state.uri.queryParameters['difficulty'] ?? 'beginner',
         tc: state.uri.queryParameters['tc'] ?? 'blitz',
+        isBot: state.uri.queryParameters['bot'] == 'true',
       ),
     ),
     GoRoute(path: '/game/:id', builder: (_, state) => GameScreen(id: state.pathParameters['id']!)),
     GoRoute(path: '/bot/difficulty', builder: (_, _) => const DifficultyScreen()),
+    GoRoute(path: '/bot/config', builder: (_, _) => const BotConfigScreen()),
+    GoRoute(path: '/bot/mode', builder: (_, _) => const BotModeScreen()),
     GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
     GoRoute(path: '/leaderboard', builder: (_, _) => const LeaderboardScreen()),
     GoRoute(path: '/tutorial', builder: (_, _) => const TutorialHubScreen()),

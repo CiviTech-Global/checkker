@@ -5,6 +5,8 @@ import { GameEngine } from "./GameEngine";
 import type { BotDifficulty, TimeControl, Color, ChatMessage, GameMode } from "@checkker/shared";
 import { isFreeGame, BET_AMOUNTS_USD, DEPOSIT_TIMEOUT_MS } from "@checkker/shared";
 import { expectedScore, newRating } from "@checkker/shared";
+import type { BotConfiguration, BotMaturity } from "@checkker/shared";
+import { deserializeBotConfig, serializeBotConfig, deserializeBotMaturity, serializeBotMaturity } from "@checkker/shared";
 import { BotManager } from "./bot/BotManager";
 import { SpectateManager } from "./bot/SpectateManager";
 import { playerStore } from "./PlayerStore";
@@ -23,6 +25,8 @@ interface Player {
   casual: boolean;
   walletAddress?: string;
   userId?: string; // DB user ID
+  /** True when this player has enabled client-side delegate/bot mode for this match. */
+  isBot?: boolean;
 }
 
 interface Match {
@@ -249,6 +253,46 @@ export class GameServer {
       }
     });
 
+    /* ── Online Bot / Delegate Mode config sync ─────────────────────── */
+
+    socket.on("update_bot_config", async ({ config, maturity }: { config?: BotConfiguration; maturity?: BotMaturity }) => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) {
+        socket.emit("bot_error", { error: "Not authenticated" });
+        return;
+      }
+      try {
+        const { UserRepository } = await import("@checkker/database");
+        if (config) {
+          await UserRepository.updateBotConfig(auth.userId, serializeBotConfig(config));
+        }
+        if (maturity) {
+          await UserRepository.updateBotMaturity(auth.userId, serializeBotMaturity(maturity));
+        }
+        socket.emit("bot_config_updated", { success: true });
+      } catch {
+        socket.emit("bot_error", { error: "Failed to save bot data" });
+      }
+    });
+
+    socket.on("get_bot_data", async () => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) {
+        socket.emit("bot_data", { config: null, maturity: null });
+        return;
+      }
+      try {
+        const { UserRepository } = await import("@checkker/database");
+        const user = await UserRepository.findById(auth.userId);
+        socket.emit("bot_data", {
+          config: deserializeBotConfig(user?.botConfig ?? null),
+          maturity: deserializeBotMaturity(user?.botMaturity ?? null),
+        });
+      } catch {
+        socket.emit("bot_data", { config: null, maturity: null });
+      }
+    });
+
     /* ── Legacy queue events (backward compat) ──────────────────────── */
 
     socket.on("join_queue", ({ rating, tc }: { rating: number; tc: TimeControl }) => {
@@ -263,7 +307,7 @@ export class GameServer {
 
     /* ── New difficulty-based matchmaking ─────────────────────────────── */
 
-    socket.on("join_ranked", ({ difficulty, tc }: { difficulty: BotDifficulty; tc: TimeControl }) => {
+    socket.on("join_ranked", ({ difficulty, tc, isBot }: { difficulty: BotDifficulty; tc: TimeControl; isBot?: boolean }) => {
       const profile = playerStore.get(socket.id);
       const auth = authenticatedSockets.get(socket.id);
       const player: Player = {
@@ -273,11 +317,12 @@ export class GameServer {
         casual: false,
         walletAddress: auth?.walletAddress,
         userId: auth?.userId,
+        isBot: isBot ?? false,
       };
       this.addToDifficultyQueue(player, tc, "ranked", difficulty);
     });
 
-    socket.on("join_casual_difficulty", ({ difficulty, tc }: { difficulty: BotDifficulty; tc: TimeControl }) => {
+    socket.on("join_casual_difficulty", ({ difficulty, tc, isBot }: { difficulty: BotDifficulty; tc: TimeControl; isBot?: boolean }) => {
       const auth = authenticatedSockets.get(socket.id);
       const player: Player = {
         id: socket.id,
@@ -286,6 +331,7 @@ export class GameServer {
         casual: true,
         walletAddress: auth?.walletAddress,
         userId: auth?.userId,
+        isBot: isBot ?? false,
       };
       this.addToDifficultyQueue(player, tc, "casual", difficulty);
     });
@@ -1224,6 +1270,8 @@ export class GameServer {
           timeControl: tc,
           whiteRatingBefore: p1.rating,
           blackRatingBefore: p2.rating,
+          whiteIsBot: p1.isBot ?? false,
+          blackIsBot: p2.isBot ?? false,
         });
         match.dbGameId = dbGame.id;
       } catch {

@@ -8,3 +8,4 @@ export * from "./donations";
 export * from "./contract";
 export * from "./replay";
 export * from "./cosmetics";
+export * from "./bot";

@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
@@ -42,6 +43,8 @@ import PromotionPicker from "../../src/components/PromotionPicker";
 import CoachingTipBanner from "../../src/components/CoachingTipBanner";
 import SpectatorBanner from "../../src/components/SpectatorBanner";
 import { useSocket } from "../../src/hooks/useSocket";
+import { useBot } from "../../src/context/BotContext";
+import { pickOnlineBotMove } from "../../src/bot/engine";
 import {
   playMoveSound,
   playCaptureSound,
@@ -52,9 +55,48 @@ import {
   playGameStartSound,
   playGameOverSound,
 } from "../../src/utils/sounds";
-import { colors, spacing, glassStyle } from "../../src/theme/tokens";
+import { colors, spacing, radius, glassStyle } from "../../src/theme/tokens";
 
 /* ── Bot Thinking Indicator ──────────────────────────────────────────── */
+
+function BotBanner({
+  strategy,
+  onTakeOver,
+  allowTakeover,
+}: {
+  strategy: string;
+  onTakeOver: () => void;
+  allowTakeover: boolean;
+}) {
+  return (
+    <View style={botBannerStyles.container}>
+      <Text style={botBannerStyles.text}>🤖 Bot is playing for you • {strategy}</Text>
+      {allowTakeover && (
+        <TouchableOpacity onPress={onTakeOver} style={botBannerStyles.btn}>
+          <Text style={botBannerStyles.btnText}>Take Over</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
+const botBannerStyles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: colors.accent.gold + "26",
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.accent.gold,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  text: { color: colors.text.primary, fontWeight: "600", flex: 1 },
+  btn: { paddingHorizontal: spacing.sm },
+  btnText: { color: colors.accent.gold, fontWeight: "700" },
+});
 
 function BotThinkingIndicator() {
   const opacity1 = useSharedValue(0.3);
@@ -139,6 +181,11 @@ export default function GameScreen() {
     betAmountUsd: number;
     txHash: string;
   } | null>(null);
+  const [botTakeover, setBotTakeover] = useState(false);
+  const botTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { config, maturity, inBotMatch, recordGameResult, setInBotMatch } = useBot();
+  const isOnlineBotMatch = inBotMatch && !botTakeover;
 
   useEffect(() => {
     onMoveError((msg: string) => setMoveError(msg));
@@ -162,6 +209,7 @@ export default function GameScreen() {
       setRematchPending(false);
       setOpponentWantsRematch(false);
       setBetSettlement(null);
+      setBotTakeover(false);
       router.replace(`/game/${gsAny.gameId}`);
     }
   }, [(gameState as any)?.gameId]);
@@ -202,6 +250,47 @@ export default function GameScreen() {
   const myBestMoves = bestMoves[color] ?? [];
   const opponentColor: Color = color === "white" ? "black" : "white";
   const opponentBestMoves = bestMoves[opponentColor] ?? [];
+
+  // Online bot autoplay
+  useEffect(() => {
+    if (!isOnlineBotMatch || !myTurn || result !== null) return;
+    const effective = { ...config, thinkingDelayMs: Math.max(500, config.thinkingDelayMs) };
+    botTimeoutRef.current = setTimeout(() => {
+      const pick = pickOnlineBotMove({
+        fen,
+        hand: myHand,
+        config,
+        maturity,
+        myColor: color,
+      });
+      if (pick) playMove(pick.cardId, pick.move);
+    }, effective.thinkingDelayMs);
+    return () => {
+      if (botTimeoutRef.current) clearTimeout(botTimeoutRef.current);
+    };
+  }, [isOnlineBotMatch, myTurn, fen, myHand, config, maturity, color, result, playMove]);
+
+  // Record bot game result for maturity
+  useEffect(() => {
+    if (!inBotMatch || result === null) return;
+    let outcome: "win" | "loss" | "draw" = "draw";
+    if (result.type === "draw" || result.type === "deckExhausted") {
+      outcome = "draw";
+    } else if (result.winner === color) {
+      outcome = "win";
+    } else {
+      outcome = "loss";
+    }
+    recordGameResult(outcome);
+  }, [inBotMatch, result, color, recordGameResult]);
+
+  // Clear bot match flag when leaving
+  useEffect(() => {
+    return () => {
+      if (botTimeoutRef.current) clearTimeout(botTimeoutRef.current);
+      setInBotMatch(false);
+    };
+  }, []);
 
   // Authoritative last move (UCI from the server) for the board slide animation.
   const lastMove = useMemo(() => {
@@ -394,6 +483,13 @@ export default function GameScreen() {
               showsVerticalScrollIndicator={false}
               bounces={false}
             >
+              {isOnlineBotMatch && (
+                <BotBanner
+                  strategy={config.strategy}
+                  allowTakeover={config.allowTakeover}
+                  onTakeOver={() => setBotTakeover(true)}
+                />
+              )}
               <View style={styles.boardWrapper}>
                 <BoardComponent
                   fen={fen}
@@ -487,6 +583,13 @@ export default function GameScreen() {
             />
           </View>
           <OpponentHand cardCount={opponentHandCount} />
+          {isOnlineBotMatch && (
+            <BotBanner
+              strategy={config.strategy}
+              allowTakeover={config.allowTakeover}
+              onTakeOver={() => setBotTakeover(true)}
+            />
+          )}
           <View style={styles.fullWidthRow}>
             <ScorePile cards={opponentScorePile} label="Captured" points={opponentPoints} />
           </View>

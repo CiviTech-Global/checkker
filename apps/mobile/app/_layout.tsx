@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-router";
 import { colors, typography } from "../src/theme/tokens";
 import { LocalProfileProvider, useLocalProfile } from "../src/context/LocalProfileContext";
+import { BotProvider } from "../src/context/BotContext";
 import { useSocket } from "../src/hooks/useSocket";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
 import { initMonitoring } from "../src/utils/analytics";
@@ -71,14 +72,16 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <LocalProfileProvider>
-        <GameRecordBridge />
-        <StatusBar style="light" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: colors.bg.primary },
-          }}
-        />
+        <BotProvider>
+          <GameRecordBridge />
+          <StatusBar style="light" />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.bg.primary },
+            }}
+          />
+        </BotProvider>
       </LocalProfileProvider>
     </ErrorBoundary>
   );

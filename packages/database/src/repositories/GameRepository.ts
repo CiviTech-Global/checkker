@@ -9,6 +9,8 @@ export type CreateGameInput = {
   timeControl: string;
   whiteRatingBefore: number;
   blackRatingBefore: number;
+  whiteIsBot?: boolean;
+  blackIsBot?: boolean;
 };
 
 export type CompleteGameInput = {

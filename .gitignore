@@ -26,3 +26,6 @@ graphify-out
 
 # Deployment package (build artifact)
 deploy/
+
+# Local issue tracking / scratch notes
+issues/
