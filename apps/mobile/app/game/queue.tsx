@@ -13,9 +13,10 @@ export default function QueueScreen() {
   const tc = params.tc ?? "blitz";
   const isBot = params.bot === "true";
 
-  const { connected, joinQueue, joinRanked, joinCasualDifficulty, gameState, requestBot, onBotFallbackOffer } = useSocket();
+  const { connected, joinQueue, joinRanked, joinCasualDifficulty, gameState, requestBot, onBotFallbackOffer, onQueueError } = useSocket();
   const { setInBotMatch } = useBot();
   const [searching, setSearching] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [botOffer, setBotOffer] = useState<{ tc: string } | null>(null);
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function QueueScreen() {
   }, [isBot]);
 
   useEffect(() => {
-    if (connected && !searching) {
+    if (connected && !searching && !error) {
       setSearching(true);
       if (mode === "casual") {
         joinCasualDifficulty(difficulty, tc, isBot);
@@ -31,7 +32,7 @@ export default function QueueScreen() {
         joinRanked(difficulty, tc, isBot);
       }
     }
-  }, [connected]);
+  }, [connected, searching, error, mode, difficulty, tc, isBot, joinCasualDifficulty, joinRanked]);
 
   useEffect(() => {
     if (gameState && "gameId" in gameState) {
@@ -43,12 +44,26 @@ export default function QueueScreen() {
     onBotFallbackOffer((data) => setBotOffer(data));
   }, [onBotFallbackOffer]);
 
+  useEffect(() => {
+    onQueueError((msg) => {
+      setSearching(false);
+      setError(msg);
+    });
+  }, [onQueueError]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Checkker</Text>
       <Text style={styles.subtitle}>{mode === "casual" ? "Casual Match" : "Ranked Match"}</Text>
 
-      {searching ? (
+      {error ? (
+        <View style={styles.searching}>
+          <Text style={[styles.searchText, { color: colors.accent.red }]}>{error}</Text>
+          <TouchableOpacity style={styles.cancelBtn} onPress={() => router.replace("/")}>
+            <Text style={styles.cancelText}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      ) : searching ? (
         <View style={styles.searching}>
           <ActivityIndicator size="large" color={colors.accent.primary} />
           <Text style={styles.searchText}>Searching for opponent...</Text>

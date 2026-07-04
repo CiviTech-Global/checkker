@@ -9,7 +9,9 @@ datasource db {
 
 model User {
   id            String   @id @default(uuid()) @db.Uuid
-  walletAddress String   @unique @map("wallet_address") @db.VarChar(42)
+  walletAddress String?  @unique @map("wallet_address") @db.VarChar(42)
+  guestDeviceId String?  @unique @map("guest_device_id") @db.VarChar(64)
+  isGuest       Boolean  @default(false) @map("is_guest")
   username      String   @unique @db.VarChar(32)
   avatarId      String   @default("king_white") @map("avatar_id") @db.VarChar(32)
   rating        Int      @default(1000)

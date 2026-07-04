@@ -13,12 +13,22 @@ const strategies: BotStrategy[] = ["balanced", "aggressive", "defensive", "gambl
 
 export default function BotConfigScreen() {
   const router = useRouter();
-  const { config, maturity, setConfig } = useBot();
-  const { updateBotConfig, onBotConfigUpdated, onBotError } = useSocket();
+  const { config, maturity, setConfig, setEnabled } = useBot();
+  const { authState, updateBotConfig, onBotConfigUpdated, onBotError, guestIdentify } = useSocket();
   const [local, setLocal] = useState(config);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isAuthenticated = authState?.profile != null;
+  const walletVerified = authState != null && authState.profile == null;
+
+  // Ensure a guest identity exists for wallet-less bot config sync.
+  useEffect(() => {
+    if (!authState) {
+      void guestIdentify();
+    }
+  }, [authState, guestIdentify]);
 
   useEffect(() => {
     onBotConfigUpdated((data) => {
@@ -34,14 +44,28 @@ export default function BotConfigScreen() {
     onBotError((msg) => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       setSaving(false);
-      setError(msg);
+      if (msg === "Not authenticated") {
+        setError("Sign in to sync bot settings across devices. Settings are saved locally.");
+      } else {
+        setError(msg);
+      }
     });
   }, [onBotError]);
 
   const handleSave = () => {
     setError(null);
+    setInfo(null);
     setSaving(true);
     setConfig(local).then(() => {
+      if (!isAuthenticated) {
+        setSaving(false);
+        if (walletVerified) {
+          setInfo("Settings saved locally. Complete profile setup to sync across devices.");
+        } else {
+          setInfo("Settings saved locally. Sign in to sync across devices.");
+        }
+        return;
+      }
       updateBotConfig(local, maturity);
       timeoutRef.current = setTimeout(() => {
         setSaving(false);
@@ -56,6 +80,14 @@ export default function BotConfigScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Bot Configuration</Text>
       <ScrollView contentContainerStyle={styles.scroll}>
+        <View style={[styles.row, styles.enableRow]}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.label}>Enable Delegate Mode</Text>
+            <Text style={styles.hint}>Let the bot play online matches for you</Text>
+          </View>
+          <Switch value={local.enabled} onValueChange={(v) => update({ enabled: v })} />
+        </View>
+
         <View style={styles.section}>
           <Text style={styles.label}>Difficulty</Text>
           <View style={styles.chipRow}>
@@ -113,6 +145,11 @@ export default function BotConfigScreen() {
         </View>
       </ScrollView>
 
+      {info && (
+        <View style={styles.infoBox}>
+          <Text style={styles.infoText}>{info}</Text>
+        </View>
+      )}
       {error && (
         <View style={styles.errorBox}>
           <Text style={styles.errorText}>{error}</Text>
@@ -121,6 +158,16 @@ export default function BotConfigScreen() {
       <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={saving}>
         <Text style={styles.saveText}>{saving ? "Saving..." : "Save & Sync"}</Text>
       </TouchableOpacity>
+      {!isAuthenticated && (
+        <TouchableOpacity
+          style={styles.secondaryBtn}
+          onPress={() => router.push(walletVerified ? "/auth/setup" : "/profile")}
+        >
+          <Text style={styles.secondaryBtnText}>
+            {walletVerified ? "Complete Profile Setup" : "Sign In to Sync"}
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -178,6 +225,8 @@ const styles = StyleSheet.create({
   chipText: { color: colors.text.primary, fontWeight: "600" },
   chipTextActive: { color: "#fff" },
   row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: spacing.sm },
+  enableRow: { backgroundColor: colors.bg.secondary, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.sm },
+  hint: { color: colors.text.muted, fontSize: 13, marginTop: 2 },
   sliderHeader: { flexDirection: "row", justifyContent: "space-between" },
   value: { color: colors.accent.gold, fontWeight: "700" },
   sliderTrack: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", height: 24 },
@@ -185,6 +234,10 @@ const styles = StyleSheet.create({
   sliderDotActive: { backgroundColor: colors.accent.primary, borderColor: colors.accent.primary },
   saveBtn: { backgroundColor: colors.accent.primary, padding: spacing.md, borderRadius: radius.lg, alignItems: "center", marginTop: spacing.sm },
   saveText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  secondaryBtn: { padding: spacing.md, borderRadius: radius.lg, alignItems: "center", marginTop: spacing.sm, borderWidth: 1, borderColor: colors.accent.blue },
+  secondaryBtnText: { color: colors.accent.blue, fontSize: 16, fontWeight: "700" },
+  infoBox: { backgroundColor: colors.accent.blue + "26", borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.sm },
+  infoText: { color: colors.accent.blue, textAlign: "center" },
   errorBox: { backgroundColor: colors.accent.red + "26", borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.sm },
   errorText: { color: colors.accent.red, textAlign: "center" },
 });

@@ -44,6 +44,7 @@ export interface AuthState {
   profile: PlayerProfile | null;
   isNewUser: boolean;
   walletAddress?: string;
+  isGuest?: boolean;
 }
 
 export interface DepositStatus {
@@ -70,6 +71,7 @@ let _depositStatus: DepositStatus | null = null;
 let _betSettledCallback: ((data: BetSettledPayload) => void) | null = null;
 let _betCancelledCallback: ((data: { gameId: string; reason: string }) => void) | null = null;
 let _queueJoinedCallback: ((data: { mode: string; difficulty: string; tc: string; betAmountUsd: number }) => void) | null = null;
+let _queueErrorCallback: ((error: string) => void) | null = null;
 let _usernameCheckCallback: ((data: { username: string; available: boolean }) => void) | null = null;
 const authStateListeners = new Set<(v: AuthState | null) => void>();
 const depositStatusListeners = new Set<(v: DepositStatus | null) => void>();
@@ -193,6 +195,54 @@ const dailyPuzzleListeners = new Set<(v: Puzzle | null) => void>();
 const SESSION_TOKEN_KEY = "checkker:sessionToken";
 let _sessionToken: string | null = null;
 
+/* ── Guest device ID persistence (wallet-less free play) ────────────── */
+
+const GUEST_DEVICE_ID_KEY = "checkker:guestDeviceId";
+let _guestDeviceId: string | null = null;
+
+function generateDeviceId(): string {
+  const bytes = new Uint8Array(16);
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] = Math.floor(Math.random() * 256);
+  }
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function getStoredGuestDeviceId(): string | null {
+  if (_guestDeviceId) return _guestDeviceId;
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      _guestDeviceId = window.localStorage.getItem(GUEST_DEVICE_ID_KEY);
+    }
+  } catch {
+    // storage unavailable
+  }
+  return _guestDeviceId;
+}
+
+async function ensureGuestDeviceId(): Promise<string | null> {
+  let id = getStoredGuestDeviceId();
+  if (id) return id;
+  id = generateDeviceId();
+  _guestDeviceId = id;
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      window.localStorage.setItem(GUEST_DEVICE_ID_KEY, id);
+    }
+  } catch {
+    // storage unavailable
+  }
+  try {
+    const AsyncStorage = require("@react-native-async-storage/async-storage").default;
+    await AsyncStorage.setItem(GUEST_DEVICE_ID_KEY, id);
+  } catch {
+    // not available (web)
+  }
+  return id;
+}
+
 function getStoredSessionToken(): string | null {
   if (_sessionToken) return _sessionToken;
   try {
@@ -237,10 +287,15 @@ export function logoutSession(): void {
   storeSessionToken(null);
   _authState = null;
   authStateListeners.forEach((fn) => fn(null));
+  // Fall back to guest identity for wallet-less free play.
+  void ensureGuestDeviceId().then((deviceId) => {
+    if (deviceId && socket?.connected && !_authState) {
+      socket.emit("guest_identify", { deviceId });
+    }
+  });
 }
 
-// Hydrate the token from AsyncStorage on native; if the socket is already
-// connected and unauthenticated, re-auth immediately.
+// Hydrate the token and guest device id from AsyncStorage on native.
 (() => {
   try {
     const AsyncStorage = require("@react-native-async-storage/async-storage").default;
@@ -250,6 +305,11 @@ export function logoutSession(): void {
         if (socket?.connected && !_authState) {
           socket.emit("auth_token", { token });
         }
+      }
+    });
+    AsyncStorage.getItem(GUEST_DEVICE_ID_KEY).then((id: string | null) => {
+      if (id && !_guestDeviceId) {
+        _guestDeviceId = id;
       }
     });
   } catch {
@@ -270,7 +330,16 @@ function attachListeners(s: Socket) {
     // the server restore identity without prompting the wallet again.
     if (!_authState) {
       const token = getStoredSessionToken();
-      if (token) s.emit("auth_token", { token });
+      if (token) {
+        s.emit("auth_token", { token });
+      } else {
+        // No wallet session — identify as a guest for wallet-less free play.
+        void ensureGuestDeviceId().then((deviceId) => {
+          if (deviceId && s.connected && !_authState) {
+            s.emit("guest_identify", { deviceId });
+          }
+        });
+      }
     }
   });
 
@@ -346,7 +415,7 @@ function attachListeners(s: Socket) {
     _authChallengeCallback?.(data);
   });
 
-  s.on("auth_success", (data: { profile: PlayerProfile | null; isNewUser: boolean; walletAddress?: string; sessionToken?: string }) => {
+  s.on("auth_success", (data: { profile: PlayerProfile | null; isNewUser: boolean; walletAddress?: string; sessionToken?: string; isGuest?: boolean }) => {
     _authState = data;
     authStateListeners.forEach((fn) => fn(_authState));
     if (data.sessionToken) storeSessionToken(data.sessionToken);
@@ -398,6 +467,10 @@ function attachListeners(s: Socket) {
 
   s.on("queue_joined", (data: { mode: string; difficulty: string; tc: string; betAmountUsd: number }) => {
     _queueJoinedCallback?.(data);
+  });
+
+  s.on("queue_error", (data: { error: string }) => {
+    _queueErrorCallback?.(data.error);
   });
 
   s.on("leaderboard", (data: LeaderboardData) => {
@@ -775,6 +848,7 @@ export function useSocket() {
   const betSettledCbRef = useRef<((data: BetSettledPayload) => void) | null>(null);
   const betCancelledCbRef = useRef<((data: { gameId: string; reason: string }) => void) | null>(null);
   const queueJoinedCbRef = useRef<((data: { mode: string; difficulty: string; tc: string; betAmountUsd: number }) => void) | null>(null);
+  const queueErrorCbRef = useRef<((error: string) => void) | null>(null);
   const usernameCheckCbRef = useRef<((data: { username: string; available: boolean }) => void) | null>(null);
 
   useEffect(() => {
@@ -794,6 +868,7 @@ export function useSocket() {
     _betSettledCallback = (data) => betSettledCbRef.current?.(data);
     _betCancelledCallback = (data) => betCancelledCbRef.current?.(data);
     _queueJoinedCallback = (data) => queueJoinedCbRef.current?.(data);
+    _queueErrorCallback = (error) => queueErrorCbRef.current?.(error);
     _usernameCheckCallback = (data) => usernameCheckCbRef.current?.(data);
   }, []);
 
@@ -803,6 +878,13 @@ export function useSocket() {
 
   const authVerify = useCallback((walletAddress: string, signature: string) => {
     getSocket().emit("auth_verify", { walletAddress, signature });
+  }, []);
+
+  const guestIdentify = useCallback(async (username?: string, avatarId?: string) => {
+    const deviceId = await ensureGuestDeviceId();
+    if (deviceId) {
+      getSocket().emit("guest_identify", { deviceId, username, avatarId });
+    }
   }, []);
 
   const setUsername = useCallback((walletAddress: string, username: string, avatarId?: string) => {
@@ -859,6 +941,10 @@ export function useSocket() {
 
   const onQueueJoined = useCallback((fn: (data: { mode: string; difficulty: string; tc: string; betAmountUsd: number }) => void) => {
     queueJoinedCbRef.current = fn;
+  }, []);
+
+  const onQueueError = useCallback((fn: (error: string) => void) => {
+    queueErrorCbRef.current = fn;
   }, []);
 
   const onUsernameCheck = useCallback((fn: (data: { username: string; available: boolean }) => void) => {
@@ -1166,6 +1252,7 @@ export function useSocket() {
     authState,
     authRequest,
     authVerify,
+    guestIdentify,
     logout: logoutSession,
     setUsername,
     checkUsername,
@@ -1180,6 +1267,7 @@ export function useSocket() {
     onBetSettled,
     onBetCancelled,
     onQueueJoined,
+    onQueueError,
     getLeaderboard,
     getProfile,
     onLeaderboard,

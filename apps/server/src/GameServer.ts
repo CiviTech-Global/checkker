@@ -10,6 +10,7 @@ import { deserializeBotConfig, serializeBotConfig, deserializeBotMaturity, seria
 import { BotManager } from "./bot/BotManager";
 import { SpectateManager } from "./bot/SpectateManager";
 import { playerStore } from "./PlayerStore";
+import { UserRepository } from "@checkker/database";
 import { calculateOdds } from "./odds";
 import { brain } from "./bot/evaluators";
 import { createChallenge, verifyChallenge, cleanupExpiredChallenges, createSession, verifySession, revokeSession } from "./auth/WalletAuth";
@@ -55,7 +56,7 @@ interface PendingBetGame {
 }
 
 /** Authenticated socket sessions */
-const authenticatedSockets = new Map<string, { walletAddress: string; userId: string }>();
+const authenticatedSockets = new Map<string, { walletAddress?: string; userId: string; isGuest?: boolean }>();
 
 /** Pending private game invite between friends */
 interface PrivateInvite {
@@ -129,6 +130,7 @@ export class GameServer {
         authenticatedSockets.set(socket.id, {
           walletAddress: walletAddress.toLowerCase(),
           userId: profile.id,
+          isGuest: false,
         });
         this.userSockets.set(profile.id, socket);
         socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress) });
@@ -148,11 +150,40 @@ export class GameServer {
       }
       const profile = await playerStore.loadFromWallet(socket.id, walletAddress);
       if (profile) {
-        authenticatedSockets.set(socket.id, { walletAddress, userId: profile.id });
+        authenticatedSockets.set(socket.id, { walletAddress, userId: profile.id, isGuest: false });
         this.userSockets.set(profile.id, socket);
         socket.emit("auth_success", { profile, isNewUser: false, sessionToken: token });
       } else {
         socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress, sessionToken: token });
+      }
+    });
+
+    // Guest identity for wallet-less free play.
+    socket.on("guest_identify", async ({ deviceId, username, avatarId }: { deviceId?: string; username?: string; avatarId?: string }) => {
+      if (!deviceId || deviceId.length < 8 || deviceId.length > 64) {
+        socket.emit("auth_error", { error: "Invalid guest device id" });
+        return;
+      }
+      const safeUsername = (username?.trim() || `Guest-${deviceId.slice(0, 6)}`).slice(0, 32);
+      try {
+        let user = await UserRepository.findByGuestDeviceId(deviceId);
+        if (!user) {
+          // Ensure synthetic username is unique
+          let candidate = safeUsername;
+          let suffix = 0;
+          while (await UserRepository.isUsernameTaken(candidate)) {
+            suffix += 1;
+            const suffixStr = `-${suffix}`;
+            candidate = safeUsername.slice(0, 32 - suffixStr.length) + suffixStr;
+          }
+          user = await UserRepository.createGuest({ guestDeviceId: deviceId, username: candidate, avatarId });
+        }
+        authenticatedSockets.set(socket.id, { userId: user.id, isGuest: true });
+        this.userSockets.set(user.id, socket);
+        const profile = await playerStore.loadFromUser(socket.id, user);
+        socket.emit("auth_success", { profile, isNewUser: false, isGuest: true });
+      } catch (err: any) {
+        socket.emit("auth_error", { error: err?.message ?? "Guest identification failed" });
       }
     });
 
@@ -223,6 +254,7 @@ export class GameServer {
         authenticatedSockets.set(socket.id, {
           walletAddress: walletAddress.toLowerCase(),
           userId: profile.id,
+          isGuest: false,
         });
         this.userSockets.set(profile.id, socket);
         socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress) });
@@ -308,15 +340,19 @@ export class GameServer {
     /* ── New difficulty-based matchmaking ─────────────────────────────── */
 
     socket.on("join_ranked", ({ difficulty, tc, isBot }: { difficulty: BotDifficulty; tc: TimeControl; isBot?: boolean }) => {
-      const profile = playerStore.get(socket.id);
       const auth = authenticatedSockets.get(socket.id);
+      if (!auth || auth.isGuest) {
+        socket.emit("queue_error", { error: "Ranked games require a connected wallet" });
+        return;
+      }
+      const profile = playerStore.get(socket.id);
       const player: Player = {
         id: socket.id,
         socket,
         rating: profile?.rating ?? 1000,
         casual: false,
-        walletAddress: auth?.walletAddress,
-        userId: auth?.userId,
+        walletAddress: auth.walletAddress,
+        userId: auth.userId,
         isBot: isBot ?? false,
       };
       this.addToDifficultyQueue(player, tc, "ranked", difficulty);
@@ -324,6 +360,11 @@ export class GameServer {
 
     socket.on("join_casual_difficulty", ({ difficulty, tc, isBot }: { difficulty: BotDifficulty; tc: TimeControl; isBot?: boolean }) => {
       const auth = authenticatedSockets.get(socket.id);
+      const needsWallet = !isFreeGame("casual", difficulty);
+      if (needsWallet && (!auth || auth.isGuest)) {
+        socket.emit("queue_error", { error: "This casual tier requires a connected wallet" });
+        return;
+      }
       const player: Player = {
         id: socket.id,
         socket,

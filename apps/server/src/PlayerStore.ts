@@ -1,5 +1,6 @@
 import { v4 as uuid } from "uuid";
 import type { PlayerProfile } from "@checkker/shared";
+import type { User } from "@prisma/client";
 
 /** Whether the database is available (set by server startup) */
 let dbEnabled = false;
@@ -81,12 +82,34 @@ class PlayerStore {
       draws: user.draws,
       currentStreak: user.currentStreak,
       bestStreak: user.bestStreak,
-      walletAddress: user.walletAddress,
+      walletAddress: user.walletAddress ?? undefined,
       avatarId: user.avatarId,
     };
 
     sessionCache.set(socketId, profile);
     walletToSocket.set(walletAddress.toLowerCase(), socketId);
+    return profile;
+  }
+
+  /** Load profile from an already-fetched User row and cache it */
+  async loadFromUser(socketId: string, user: User): Promise<PlayerProfile> {
+    const profile: PlayerProfile = {
+      id: user.id,
+      displayName: user.username,
+      rating: user.rating,
+      gamesPlayed: user.gamesPlayed,
+      wins: user.wins,
+      losses: user.losses,
+      draws: user.draws,
+      currentStreak: user.currentStreak,
+      bestStreak: user.bestStreak,
+      walletAddress: user.walletAddress ?? undefined,
+      avatarId: user.avatarId,
+    };
+    sessionCache.set(socketId, profile);
+    if (user.walletAddress) {
+      walletToSocket.set(user.walletAddress.toLowerCase(), socketId);
+    }
     return profile;
   }
 
@@ -136,7 +159,7 @@ class PlayerStore {
       draws: user.draws,
       currentStreak: user.currentStreak,
       bestStreak: user.bestStreak,
-      walletAddress: user.walletAddress,
+      walletAddress: user.walletAddress ?? undefined,
       avatarId: user.avatarId,
     };
 
@@ -192,7 +215,7 @@ class PlayerStore {
     if (!dbEnabled || !UserRepo) return;
 
     const profile = sessionCache.get(socketId);
-    if (!profile?.walletAddress) return;
+    if (!profile) return;
 
     await UserRepo.updateAfterGame(profile.id, {
       outcome,

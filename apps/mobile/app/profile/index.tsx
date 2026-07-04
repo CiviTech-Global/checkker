@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -61,7 +61,16 @@ function combineStats(a: SimpleStats, b: SimpleStats): SimpleStats {
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { connected, getProfile, onProfileData, authState } = useSocket();
+  const {
+    connected,
+    getProfile,
+    onProfileData,
+    authState,
+    authRequest,
+    authVerify,
+    onAuthChallenge,
+    onAuthError,
+  } = useSocket();
   const wallet = useWallet();
   const {
     localProfile,
@@ -81,6 +90,7 @@ export default function ProfileScreen() {
   const [nameInput, setNameInput] = useState(localProfile.offlineName);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const nameInputRef = useRef<TextInput>(null);
+  const authAttemptedRef = useRef<string | null>(null);
 
   // Sync online stats when server data arrives
   useEffect(() => {
@@ -107,6 +117,41 @@ export default function ProfileScreen() {
   useEffect(() => {
     if (connected) getProfile();
   }, [connected, getProfile]);
+
+  // Listen for auth challenge and sign it
+  useEffect(() => {
+    onAuthChallenge(async (data) => {
+      if (!wallet.address) return;
+      try {
+        const signature = await wallet.sign(data.message);
+        if (signature) {
+          authVerify(wallet.address, signature);
+        }
+      } catch {
+        // Signing failed; leave wallet connected but unauthenticated
+      }
+    });
+  }, [onAuthChallenge, wallet.address, wallet.sign, authVerify]);
+
+  useEffect(() => {
+    onAuthError(() => {
+      authAttemptedRef.current = null;
+    });
+  }, [onAuthError]);
+
+  const isServerAuthenticated = authState?.profile != null;
+  const walletVerifiedNoProfile = authState != null && authState.profile == null;
+
+  const handleSignIn = useCallback(async () => {
+    if (!wallet.address) {
+      await wallet.connect();
+    }
+    const address = wallet.address ?? localProfile.walletAddress;
+    if (address && connected && !isServerAuthenticated) {
+      authAttemptedRef.current = address;
+      authRequest(address);
+    }
+  }, [wallet, connected, isServerAuthenticated, localProfile.walletAddress, authRequest]);
 
   // Get stats for current tab
   const currentStats: SimpleStats =
@@ -147,15 +192,25 @@ export default function ProfileScreen() {
     await wallet.connect();
     if (wallet.address) {
       cacheWalletAddress(wallet.address);
+      if (connected && !authState) {
+        authAttemptedRef.current = wallet.address;
+        authRequest(wallet.address);
+      }
     }
   };
 
-  // Update cached wallet when wallet connects
+  // Update cached wallet when wallet connects and start server auth if needed
   useEffect(() => {
     if (wallet.address && wallet.isConnected) {
       cacheWalletAddress(wallet.address);
+      if (connected && !authState && authAttemptedRef.current !== wallet.address) {
+        authAttemptedRef.current = wallet.address;
+        authRequest(wallet.address);
+      }
+    } else {
+      authAttemptedRef.current = null;
     }
-  }, [wallet.address, wallet.isConnected, cacheWalletAddress]);
+  }, [wallet.address, wallet.isConnected, connected, authState, cacheWalletAddress, authRequest]);
 
   const handleSelectAvatar = (id: string) => {
     updateAvatar(id);
@@ -310,6 +365,31 @@ export default function ProfileScreen() {
             <View style={styles.connectedBadge}>
               <Text style={styles.connectedBadgeText}>Connected</Text>
             </View>
+            {isServerAuthenticated ? (
+              authState?.isGuest ? (
+                <View style={[styles.authBadge, { backgroundColor: colors.accent.blue + "26" }]}>
+                  <Text style={[styles.authBadgeText, { color: colors.accent.blue }]}>Guest</Text>
+                </View>
+              ) : (
+                <View style={[styles.authBadge, { backgroundColor: colors.accent.green + "26" }]}>
+                  <Text style={[styles.authBadgeText, { color: colors.accent.green }]}>Signed In</Text>
+                </View>
+              )
+            ) : walletVerifiedNoProfile ? (
+              <TouchableOpacity
+                style={[styles.authBadge, { backgroundColor: colors.accent.blue + "26" }]}
+                onPress={() => router.push("/auth/setup")}
+              >
+                <Text style={[styles.authBadgeText, { color: colors.accent.blue }]}>Complete Setup</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={[styles.authBadge, { backgroundColor: colors.accent.gold + "26" }]}
+                onPress={handleSignIn}
+              >
+                <Text style={[styles.authBadgeText, { color: colors.accent.gold }]}>Sign In</Text>
+              </TouchableOpacity>
+            )}
           </View>
         ) : (
           <TouchableOpacity style={styles.connectBtn} onPress={handleConnectWallet}>
@@ -620,6 +700,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    flexWrap: "wrap",
+    gap: spacing.sm,
   },
   walletAddr: {
     fontSize: 13,
@@ -638,6 +720,16 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "600",
     color: colors.accent.green,
+  },
+  authBadge: {
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderWidth: 1,
+  },
+  authBadgeText: {
+    fontSize: 11,
+    fontWeight: "600",
   },
   connectBtn: {
     backgroundColor: colors.accent.primary,

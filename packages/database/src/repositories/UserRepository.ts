@@ -2,7 +2,13 @@ import { getDb } from "../client";
 import type { User } from "@prisma/client";
 
 export type CreateUserInput = {
-  walletAddress: string;
+  walletAddress?: string;
+  username: string;
+  avatarId?: string;
+};
+
+export type CreateGuestInput = {
+  guestDeviceId: string;
   username: string;
   avatarId?: string;
 };
@@ -34,9 +40,34 @@ export const UserRepository = {
   async create(input: CreateUserInput): Promise<User> {
     return getDb().user.create({
       data: {
-        walletAddress: input.walletAddress.toLowerCase(),
+        walletAddress: input.walletAddress?.toLowerCase(),
         username: input.username,
         avatarId: input.avatarId ?? "king_white",
+      },
+    });
+  },
+
+  async findByGuestDeviceId(guestDeviceId: string): Promise<User | null> {
+    return getDb().user.findUnique({ where: { guestDeviceId } });
+  },
+
+  async createGuest(input: CreateGuestInput): Promise<User> {
+    return getDb().user.create({
+      data: {
+        guestDeviceId: input.guestDeviceId,
+        isGuest: true,
+        username: input.username,
+        avatarId: input.avatarId ?? "king_white",
+      },
+    });
+  },
+
+  async linkWalletToGuest(guestDeviceId: string, walletAddress: string): Promise<User | null> {
+    return getDb().user.update({
+      where: { guestDeviceId },
+      data: {
+        walletAddress: walletAddress.toLowerCase(),
+        isGuest: false,
       },
     });
   },
