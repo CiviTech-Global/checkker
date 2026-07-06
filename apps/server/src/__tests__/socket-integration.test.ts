@@ -1,6 +1,10 @@
 import { createServer, type Server as HttpServer } from "http";
 import { Server } from "socket.io";
 import { io as ioClient, type Socket as ClientSocket } from "socket.io-client";
+import { Chess } from "@checkker/chess";
+import type { Card } from "@checkker/shared";
+import { cardId } from "@checkker/shared";
+import { getLegalMovesForHand } from "@checkker/chess";
 import { GameServer } from "../GameServer";
 
 /**
@@ -111,4 +115,57 @@ describe("GameServer socket integration", () => {
     guest.emit("join_lan_game", { code });
     expect((await result).success).toBe(false);
   }, 10000);
+
+  it("matches two players in casual queue, plays a move, and emits game_over on resign", async () => {
+    const p1 = await connect();
+    const p2 = await connect();
+
+    // Both join the free beginner casual queue.
+    p1.emit("join_casual_difficulty", { difficulty: "beginner", tc: "blitz" });
+    p2.emit("join_casual_difficulty", { difficulty: "beginner", tc: "blitz" });
+
+    const p1Start = once<any>(p1, "game_start");
+    const p2Start = once<any>(p2, "game_start");
+    const [s1, s2] = await Promise.all([p1Start, p2Start]);
+
+    expect(s1.gameId).toBeTruthy();
+    expect(s1.gameId).toBe(s2.gameId);
+
+    // Identify who is white / black.
+    const whiteClient = s1.color === "white" ? p1 : p2;
+    const blackClient = s1.color === "white" ? p2 : p1;
+    const whiteState = s1.color === "white" ? s1 : s2;
+    const gameId = s1.gameId;
+
+    // White plays one legal move.
+    const move = pickLegalMove(whiteState.hand, whiteState.fen);
+    expect(move).toBeTruthy();
+
+    const whiteUpdated = once<any>(whiteClient, "game_update");
+    const blackUpdated = once<any>(blackClient, "game_update");
+    whiteClient.emit("play_move", { gameId, card: move!.cardId, move: move!.move });
+    await Promise.all([whiteUpdated, blackUpdated]);
+
+    // Black resigns to end the game deterministically.
+    const whiteOver = once<any>(whiteClient, "game_over");
+    const blackOver = once<any>(blackClient, "game_over");
+    blackClient.emit("resign", { gameId });
+    const [wo, bo] = await Promise.all([whiteOver, blackOver]);
+
+    expect(wo.gameId).toBe(gameId);
+    expect(bo.gameId).toBe(gameId);
+    expect(wo.result?.type).toBe("resignation");
+    expect(bo.result?.type).toBe("resignation");
+  }, 20000);
 });
+
+function pickLegalMove(hand: Card[], fen: string): { cardId: string; move: string } | null {
+  const chess = new Chess(fen);
+  for (const card of hand) {
+    const moves = getLegalMovesForHand(chess, [card])[0]?.moves ?? [];
+    if (moves.length > 0) {
+      return { cardId: cardId(card), move: moves[0] };
+    }
+  }
+  return null;
+}

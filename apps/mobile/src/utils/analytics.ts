@@ -19,7 +19,7 @@ export function initMonitoring(): void {
   try {
     const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
     if (!dsn) return;
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     sentry = require("@sentry/react-native");
     sentry.init({ dsn, tracesSampleRate: 0.1 });
   } catch {

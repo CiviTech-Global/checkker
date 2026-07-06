@@ -17,7 +17,7 @@ import {
 } from "@checkker/shared";
 import { getLegalMovesForHand, getCaptureBonus } from "@checkker/chess";
 import { evaluateScorePile } from "@checkker/poker";
-import { getTopMoves, type MoveEvaluation, brain } from "./bot/evaluators";
+import { getTopMoves, type MoveEvaluation } from "./bot/evaluators";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -217,14 +217,12 @@ export class GameEngine {
     const isMate = this.chess.isCheckmate();
     let bonusCards = 0;
 
-    if (wasCapture) {
+    if (wasCapture && piece !== "wild") {
       player.scorePile.push(card);
-      if (piece !== "wild") {
-        bonusCards = getCaptureBonus(moveResult.captured!, isCheckMove);
-        if (bonusCards > 1) {
-          const drawn = this.drawCards(player, bonusCards - 1);
-          bonusCards = drawn.length + 1;
-        }
+      bonusCards = getCaptureBonus(moveResult.captured!, isCheckMove);
+      if (bonusCards > 1) {
+        const drawn = this.drawCards(player, bonusCards - 1);
+        bonusCards = drawn.length + 1;
       }
     } else {
       this.deadPile.push(card);

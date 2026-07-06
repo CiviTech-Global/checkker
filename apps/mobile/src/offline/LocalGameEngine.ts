@@ -184,16 +184,14 @@ export class LocalGameEngine {
     const isCheckMove = this.chess.isCheck();
     let bonusCards = 0;
 
-    if (wasCapture) {
+    if (wasCapture && piece !== "wild") {
       player.scorePile.push(card);
-      if (piece !== "wild") {
-        bonusCards = getCaptureBonus(moveResult.captured!, isCheckMove);
-        if (bonusCards > 1) {
-          for (let i = 0; i < bonusCards - 1; i++) {
-            if (this.drawPile.length === 0) this.reshuffleDead();
-            if (this.result) break;
-            if (this.drawPile.length > 0) player.hand.push(this.drawPile.pop()!);
-          }
+      bonusCards = getCaptureBonus(moveResult.captured!, isCheckMove);
+      if (bonusCards > 1) {
+        for (let i = 0; i < bonusCards - 1; i++) {
+          if (this.drawPile.length === 0) this.reshuffleDead();
+          if (this.result) break;
+          if (this.drawPile.length > 0) player.hand.push(this.drawPile.pop()!);
         }
       }
     } else {

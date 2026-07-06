@@ -18,6 +18,7 @@ import { BetManager } from "./betting/BetManager";
 import type { BetSetup } from "./betting/BetManager";
 import { CONTRACT_ADDRESS, BLOCKCHAIN_ENABLED } from "./blockchain/config";
 import { ContractService } from "./blockchain/ContractService";
+import { SocketRateLimiter } from "./rateLimit";
 
 interface Player {
   id: string; // socket ID (or user UUID when authenticated)
@@ -90,10 +91,12 @@ export class GameServer {
   private userSockets = new Map<string, Socket>(); // userId → live socket
   private privateInvites = new Map<string, PrivateInvite>();
   private lanHosts = new Map<string, { hostSocketId: string; tc: TimeControl; createdAt: number }>(); // code → host
-  private queueTimeouts = new Map<string, NodeJS.Timeout>();
+  private queueTimeouts = new Map<string, ReturnType<typeof setInterval>>();
   private botManager: BotManager;
   private spectateManager: SpectateManager;
-  private challengeCleanupInterval: NodeJS.Timeout;
+  private challengeCleanupInterval: ReturnType<typeof setInterval>;
+  private authRateLimiter = new SocketRateLimiter({ capacity: 5, refillRate: 1 / 60 }); // 5 auth attempts per minute
+  private moveRateLimiter = new SocketRateLimiter({ capacity: 10, refillRate: 2 }); // 2 moves/sec burst 10
 
   constructor(io: SocketServer) {
     this.io = io;
@@ -101,6 +104,11 @@ export class GameServer {
     this.spectateManager = new SpectateManager();
     // Clean up expired auth challenges every 60 seconds
     this.challengeCleanupInterval = setInterval(cleanupExpiredChallenges, 60_000);
+    // Prune stale rate-limit buckets every 5 minutes
+    setInterval(() => {
+      this.authRateLimiter.prune();
+      this.moveRateLimiter.prune();
+    }, 5 * 60 * 1000).unref();
   }
 
   handleConnection(socket: Socket): void {
@@ -109,6 +117,10 @@ export class GameServer {
     /* ── Authentication Events ──────────────────────────────────────── */
 
     socket.on("auth_request", ({ walletAddress }: { walletAddress: string }) => {
+      if (!this.authRateLimiter.allow(socket.id, "auth_request")) {
+        socket.emit("auth_error", { error: "Rate limit exceeded. Try again later." });
+        return;
+      }
       if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
         socket.emit("auth_error", { error: "Invalid wallet address" });
         return;
@@ -118,6 +130,10 @@ export class GameServer {
     });
 
     socket.on("auth_verify", async ({ walletAddress, signature }: { walletAddress: string; signature: string }) => {
+      if (!this.authRateLimiter.allow(socket.id, "auth_verify")) {
+        socket.emit("auth_error", { error: "Rate limit exceeded. Try again later." });
+        return;
+      }
       const result = verifyChallenge(walletAddress, signature);
       if (!result.valid) {
         socket.emit("auth_error", { error: result.error ?? "Verification failed" });
@@ -978,6 +994,10 @@ export class GameServer {
     /* ── In-Game Events ──────────────────────────────────────────────── */
 
     socket.on("play_move", async ({ gameId, card, move }: { gameId: string; card: string; move: string }) => {
+      if (!this.moveRateLimiter.allow(socket.id, "play_move")) {
+        socket.emit("move_error", { error: "Rate limit exceeded. Slow down." });
+        return;
+      }
       const match = this.matches.get(gameId);
       if (!match) return;
       const { game, white, black } = match;
@@ -986,7 +1006,6 @@ export class GameServer {
       const color: Color = socket.id === white.id ? "white" : "black";
       if (game.getState().turn !== color) return;
 
-      const beforeFen = game.getState().fen;
       const result = game.playCard(card, move);
       if (result.success) {
         // Persist move to DB if the game is tracked
@@ -1045,7 +1064,7 @@ export class GameServer {
     socket.on("resign", ({ gameId }: { gameId: string }) => {
       const match = this.matches.get(gameId);
       if (!match) return;
-      const { game, white, black } = match;
+      const { game, white } = match;
       const color: Color = socket.id === white.id ? "white" : "black";
       game.resign(color);
       this.broadcastGame(gameId);
@@ -1065,7 +1084,7 @@ export class GameServer {
       }
     });
 
-    socket.on("undo_move", ({ gameId }: { gameId: string }) => {
+    socket.on("undo_move", ({ gameId: _gameId }: { gameId: string }) => {
       // Only allowed for bot games — handled by BotManager
     });
 
@@ -1282,7 +1301,7 @@ export class GameServer {
   private async launchGame(
     p1: Player, p2: Player, tc: TimeControl,
     mode: GameMode, difficulty: BotDifficulty,
-    betSetup: BetSetup | null, existingGameId?: string
+    betSetup: BetSetup | null, _existingGameId?: string
   ): Promise<void> {
     const game = new GameEngine(p1.rating, p2.rating, tc);
     // If we already have a gameId from escrow, we track it via betSetup.gameId
@@ -1403,7 +1422,7 @@ export class GameServer {
     });
 
     if (game.getResult()) {
-      const payload = { result: game.getResult(), scores: game.getScores() };
+      const payload = { gameId, result: game.getResult(), scores: game.getScores() };
       white.socket.emit("game_over", payload);
       black.socket.emit("game_over", payload);
     }

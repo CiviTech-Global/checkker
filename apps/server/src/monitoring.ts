@@ -13,7 +13,7 @@ export function initMonitoring(): void {
   const dsn = process.env.SENTRY_DSN;
   if (dsn) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       sentry = require("@sentry/node");
       sentry.init({
         dsn,

@@ -139,9 +139,6 @@ export class SpectateManager {
       if (entry.disposed || entry.paused) continue;
       if (entry.game.isOver()) break;
 
-      const fenBefore = entry.game.getState().fen;
-      const turnBefore = entry.game.getState().turn;
-
       await this.executeBotMove(entry, currentBot);
 
       if (entry.disposed) break;

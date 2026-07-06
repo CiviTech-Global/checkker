@@ -24,7 +24,7 @@ export async function registerForPushNotifications(
   attempted = true;
   try {
     // Dynamic require so the app works without the optional dependency.
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const Notifications = require("expo-notifications");
     const { status: existing } = await Notifications.getPermissionsAsync();
     let status = existing;

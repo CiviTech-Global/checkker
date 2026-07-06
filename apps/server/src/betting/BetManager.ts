@@ -177,7 +177,7 @@ export const BetManager = {
     result: GameResult,
     winnerAddress: string | null,
     winnerUserId?: string,
-    loserUserId?: string,
+    _loserUserId?: string,
   ): Promise<string | null> {
     if (!ContractService.enabled) return null;
 

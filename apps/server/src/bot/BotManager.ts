@@ -34,8 +34,6 @@ const BOT_RATINGS: Record<BotDifficulty, number> = {
   master: 1900,
 };
 
-const HUMAN_DEFAULT_RATING = 1000;
-
 export class BotManager {
   private botGames: Map<string, BotGame> = new Map();
   private socketHandlers: Map<string, BotGameHandlers> = new Map();
@@ -228,7 +226,9 @@ export class BotManager {
         if (report.summary) {
           humanSocket.emit("game_analysis", { summary: report.summary, accuracy: report.chessAccuracy, mistakes: report.mistakes.length });
         }
-      } catch {}
+      } catch {
+        // Analysis failure is non-fatal.
+      }
     }
   }
 

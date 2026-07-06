@@ -11,7 +11,7 @@
     "build": "echo web ok",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "lint": "echo lint ok",
+    "lint": "eslint src app --ext .ts,.tsx",
     "export:web": "expo export --platform web",
     "clean": "rm -rf .turbo dist node_modules/.cache"
   },
@@ -41,9 +41,16 @@
     "three": "^0.166.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@types/jest": "^29.5.14",
     "@types/react": "~18.3.0",
     "@types/three": "^0.184.1",
+    "@typescript-eslint/eslint-plugin": "^8.62.1",
+    "@typescript-eslint/parser": "^8.62.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.7.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.4.11",
     "typescript": "^5.8.0"

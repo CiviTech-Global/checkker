@@ -135,7 +135,7 @@ function ChessBoard({
   const visibleFiles = orientation === "white" ? FILES : [...FILES].reverse();
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
+    <View testID="chess-board" style={styles.container} onLayout={onLayout}>
       <View style={{ flexDirection: "row" }}>
         <View style={{ width: coordSize }}>
           {visibleRanks.map((r) => (
@@ -157,9 +157,9 @@ function ChessBoard({
                 const animFrom = isAnimSq ? { dx: anim!.dx, dy: anim!.dy } : null;
 
                 return (
-                  <ChessSquare
-                    key={sq}
-                    square={sq}
+                  <View key={sq} testID={`square-${sq}`}>
+                    <ChessSquare
+                      square={sq}
                     piece={piece || null}
                     isLight={isLightSquare(boardFi, boardRi)}
                     isHighlighted={highlightSet.has(sq)}
@@ -172,7 +172,8 @@ function ChessBoard({
                     animKey={isAnimSq ? anim!.key : 0}
                     boardColors={equippedTheme.board?.board}
                     pieceColors={equippedTheme.piece?.isDefault ? undefined : equippedTheme.piece?.piece}
-                  />
+                    />
+                  </View>
                 );
               })}
             </View>

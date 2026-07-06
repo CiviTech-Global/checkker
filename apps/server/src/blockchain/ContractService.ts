@@ -79,7 +79,7 @@ async function retryWrite(
     try {
       const nonce = await nonceManager.acquire();
       const tx = await call(nonce);
-      const receipt = await tx.wait();
+      await tx.wait();
       console.log(`[ContractService] ${label} OK (attempt ${attempt}): ${tx.hash}`);
       return tx.hash;
     } catch (err: any) {

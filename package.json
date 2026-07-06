@@ -15,6 +15,7 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "jest-junit": "^17.0.0",
     "turbo": "^2.5.0",
     "typescript": "^5.8.0"

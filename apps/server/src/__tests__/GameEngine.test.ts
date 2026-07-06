@@ -121,6 +121,30 @@ describe("GameEngine — captures", () => {
     expect(state.white.scorePile.length).toBe(0);
     engine.dispose();
   });
+
+  it("capture with a regular card puts the played card in scorePile", () => {
+    // White: Ace + two pawn cards. Black: three pawn cards.
+    const wh: Card[] = [c("A", "clubs"), c("5", "hearts"), c("6", "spades")];
+    const bh: Card[] = [c("3", "diamonds"), c("4", "clubs"), c("8", "hearts")];
+    const engine = new GameEngine(1200, 1200, "blitz", testDeck(wh, bh));
+
+    // White plays e2-e4 with a pawn card.
+    const whitePawn = cardId(c("5", "hearts"));
+    engine.playCard(whitePawn, "e2e4");
+
+    // Black plays d7-d5 with a pawn card.
+    const blackPawn = cardId(c("3", "diamonds"));
+    engine.playCard(blackPawn, "d7d5");
+
+    // White captures e4xd5 with the other pawn card.
+    const capturingPawn = cardId(c("6", "spades"));
+    engine.playCard(capturingPawn, "e4d5");
+
+    const state = engine.getState();
+    expect(state.white.scorePile.length).toBe(1);
+    expect(state.white.scorePile[0].rank).toBe("6");
+    engine.dispose();
+  });
 });
 
 /* ── Wild card behavior ──────────────────────────────────────────────── */
@@ -148,6 +172,31 @@ describe("GameEngine — ace/wild", () => {
     const aceId = cardId(c("A", "clubs"));
     engine.playCard(aceId, "e2e4");
     const state = engine.getState();
+    const aceInDead = state.deadPile.some(
+      (cd) => cd.rank === "A" && cd.suit === "clubs"
+    );
+    expect(aceInDead).toBe(true);
+    engine.dispose();
+  });
+
+  it("ace capture goes to deadPile, not scorePile", () => {
+    // White: Ace + two pawn cards. Black: three pawn cards.
+    const wh: Card[] = [c("A", "clubs"), c("5", "hearts"), c("6", "spades")];
+    const bh: Card[] = [c("3", "diamonds"), c("4", "clubs"), c("8", "hearts")];
+    const engine = new GameEngine(1200, 1200, "blitz", testDeck(wh, bh));
+
+    // White plays e2-e4 with a pawn card.
+    engine.playCard(cardId(c("5", "hearts")), "e2e4");
+
+    // Black plays d7-d5 with a pawn card.
+    engine.playCard(cardId(c("3", "diamonds")), "d7d5");
+
+    // White captures e4xd5 with the Ace (wild).
+    const aceId = cardId(c("A", "clubs"));
+    engine.playCard(aceId, "e4d5");
+
+    const state = engine.getState();
+    expect(state.white.scorePile.length).toBe(0);
     const aceInDead = state.deadPile.some(
       (cd) => cd.rank === "A" && cd.suit === "clubs"
     );
