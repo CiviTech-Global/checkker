@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
+import '../models/betting.dart';
 import '../models/bot.dart';
 import '../models/card.dart';
 import '../models/game.dart';
@@ -641,6 +642,9 @@ class SocketService {
   final _lanJoinResultController = StreamController<Map<String, dynamic>>.broadcast();
   final _botConfigUpdatedController = StreamController<Map<String, dynamic>>.broadcast();
   final _botDataController = StreamController<Map<String, dynamic>>.broadcast();
+  final _serverFeaturesController = StreamController<ServerFeatures>.broadcast();
+
+  ServerFeatures _serverFeatures = const ServerFeatures();
 
   // Public getters
   bool get isConnected => _socket?.connected ?? false;
@@ -649,6 +653,7 @@ class SocketService {
   ScoredGame? get scores => _scores;
   List<ChatMessage> get chatMessages => _chatMessages;
   AuthState? get authState => _authState;
+  ServerFeatures get serverFeatures => _serverFeatures;
   DepositStatus? get depositStatus => _depositStatus;
   SpectateGameState? get spectateState => _spectateState;
   List<SpectateMove> get spectateMoves => _spectateMoves;
@@ -660,6 +665,7 @@ class SocketService {
   Stream<ScoredGame?> get scoresStream => _scoresController.stream;
   Stream<List<ChatMessage>> get chatStream => _chatController.stream;
   Stream<AuthState?> get authStateStream => _authStateController.stream;
+  Stream<ServerFeatures> get serverFeaturesStream => _serverFeaturesController.stream;
   Stream<DepositStatus?> get depositStatusStream => _depositStatusController.stream;
   Stream<SpectateGameState?> get spectateStateStream => _spectateStateController.stream;
   Stream<List<SpectateMove>> get spectateMovesStream => _spectateMovesController.stream;
@@ -833,10 +839,16 @@ class SocketService {
       _authStateController.add(_authState);
       final token = json['sessionToken'] as String?;
       if (token != null) _storeSessionToken(token);
+      final features = json['serverFeatures'] as Map<String, dynamic>?;
+      if (features != null) _updateServerFeatures(ServerFeatures.fromJson(features));
       // Fetch cosmetics so equipped themes apply without visiting the shop,
       // and notifications so the home badge is current.
       s.emit('get_cosmetics');
       s.emit('get_notifications');
+    });
+
+    s.on('server_features', (data) {
+      _updateServerFeatures(ServerFeatures.fromJson(_toMap(data)));
     });
 
     s.on('auth_error', (data) {
@@ -1211,12 +1223,12 @@ class SocketService {
     socket.emit('update_avatar', {'avatarId': avatarId});
   }
 
-  void joinRanked(String difficulty, String tc, {bool isBot = false}) {
-    socket.emit('join_ranked', {'difficulty': difficulty, 'tc': tc, 'isBot': isBot});
+  void joinRanked(String difficulty, String tc, {StakeLevel stake = StakeLevel.free, bool isBot = false}) {
+    socket.emit('join_ranked', {'difficulty': difficulty, 'tc': tc, 'stake': stake.name, 'isBot': isBot});
   }
 
-  void joinCasualDifficulty(String difficulty, String tc, {bool isBot = false}) {
-    socket.emit('join_casual_difficulty', {'difficulty': difficulty, 'tc': tc, 'isBot': isBot});
+  void joinCasualDifficulty(String difficulty, String tc, {StakeLevel stake = StakeLevel.free, bool isBot = false}) {
+    socket.emit('join_casual_difficulty', {'difficulty': difficulty, 'tc': tc, 'stake': stake.name, 'isBot': isBot});
   }
 
   void updateBotConfig(BotConfiguration config, BotMaturity maturity) {
@@ -1357,6 +1369,11 @@ class SocketService {
     _spectateMovesController.add([]);
   }
 
+  void _updateServerFeatures(ServerFeatures features) {
+    _serverFeatures = features;
+    _serverFeaturesController.add(features);
+  }
+
   // Helpers
   Map<String, dynamic> _toMap(dynamic data) {
     if (data is Map<String, dynamic>) return data;
@@ -1406,5 +1423,6 @@ class SocketService {
     _inviteDeclinedController.close();
     _inviteResponseResultController.close();
     _notificationsController.close();
+    _serverFeaturesController.close();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/betting.dart';
 import '../services/cosmetics_theme.dart';
 import '../services/push_service.dart';
 import '../services/socket_service.dart';
@@ -33,4 +34,9 @@ final connectedProvider = StreamProvider<bool>((ref) {
 final notificationsProvider = StreamProvider<NotificationsData>((ref) {
   final service = ref.watch(socketServiceProvider);
   return service.notificationsStream;
+});
+
+final serverFeaturesProvider = StreamProvider<ServerFeatures>((ref) {
+  final service = ref.watch(socketServiceProvider);
+  return service.serverFeaturesStream;
 });

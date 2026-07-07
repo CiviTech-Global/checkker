@@ -1,5 +1,5 @@
-import type { BotDifficulty, GameMode, GameResult } from "@checkker/shared";
-import { BET_AMOUNTS_USD, isFreeGame, DEPOSIT_TIMEOUT_MS } from "@checkker/shared";
+import type { BotDifficulty, GameMode, GameResult, StakeLevel } from "@checkker/shared";
+import { BET_AMOUNTS_USD, isFreeStake, DEPOSIT_TIMEOUT_MS } from "@checkker/shared";
 import { ContractService } from "../blockchain/ContractService";
 import { usdToWei } from "../blockchain/PriceOracle";
 
@@ -87,12 +87,13 @@ export const BetManager = {
     gameId: string,
     mode: GameMode,
     difficulty: BotDifficulty,
+    stake: StakeLevel,
     whiteAddress: string,
     blackAddress: string,
     whiteUserId?: string,
     blackUserId?: string,
   ): Promise<BetSetup | null> {
-    if (isFreeGame(mode, difficulty)) {
+    if (isFreeStake(stake)) {
       return { gameId, betAmountWei: "0", betAmountUsd: 0, isFree: true };
     }
 

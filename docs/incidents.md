@@ -95,7 +95,7 @@ recent deployments.
 
 1. Confirm `RPC_URL` and `CONTRACT_ADDRESS` are healthy.
 2. Check transaction status on-chain.
-3. If mainnet is impacted, disable `BETTING_ENABLED` until resolved.
+3. If mainnet is impacted, remove/blank the blockchain env vars (`BSC_RPC_URL`, `CHECKKER_CONTRACT_ADDRESS`, `REFEREE_PRIVATE_KEY`) until resolved.
 
 ## Rollback Procedure
 

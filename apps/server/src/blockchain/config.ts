@@ -11,6 +11,25 @@ export const REFEREE_PRIVATE_KEY = process.env.REFEREE_PRIVATE_KEY ?? "";
 export const HOUSE_WALLET = process.env.HOUSE_WALLET_ADDRESS ?? "";
 export const CHAIN_ID = parseInt(process.env.BSC_CHAIN_ID ?? "97", 10); // 97=testnet, 56=mainnet
 
+/** Whether the required blockchain env vars are present. */
+function hasBlockchainConfig(): boolean {
+  return !!(
+    process.env.BSC_RPC_URL &&
+    process.env.CHECKKER_CONTRACT_ADDRESS &&
+    process.env.REFEREE_PRIVATE_KEY
+  );
+}
+
+/** Whether real betting is enabled. Disabled in production unless explicitly overridden. */
+export function isBettingEnabled(): boolean {
+  // Hard-disable betting in production unless an explicit override is set.
+  // This prevents accidental exposure of real-money gambling flows.
+  if (process.env.NODE_ENV === "production" && process.env.CHECKKER_BETTING_ENABLED !== "true") {
+    return false;
+  }
+  return hasBlockchainConfig();
+}
+
 /** Minimal ABI for the CheckkerEscrow contract (only functions we call from the server) */
 export const ESCROW_ABI = [
   "function createGame(bytes32 gameId, address white, address black, uint256 betAmount) external",

@@ -23,6 +23,9 @@ export const DEPOSIT_TIMEOUT_MS = 120_000;
 
 export type GameMode = "ranked" | "casual";
 
+/** Player-selected stake level for a match. */
+export type StakeLevel = "free" | "bet";
+
 export interface BetInfo {
   amountWei: string;
   amountUsd: number;
@@ -42,6 +45,16 @@ export interface BetSettlement {
 /** Returns true if this mode+difficulty combo is free (no bet required) */
 export function isFreeGame(mode: GameMode, difficulty: BotDifficulty): boolean {
   return mode === "casual" && difficulty === "beginner";
+}
+
+/** Returns the USD bet amount for a difficulty tier. */
+export function getBetAmountUsd(difficulty: BotDifficulty): number {
+  return BET_AMOUNTS_USD[difficulty];
+}
+
+/** Returns true if the player chose a free stake. */
+export function isFreeStake(stake: StakeLevel): boolean {
+  return stake === "free";
 }
 
 /** Calculate payout amounts from total pot */

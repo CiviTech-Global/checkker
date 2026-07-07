@@ -15,7 +15,11 @@ const int depositTimeoutMs = 120000;
 
 enum GameMode { ranked, casual }
 
+enum StakeLevel { free, bet }
+
 GameMode parseGameMode(String m) => m == 'ranked' ? GameMode.ranked : GameMode.casual;
+
+StakeLevel parseStakeLevel(String s) => s == 'bet' ? StakeLevel.bet : StakeLevel.free;
 
 class BetInfo {
   final String amountWei;
@@ -55,6 +59,22 @@ class BetSettlement {
   });
 }
 
+/// Server-reported feature flags that control which client UI surfaces are
+/// enabled. Defaults assume betting is disabled until the server says otherwise.
+class ServerFeatures {
+  final bool bettingEnabled;
+
+  const ServerFeatures({this.bettingEnabled = false});
+
+  factory ServerFeatures.fromJson(Map<String, dynamic> json) {
+    return ServerFeatures(
+      bettingEnabled: json['bettingEnabled'] as bool? ?? false,
+    );
+  }
+}
+
 bool isFreeGame(GameMode mode, BotDifficulty difficulty) {
   return mode == GameMode.casual && difficulty == BotDifficulty.beginner;
 }
+
+bool isFreeStake(StakeLevel stake) => stake == StakeLevel.free;

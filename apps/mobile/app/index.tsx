@@ -1,569 +1,417 @@
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Image } from "react-native";
+import { useEffect, useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Image,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   FadeIn,
+  FadeInDown,
   SlideInUp,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { getAvatar, getTier } from "@checkker/shared";
 import {
   colors,
   spacing,
   radius,
   gradients,
   shadows,
+  typography,
 } from "../src/theme/tokens";
 import { useSpringPress, staggerDelay } from "../src/utils/animations";
 import { useLocalProfile } from "../src/context/LocalProfileContext";
-import { getAvatar } from "@checkker/shared";
-import { features } from "../src/config/features";
+import { lastPlayed, type LastPlayedMatch } from "../src/services/LastPlayedService";
+import { haptics } from "../src/services/HapticsService";
+import { onboarding } from "../src/services/OnboardingService";
 import Icon, { type IconName } from "../src/components/Icon";
-import { useSocket } from "../src/hooks/useSocket";
 
-/* ── Ornamental Divider ────────────────────────────────────────────── */
+/* ── Helpers ─────────────────────────────────────────────────────────── */
 
-function OrnamentDivider({ delay = 0 }: { delay?: number }) {
-  return (
-    <Animated.View
-      entering={FadeIn.duration(400).delay(delay)}
-      style={styles.dividerRow}
-    >
-      <View style={styles.dividerLine} />
-      <Icon name="ornament" size={14} color={colors.accent.gold} style={{ marginHorizontal: spacing.sm }} />
-      <View style={styles.dividerLine} />
-    </Animated.View>
-  );
+function formatModeLabel(match: LastPlayedMatch) {
+  const difficulty = match.difficulty[0].toUpperCase() + match.difficulty.slice(1);
+  const mode = match.mode === "ranked" ? "Ranked" : "Casual";
+  return `${mode} • ${difficulty} • ${match.tc}`;
 }
 
-/* ── Menu Button (vertical stack) ─────────────────────────────────── */
+/* ── Header ──────────────────────────────────────────────────────────── */
 
-function MenuButton({
-  label,
-  symbol,
-  index,
-  onPress,
-  disabled = false,
-}: {
-  label: string;
-  symbol: IconName;
-  index: number;
-  onPress: () => void;
-  disabled?: boolean;
-}) {
-  const { onPressIn, onPressOut, animatedStyle } = useSpringPress();
+function ProfileHeader({ onSettings, onProfile }: { onSettings: () => void; onProfile: () => void }) {
+  const { localProfile, displayName, onlineStats } = useLocalProfile();
+  const avatar = getAvatar(localProfile.avatarId);
+  const tier = getTier(onlineStats.rating);
 
   return (
-    <Animated.View
-      entering={SlideInUp.duration(350)
-        .delay(staggerDelay(index, 60) + 300)
-        .springify()
-        .damping(15)}
-      style={[styles.menuCell, animatedStyle, disabled && { opacity: 0.45 }]}
-    >
+    <Animated.View entering={FadeIn.duration(400)} style={styles.header}>
       <TouchableOpacity
-        onPress={disabled ? undefined : onPress}
-        onPressIn={disabled ? undefined : onPressIn}
-        onPressOut={disabled ? undefined : onPressOut}
-        activeOpacity={disabled ? 1 : 0.9}
-        style={styles.menuButtonOuter}
+        activeOpacity={0.8}
+        onPress={onProfile}
+        accessibilityRole="button"
+        accessibilityLabel="Open profile"
       >
-        <View style={styles.menuButton}>
-          <View style={styles.menuSymbolContainer}>
-            <Icon name={symbol} size={22} color={colors.accent.primary} />
+        <View style={styles.avatarRing}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarSymbol}>{avatar.symbol}</Text>
           </View>
-          <Text style={styles.menuLabel}>
-            {label}
-            {disabled ? " — Coming Soon" : ""}
-          </Text>
         </View>
+      </TouchableOpacity>
+
+      <View style={styles.headerText}>
+        <Text style={styles.displayName}>{displayName}</Text>
+        <View style={styles.tierRow}>
+          <Text style={styles.tierName}>{tier.label}</Text>
+          <Text style={styles.rating}>{onlineStats.rating}</Text>
+        </View>
+      </View>
+
+      <TouchableOpacity
+        onPress={onSettings}
+        style={styles.iconBtn}
+        accessibilityRole="button"
+        accessibilityLabel="Settings"
+      >
+        <Icon name="settings" size={22} color={colors.text.primary} />
       </TouchableOpacity>
     </Animated.View>
   );
 }
 
-/* ── Full-Width Button ─────────────────────────────────────────────── */
+/* ── Play Now ────────────────────────────────────────────────────────── */
 
-function WideButton({
-  label,
-  symbol,
-  index,
-  onPress,
-}: {
-  label: string;
-  symbol: IconName;
-  index: number;
-  onPress: () => void;
-}) {
-  const { onPressIn, onPressOut, animatedStyle } = useSpringPress();
+function PlayNowCard({ match, onPress, index }: { match: LastPlayedMatch | null; onPress: () => void; index: number }) {
+  const { onPressIn, onPressOut, animatedStyle } = useSpringPress(0.97);
 
   return (
     <Animated.View
-      entering={SlideInUp.duration(350)
-        .delay(staggerDelay(index, 60) + 300)
-        .springify()
-        .damping(15)}
-      style={[styles.wideCell, animatedStyle]}
+      entering={SlideInUp.duration(350).delay(staggerDelay(index, 60) + 200).springify().damping(15)}
+      style={[styles.playNowContainer, animatedStyle]}
     >
       <TouchableOpacity
-        onPress={onPress}
+        activeOpacity={0.9}
+        onPress={() => {
+          haptics.impact();
+          onPress();
+        }}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
-        activeOpacity={0.9}
-        style={styles.wideButtonOuter}
+        accessibilityRole="button"
+        accessibilityLabel="Play now"
       >
         <LinearGradient
-          colors={gradients.casinoGreen}
+          colors={gradients.gold}
           start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.wideButtonGradient}
+          end={{ x: 1, y: 1 }}
+          style={styles.playNowGradient}
         >
-          <Icon name={symbol} size={22} color={colors.text.primary} />
-          <Text style={styles.wideLabel}>{label}</Text>
+          <View style={styles.playNowContent}>
+            <View style={styles.playNowIconCircle}>
+              <Icon name="play-now" size={32} color={colors.bg.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.playNowTitle}>Play Now</Text>
+              <Text style={styles.playNowSubtitle}>
+                {match ? formatModeLabel(match) : "Ranked • Beginner • Blitz"}
+              </Text>
+            </View>
+            <Icon name="chevron-right" size={24} color={colors.bg.primary} />
+          </View>
         </LinearGradient>
       </TouchableOpacity>
     </Animated.View>
   );
 }
 
-/* ── Main Screen ────────────────────────────────────────────────────── */
+/* ── Category Grid ───────────────────────────────────────────────────── */
+
+type CategoryItem = {
+  label: string;
+  icon: IconName;
+  route: string;
+  color?: string;
+  testID?: string;
+};
+
+const CATEGORIES: CategoryItem[] = [
+  { label: "Ranked", icon: "swords", route: "/game/ranked", color: colors.accent.gold },
+  { label: "Casual", icon: "casual", route: "/game/casual", color: colors.accent.green },
+  { label: "Play Bot", icon: "bot", route: "/bot/difficulty", color: colors.accent.blue },
+  { label: "LAN", icon: "lan", route: "/lan", color: colors.accent.terraCotta },
+  { label: "Puzzles", icon: "puzzles", route: "/puzzles", color: colors.accent.bronze },
+  { label: "Tutorials", icon: "school", route: "/tutorial", color: colors.accent.primary },
+  { label: "Friends", icon: "users", route: "/friends", color: colors.accent.goldBright },
+  { label: "Leaderboard", icon: "leaderboard", route: "/leaderboard", color: colors.accent.red },
+  { label: "Spectate", icon: "spectate", route: "/spectate", color: colors.accent.lapis },
+  { label: "Shop", icon: "shop", route: "/shop", color: colors.accent.gold },
+];
+
+function CategoryCard({ item, index, onPress }: { item: CategoryItem; index: number; onPress: (route: string) => void }) {
+  const { onPressIn, onPressOut, animatedStyle } = useSpringPress(0.96);
+
+  return (
+    <Animated.View
+      entering={FadeInDown.duration(300).delay(staggerDelay(index, 45) + 350).springify().damping(15)}
+      style={[styles.categoryCell, animatedStyle]}
+    >
+      <TouchableOpacity
+        onPress={() => {
+          haptics.selection();
+          onPress(item.route);
+        }}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+        activeOpacity={0.85}
+        style={styles.categoryButton}
+        accessibilityRole="button"
+        accessibilityLabel={item.label}
+      >
+        <View style={[styles.categoryIconCircle, { backgroundColor: `${item.color ?? colors.accent.primary}20` }]}>
+          <Icon name={item.icon} size={22} color={item.color ?? colors.accent.primary} />
+        </View>
+        <Text style={styles.categoryLabel}>{item.label}</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
+/* ── Main Screen ─────────────────────────────────────────────────────── */
 
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { localProfile } = useLocalProfile();
-  const avatar = getAvatar(localProfile.avatarId);
-  const { connected, notifications } = useSocket();
-  const unreadCount = notifications?.unread ?? 0;
+  const [lastMatch, setLastMatch] = useState<LastPlayedMatch | null>(null);
+  const [ready, setReady] = useState(false);
 
-  return (
-    <LinearGradient
-      colors={gradients.velvet}
-      style={{ flex: 1 }}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
-    >
-      {/* Offline Banner */}
-      {!connected && (
-        <Animated.View
-          entering={FadeIn.duration(300)}
-          style={[styles.offlineBanner, { top: insets.top }]}
-        >
-          <Icon name="close" size={14} color={colors.accent.red} />
-          <Text style={styles.offlineText}>Offline — reconnecting...</Text>
-        </Animated.View>
-      )}
+  useEffect(() => {
+    let mounted = true;
+    Promise.all([lastPlayed.get(), onboarding.isComplete()]).then(([match, complete]) => {
+      if (!mounted) return;
+      if (!complete) {
+        router.replace("/onboarding");
+        return;
+      }
+      setLastMatch(match);
+      setReady(true);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, [router]);
 
+  const handlePlayNow = useCallback(() => {
+    const match = lastMatch ?? { mode: "ranked", difficulty: "beginner", tc: "blitz", stake: "free", isBot: false };
+    lastPlayed.save(match);
+    const path = `/game/queue?mode=${match.mode}&difficulty=${match.difficulty}&tc=${match.tc}&stake=${match.stake}&bot=${match.isBot}`;
+    router.push(path);
+  }, [lastMatch, router]);
+
+  const navigate = useCallback((route: string) => {
+    router.push(route as `./${string}`);
+  }, [router]);
+
+
+
+    if (!ready) {
+      return (
+        <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+          <Text style={{ color: colors.text.muted }}>Loading…</Text>
+        </View>
+      );
+    }
+
+    return (
+    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <ScrollView
-        style={[styles.scrollRoot, { paddingTop: insets.top, paddingBottom: insets.bottom }]}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
-        bounces={false}
-        keyboardShouldPersistTaps="handled"
       >
-        {/* Logo */}
-        <Animated.View
-          entering={FadeIn.duration(600).springify().damping(14)}
-          style={styles.logoContainer}
-        >
-          <Image
-            source={require("../assets/logo.png")}
-            style={styles.logo}
-            resizeMode="contain"
-            accessibilityLabel="Checkker logo"
-          />
-        </Animated.View>
+        <ProfileHeader
+          onSettings={() => router.push("/settings")}
+          onProfile={() => router.push("/profile")}
+        />
 
-        {/* Title */}
-        <Animated.View
-          entering={FadeIn.duration(500).delay(120).springify().damping(12)}
-          style={styles.titleContainer}
-        >
-          <LinearGradient
-            colors={gradients.ornateGold}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.titleGradientMask}
-          >
-            <Text style={styles.title}>Checkker</Text>
-          </LinearGradient>
-        </Animated.View>
-
-        {/* Subtitle */}
-        <Animated.Text
-          entering={FadeIn.duration(400).delay(200)}
-          style={styles.subtitle}
-        >
-          Chess + Poker
-        </Animated.Text>
-
-        <OrnamentDivider delay={250} />
-
-        {/* Vertical Menu Stack */}
-        <View style={styles.menuStack}>
-          <MenuButton
-            label="Play ranked"
-            symbol="ranked"
-            index={0}
-            onPress={() => router.push("/game/ranked")}
-          />
-          <MenuButton
-            label="Find an opponent"
-            symbol="casual"
-            index={1}
-            onPress={() => router.push("/game/casual")}
-          />
-          <MenuButton
-            label="Play with AI and improve"
-            symbol="bot"
-            index={2}
-            onPress={() => router.push("/bot/difficulty")}
-          />
-          <MenuButton
-            label="Delegate Mode (Bot)"
-            symbol="robot"
-            index={3}
-            onPress={() => router.push("/bot/mode")}
-          />
-          <MenuButton
-            label="Play on your network (LAN, Hotspot, etc.)"
-            symbol="lan"
-            index={3}
-            onPress={() => router.push("/lan")}
-          />
-          <MenuButton
-            label="Tutorials and trainings"
-            symbol="tutorials"
-            index={4}
-            onPress={() => router.push("/tutorial")}
-          />
-          <MenuButton
-            label="Cosmetics Shop"
-            symbol="shop"
-            index={5}
-            onPress={() => router.push("/shop")}
-          />
-          <MenuButton
-            label="Puzzles"
-            symbol="puzzles"
-            index={6}
-            onPress={() => router.push("/puzzles")}
-          />
-          <MenuButton
-            label="Live rankings and leaderboard"
-            symbol="leaderboard"
-            index={7}
-            onPress={() => router.push("/leaderboard")}
-          />
-          <MenuButton
-            label="Friends and private games"
-            symbol="profile"
-            index={8}
-            onPress={() => router.push("/friends")}
-          />
+        <View style={styles.logoRow}>
+          <Image source={require("../assets/logo.png")} style={styles.logo} />
+          <Text style={styles.logoText}>Checkker</Text>
         </View>
 
-        {/* Full-width Watch Bot vs Bot button */}
-        <WideButton
-          label="Watch Bot vs. Bot"
-          symbol="spectate"
-          index={8}
-          onPress={() => router.push("/spectate")}
-        />
+        <PlayNowCard match={lastMatch} onPress={handlePlayNow} index={0} />
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Play & Train</Text>
+        </View>
+
+        <View style={styles.grid}>
+          {CATEGORIES.map((item, i) => (
+            <CategoryCard key={item.label} item={item} index={i} onPress={navigate} />
+          ))}
+        </View>
       </ScrollView>
-
-      {/* Profile circle — bottom-left, absolutely positioned */}
-      <Animated.View
-        entering={FadeIn.duration(400).delay(600)}
-        style={[styles.profileCircle, { bottom: insets.bottom + spacing.md, left: spacing.md }]}
-      >
-        <TouchableOpacity
-          onPress={() => router.push("/profile")}
-          activeOpacity={0.8}
-        >
-          <View style={styles.profileInner}>
-            {avatar?.symbol ? (
-              <Text style={styles.profileIcon}>{avatar.symbol}</Text>
-            ) : (
-              <Icon name="profile" size={24} color={colors.accent.goldBright} />
-            )}
-          </View>
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Donate button — bottom-right */}
-      <Animated.View
-        entering={FadeIn.duration(400).delay(700)}
-        style={[styles.profileCircle, { bottom: insets.bottom + spacing.md, right: spacing.md }]}
-      >
-        <TouchableOpacity
-          onPress={() => router.push("/donate")}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.profileInner, styles.donateInner]}>
-            <Icon name="donate" size={22} color={colors.accent.red} />
-          </View>
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Settings button — top-right */}
-      <Animated.View
-        entering={FadeIn.duration(400).delay(800)}
-        style={[styles.settingsCircle, { top: insets.top + spacing.xs, right: spacing.md }]}
-      >
-        <TouchableOpacity
-          onPress={() => router.push("/settings")}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.profileInner, styles.settingsInner]}>
-            <Icon name="settings" size={22} color={colors.text.secondary} />
-          </View>
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Notifications bell — below settings, top-right */}
-      <Animated.View
-        entering={FadeIn.duration(400).delay(850)}
-        style={[styles.settingsCircle, { top: insets.top + spacing.xs + 64, right: spacing.md }]}
-      >
-        <TouchableOpacity
-          onPress={() => router.push("/notifications")}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.profileInner, styles.settingsInner]}>
-            <Icon name="bell" size={22} color={colors.text.secondary} />
-            {unreadCount > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </Text>
-              </View>
-            )}
-          </View>
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Dev tools button — top-left (dev only) */}
-      {features.devMode && (
-        <Animated.View
-          entering={FadeIn.duration(400).delay(800)}
-          style={[styles.profileCircle, { top: insets.top + spacing.xs, left: spacing.md }]}
-        >
-          <TouchableOpacity
-            onPress={() => router.push("/dev")}
-            activeOpacity={0.8}
-          >
-            <View style={[styles.profileInner, styles.devInner]}>
-              <Icon name="dev-tools" size={22} color={colors.text.muted} />
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
-      )}
-    </LinearGradient>
+    </View>
   );
 }
 
+/* ── Styles ──────────────────────────────────────────────────────────── */
+
 const styles = StyleSheet.create({
-  scrollRoot: {
+  container: {
     flex: 1,
+    backgroundColor: colors.bg.primary,
   },
-  scrollContent: {
-    flexGrow: 1,
-    alignItems: "center",
-    justifyContent: "flex-start",
-    gap: spacing.sm,
-    paddingVertical: spacing.xl,
+  scroll: {
     paddingHorizontal: spacing.md,
+    paddingBottom: spacing.xxl,
   },
-  logoContainer: {
+  header: {
+    flexDirection: "row",
     alignItems: "center",
-    marginBottom: spacing.sm,
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  avatarRing: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 2,
+    borderColor: colors.accent.gold,
+    padding: 2,
+    ...shadows.sm,
+  },
+  avatar: {
+    flex: 1,
+    borderRadius: 24,
+    backgroundColor: colors.bg.secondary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  avatarSymbol: {
+    fontSize: 26,
+  },
+  headerText: {
+    flex: 1,
+    marginLeft: spacing.sm,
+  },
+  displayName: {
+    color: colors.text.primary,
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.bold,
+  },
+  tierRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    marginTop: 2,
+  },
+  tierName: {
+    color: colors.accent.gold,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.semiBold,
+  },
+  rating: {
+    color: colors.text.muted,
+    fontSize: typography.size.sm,
+  },
+  iconBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.lg,
+    backgroundColor: colors.bg.secondary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
   logo: {
-    width: 132,
-    height: 132,
+    width: 40,
+    height: 40,
   },
-  titleContainer: {
-    marginBottom: spacing.xxs,
-    ...shadows.gold,
+  logoText: {
+    color: colors.text.primary,
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.extraBold,
+    letterSpacing: 3,
   },
-  titleGradientMask: {
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xs,
+  playNowContainer: {
+    marginBottom: spacing.lg,
+    ...shadows.md,
   },
-  title: {
-    fontSize: 48,
-    fontWeight: "800",
-    color: colors.bg.primary,
-    letterSpacing: 4,
-    textAlign: "center",
+  playNowGradient: {
+    borderRadius: radius.xl,
+    padding: spacing.md,
   },
-  subtitle: {
-    fontSize: 18,
-    color: colors.text.secondary,
-    marginBottom: spacing.md,
-    letterSpacing: 5,
-    textTransform: "uppercase",
-  },
-  dividerRow: {
+  playNowContent: {
     flexDirection: "row",
     alignItems: "center",
-    width: "70%",
-    maxWidth: 280,
-    marginBottom: spacing.md,
+    gap: spacing.md,
   },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.border.gold,
-  },
-  dividerSymbol: {
-    color: colors.accent.gold,
-    fontSize: 14,
-    marginHorizontal: spacing.sm,
-  },
-
-  /* ── Vertical Menu Stack ─────────────────────────────────────────── */
-  menuStack: {
-    width: "100%",
-    maxWidth: 380,
-    gap: spacing.sm,
-  },
-  menuCell: {
-    width: "100%",
-  },
-  menuButtonOuter: {
+  playNowIconCircle: {
+    width: 56,
+    height: 56,
     borderRadius: radius.lg,
-    borderWidth: 1.5,
-    borderColor: colors.border.gold,
-    overflow: "hidden",
+    backgroundColor: "rgba(20,16,31,0.25)",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  menuButton: {
+  playNowTitle: {
+    color: colors.bg.primary,
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.extraBold,
+  },
+  playNowSubtitle: {
+    color: "rgba(20,16,31,0.75)",
+    fontSize: typography.size.sm,
+    marginTop: 2,
+  },
+  sectionHeader: {
+    marginBottom: spacing.sm,
+  },
+  sectionTitle: {
+    color: colors.text.secondary,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.semiBold,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginHorizontal: -spacing.xs / 2,
+  },
+  categoryCell: {
+    width: "50%",
+    paddingHorizontal: spacing.xs / 2,
+    paddingBottom: spacing.sm,
+  },
+  categoryButton: {
     backgroundColor: colors.bg.secondary,
-    borderRadius: radius.lg - 1,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border.subtle,
+    padding: spacing.md,
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
-    minHeight: 60,
     gap: spacing.sm,
   },
-  menuSymbolContainer: {
+  categoryIconCircle: {
     width: 40,
     height: 40,
     borderRadius: radius.md,
-    backgroundColor: "rgba(168,85,247,0.14)",
-    borderWidth: 1,
-    borderColor: colors.border.gold,
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
   },
-  menuLabel: {
-    color: colors.text.primary,
-    fontSize: 15,
-    fontWeight: "600",
+  categoryLabel: {
     flex: 1,
-  },
-
-  /* ── Wide button ────────────────────────────────────────────────── */
-  wideCell: {
-    width: "100%",
-    maxWidth: 380,
-    marginTop: spacing.xs,
-  },
-  wideButtonOuter: {
-    borderRadius: radius.lg,
-    borderWidth: 1.5,
-    borderColor: colors.accent.gold,
-    overflow: "hidden",
-  },
-  wideButtonGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: spacing.md,
-    gap: spacing.sm,
-    borderRadius: radius.lg - 1,
-  },
-  /* wideSymbol removed — now using Icon component */
-  wideLabel: {
     color: colors.text.primary,
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-  },
-
-  /* ── Profile circle ─────────────────────────────────────────────── */
-  profileCircle: {
-    position: "absolute",
-  },
-  profileInner: {
-    width: 56,
-    height: 56,
-    borderRadius: 26,
-    backgroundColor: colors.bg.secondary,
-    borderWidth: 2,
-    borderColor: colors.accent.gold,
-    alignItems: "center",
-    justifyContent: "center",
-    ...shadows.gold,
-  },
-  profileIcon: {
-    fontSize: 24,
-    color: colors.accent.goldBright,
-  },
-  donateInner: {
-    borderColor: colors.accent.red,
-  },
-  donateIcon: {
-    fontSize: 22,
-    color: colors.accent.red,
-  },
-  devInner: {
-    borderColor: colors.text.muted,
-  },
-  settingsCircle: {
-    position: "absolute",
-  },
-  settingsInner: {
-    borderColor: colors.border.gold,
-  },
-  badge: {
-    position: "absolute",
-    top: -2,
-    right: -2,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: colors.accent.red,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 3,
-  },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: "#fff",
-  },
-  devIcon: {
-    fontSize: 22,
-    color: colors.text.muted,
-  },
-  offlineBanner: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    zIndex: 100,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.xs,
-    paddingVertical: spacing.xs,
-    backgroundColor: "rgba(224, 64, 64, 0.15)",
-  },
-  offlineText: {
-    fontSize: 12,
-    color: colors.accent.red,
-    fontWeight: "600",
+    fontSize: typography.size.body,
+    fontWeight: typography.weight.semiBold,
   },
 });
