@@ -59,7 +59,7 @@ price drift between deposits is irrelevant.
   - **Player A** and **Player B** — each pays its own stake + a little gas.
   - **Referee** — the server's wallet. Pays **gas only** to create/resolve games.
     The referee can also be the contract **owner** and **house wallet** for testing.
-- **Faucet tBNB** in all three wallets — see step 3.
+- **Faucet tBNB** in all three wallets — see `docs/WALLET_SETUP_GUIDE.md` for a beginner-friendly walkthrough, or step 3 below for the short version.
 - A **WalletConnect / Reown Project ID** — see step 2.
 
 > You can run both players on one machine using two different wallets (e.g.

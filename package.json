@@ -8,7 +8,8 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
-    "clean": "turbo clean"
+    "clean": "turbo clean",
+    "deploy:wizard": "node scripts/deploy-wizard.mjs"
   },
   "workspaces": [
     "apps/*",

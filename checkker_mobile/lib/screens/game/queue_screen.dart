@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/bot_provider.dart';
 import '../../providers/socket_provider.dart';
+import '../../models/betting.dart';
 import '../../services/socket_service.dart';
 import '../../services/wallet_service.dart';
 import '../../theme/tokens.dart';
@@ -12,6 +13,7 @@ class QueueScreen extends ConsumerStatefulWidget {
   final String mode;
   final String difficulty;
   final String tc;
+  final String stake;
   final bool isBot;
 
   const QueueScreen({
@@ -19,6 +21,7 @@ class QueueScreen extends ConsumerStatefulWidget {
     required this.mode,
     required this.difficulty,
     required this.tc,
+    this.stake = 'free',
     this.isBot = false,
   });
 
@@ -53,10 +56,11 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
   void _joinQueue() {
     final socket = ref.read(socketServiceProvider);
     ref.read(botProvider.notifier).setInBotMatch(widget.isBot);
+    final stake = parseStakeLevel(widget.stake);
     if (widget.mode == 'ranked') {
-      socket.joinRanked(widget.difficulty, widget.tc, isBot: widget.isBot);
+      socket.joinRanked(widget.difficulty, widget.tc, stake: stake, isBot: widget.isBot);
     } else {
-      socket.joinCasualDifficulty(widget.difficulty, widget.tc, isBot: widget.isBot);
+      socket.joinCasualDifficulty(widget.difficulty, widget.tc, stake: stake, isBot: widget.isBot);
     }
   }
 

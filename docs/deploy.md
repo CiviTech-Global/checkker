@@ -3,6 +3,26 @@
 This document covers how to build, configure, and run the Checkker server and
 web/mobile clients in production.
 
+## Quick Start with the Deployment Wizard
+
+For a guided local setup, run the deployment wizard. It asks for every required
+value, explains where to get it, generates secrets, sets up the database,
+builds the server and web client, and starts the server.
+
+```bash
+# Linux / macOS / WSL
+./scripts/deploy-wizard.sh
+
+# Windows native PowerShell
+.\scripts\deploy-wizard.ps1
+
+# Or from npm
+npm run deploy:wizard
+```
+
+See `docs/LOCAL_DEPLOYMENT_GUIDE.md` for the full manual walkthrough and
+troubleshooting.
+
 ## Server
 
 ### Requirements
@@ -35,8 +55,12 @@ Optional variables:
 | `AI_COACH_API_KEY` | API key for the coaching LLM. |
 | `AI_BRAIN_PERSISTENCE` | Persist player models to disk (`true`/`false`). |
 | `SMART_MATCHMAKING` | Enable playstyle-based matchmaking. |
-| `BETTING_ENABLED` | Enable real/testnet betting flows (v2). |
-| `RPC_URL` / `CONTRACT_ADDRESS` | Blockchain integration. |
+| `BSC_RPC_URL` | BSC testnet/mainnet HTTP RPC endpoint. |
+| `BSC_WS_URL` | Optional WebSocket RPC for faster event detection. |
+| `BSC_CHAIN_ID` | `97` for testnet, `56` for mainnet. |
+| `CHECKKER_CONTRACT_ADDRESS` | Deployed `CheckkerEscrow` contract address. |
+| `REFEREE_PRIVATE_KEY` | Server referee wallet private key. |
+| `HOUSE_WALLET_ADDRESS` | Address receiving the house cut. |
 
 ### Build
 
@@ -74,6 +98,14 @@ Recommended nginx / cloud load balancer settings:
 
 The server sets `trust proxy` to `1`, so rate limiting and admin loopback checks
 use the client IP supplied by the proxy.
+
+## Blockchain / Testnet Betting (Optional)
+
+Free games work without any blockchain configuration. To test the escrow flow,
+set the BSC testnet env vars and fund your wallets. See:
+
+- `docs/WALLET_SETUP_GUIDE.md` — creating wallets and getting free tBNB.
+- `docs/TESTNET_BETTING.md` — full end-to-end testnet betting walkthrough.
 
 ## Web Client
 

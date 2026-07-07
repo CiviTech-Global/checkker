@@ -67,6 +67,8 @@ export interface BetSettledPayload {
 let _authState: AuthState | null = null;
 let _authErrorCallback: ((error: string) => void) | null = null;
 let _authChallengeCallback: ((data: { nonce: string; message: string }) => void) | null = null;
+let _serverFeatures: { bettingEnabled: boolean } | null = null;
+const serverFeaturesListeners = new Set<(v: { bettingEnabled: boolean } | null) => void>();
 let _depositStatus: DepositStatus | null = null;
 let _betSettledCallback: ((data: BetSettledPayload) => void) | null = null;
 let _betCancelledCallback: ((data: { gameId: string; reason: string }) => void) | null = null;
@@ -415,8 +417,17 @@ function attachListeners(s: Socket) {
     _authChallengeCallback?.(data);
   });
 
-  s.on("auth_success", (data: { profile: PlayerProfile | null; isNewUser: boolean; walletAddress?: string; sessionToken?: string; isGuest?: boolean }) => {
+  s.on("server_features", (data: { bettingEnabled: boolean }) => {
+    _serverFeatures = data;
+    serverFeaturesListeners.forEach((fn) => fn(_serverFeatures));
+  });
+
+  s.on("auth_success", (data: { profile: PlayerProfile | null; isNewUser: boolean; walletAddress?: string; sessionToken?: string; isGuest?: boolean; bettingEnabled?: boolean }) => {
     _authState = data;
+    if (data.bettingEnabled !== undefined) {
+      _serverFeatures = { ...(_serverFeatures ?? {}), bettingEnabled: data.bettingEnabled } as { bettingEnabled: boolean };
+      serverFeaturesListeners.forEach((fn) => fn(_serverFeatures));
+    }
     authStateListeners.forEach((fn) => fn(_authState));
     if (data.sessionToken) storeSessionToken(data.sessionToken);
     // Load cosmetics so equipped themes apply in-game right away.
@@ -842,6 +853,7 @@ export function useSocket() {
   /* ── Auth & Betting ─────────────────────────────────────────────────── */
 
   const [authState, setAuthState] = useState<AuthState | null>(_authState);
+  const [serverFeatures, setServerFeaturesState] = useState<{ bettingEnabled: boolean } | null>(_serverFeatures);
   const [depositStatus, setDepositStatus] = useState<DepositStatus | null>(_depositStatus);
   const authErrorCbRef = useRef<((error: string) => void) | null>(null);
   const authChallengeCbRef = useRef<((data: { nonce: string; message: string }) => void) | null>(null);
@@ -853,11 +865,14 @@ export function useSocket() {
 
   useEffect(() => {
     const onAuth = (v: AuthState | null) => setAuthState(v);
+    const onFeatures = (v: { bettingEnabled: boolean } | null) => setServerFeaturesState(v);
     const onDeposit = (v: DepositStatus | null) => setDepositStatus(v);
     authStateListeners.add(onAuth);
+    serverFeaturesListeners.add(onFeatures);
     depositStatusListeners.add(onDeposit);
     return () => {
       authStateListeners.delete(onAuth);
+      serverFeaturesListeners.delete(onFeatures);
       depositStatusListeners.delete(onDeposit);
     };
   }, []);
@@ -907,12 +922,12 @@ export function useSocket() {
     getSocket().emit("get_bot_data");
   }, []);
 
-  const joinRanked = useCallback((difficulty: string, tc: string, isBot = false) => {
-    getSocket().emit("join_ranked", { difficulty, tc, isBot });
+  const joinRanked = useCallback((difficulty: string, tc: string, isBot = false, stake: "free" | "bet" = "bet") => {
+    getSocket().emit("join_ranked", { difficulty, tc, isBot, stake });
   }, []);
 
-  const joinCasualDifficulty = useCallback((difficulty: string, tc: string, isBot = false) => {
-    getSocket().emit("join_casual_difficulty", { difficulty, tc, isBot });
+  const joinCasualDifficulty = useCallback((difficulty: string, tc: string, isBot = false, stake: "free" | "bet" = "free") => {
+    getSocket().emit("join_casual_difficulty", { difficulty, tc, isBot, stake });
   }, []);
 
   const getLeaderboard = useCallback(() => {
@@ -1250,6 +1265,7 @@ export function useSocket() {
     onBotError,
     // Auth
     authState,
+    serverFeatures,
     authRequest,
     authVerify,
     guestIdentify,

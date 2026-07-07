@@ -6,21 +6,20 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import Animated, { FadeIn, FadeInRight } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { useRouter } from "expo-router";
 import {
   colors,
   spacing,
   radius,
-  glassStyle,
 } from "../../src/theme/tokens";
 import { useSocket } from "../../src/hooks/useSocket";
 import { useWallet } from "../../src/hooks/useWallet";
 import { useLocalProfile } from "../../src/context/LocalProfileContext";
-import { useSpringPress, staggerDelay } from "../../src/utils/animations";
 import Icon from "../../src/components/Icon";
 import type { BotDifficulty } from "@checkker/shared";
-import { BET_AMOUNTS_USD } from "@checkker/shared";
+import { BET_AMOUNTS_USD, getBetAmountUsd } from "@checkker/shared";
+import ComingSoonCard from "../../src/components/ComingSoonCard";
 
 type DifficultyTier = {
   id: BotDifficulty;
@@ -37,55 +36,6 @@ const TIERS: DifficultyTier[] = [
   { id: "master", label: "Master", betUsd: BET_AMOUNTS_USD.master, stars: 4, color: colors.accent.red },
 ];
 
-function TierCard({
-  tier,
-  index,
-  onPress,
-  disabled,
-}: {
-  tier: DifficultyTier;
-  index: number;
-  onPress: () => void;
-  disabled: boolean;
-}) {
-  const { onPressIn, onPressOut, animatedStyle } = useSpringPress();
-
-  return (
-    <Animated.View
-      entering={FadeInRight.duration(300).delay(staggerDelay(index, 80))}
-      style={[animatedStyle, disabled && { opacity: 0.6 }]}
-    >
-      <TouchableOpacity
-        onPress={onPress}
-        onPressIn={onPressIn}
-        onPressOut={onPressOut}
-        disabled={disabled}
-        activeOpacity={0.9}
-      >
-        <View style={[styles.card, glassStyle]}>
-          <View style={[styles.leftBorder, { backgroundColor: tier.color }]} />
-          <View style={styles.cardContent}>
-            <View style={styles.cardHeader}>
-              <View style={styles.starsRow}>
-                {Array.from({ length: 4 }, (_, i) => (
-                  <Text key={i} style={[styles.star, { color: i < tier.stars ? tier.color : colors.text.muted }]}>
-                    {i < tier.stars ? "\u2666" : "\u2662"}
-                  </Text>
-                ))}
-              </View>
-            </View>
-            <Text style={styles.cardTitle}>{tier.label}</Text>
-            <Text style={styles.betText}>Bet: ${tier.betUsd}</Text>
-          </View>
-          <View style={styles.betBadge}>
-            <Text style={styles.betBadgeText}>${tier.betUsd}</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    </Animated.View>
-  );
-}
-
 export default function RankedScreen() {
   const router = useRouter();
   const {
@@ -93,6 +43,7 @@ export default function RankedScreen() {
     gameState,
     depositStatus,
     authState,
+    serverFeatures,
     authRequest,
     joinRanked,
     onBetCancelled,
@@ -122,11 +73,11 @@ export default function RankedScreen() {
     });
   }, [onQueueJoined, onBetCancelled]);
 
-  const handleSelectTier = async (tier: DifficultyTier) => {
+  const handleSelectTier = async (tier: DifficultyTier, stake: "free" | "bet") => {
     if (!connected) return;
 
-    // Auth gate: require wallet connection
-    if (!wallet.isConnected) {
+    // Auth gate: require wallet connection only for bet games
+    if (stake === "bet" && !wallet.isConnected) {
       setAuthPending(true);
       await wallet.connect();
       setAuthPending(false);
@@ -135,7 +86,7 @@ export default function RankedScreen() {
     }
 
     // Auto-trigger server auth if wallet connected but not authenticated
-    if (wallet.isConnected && !authState) {
+    if (stake === "bet" && wallet.isConnected && !authState) {
       setAuthPending(true);
       authRequest(wallet.address!);
       // Auth flow completes asynchronously via socket events
@@ -147,7 +98,7 @@ export default function RankedScreen() {
     setSelectedTier(tier);
     setSearching(true);
     setCancelReason(null);
-    joinRanked(tier.id, "blitz");
+    joinRanked(tier.id, "blitz", false, stake);
   };
 
   const handleDeposit = async () => {
@@ -245,7 +196,7 @@ export default function RankedScreen() {
           <Text style={styles.searchText}>Searching for opponent...</Text>
           {selectedTier && (
             <Text style={styles.modeText}>
-              Ranked {selectedTier.label} {"\u2022"} Bet ${selectedTier.betUsd} {"\u2022"} Blitz
+              Ranked {selectedTier.label} {"\u2022"} Blitz
             </Text>
           )}
         </View>
@@ -288,15 +239,51 @@ export default function RankedScreen() {
       )}
 
       <View style={styles.content}>
-        {TIERS.map((tier, index) => (
-          <TierCard
-            key={tier.id}
-            tier={tier}
-            index={index}
-            onPress={() => handleSelectTier(tier)}
-            disabled={!connected}
-          />
-        ))}
+        {TIERS.map((tier, index) => {
+          const betAmount = getBetAmountUsd(tier.id);
+          const bettingEnabled = serverFeatures?.bettingEnabled ?? false;
+
+          return (
+            <View key={tier.id} style={styles.tierBlock}>
+              <View style={styles.tierHeader}>
+                <Text style={styles.tierTitle}>{tier.label}</Text>
+                <View style={styles.starsRow}>
+                  {Array.from({ length: 4 }, (_, i) => (
+                    <Text key={i} style={[styles.star, { color: i < tier.stars ? tier.color : colors.text.muted }]}>
+                      {i < tier.stars ? "\u2666" : "\u2662"}
+                    </Text>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.actionsRow}>
+                <TouchableOpacity
+                  style={[styles.actionBtn, styles.freeBtn, !connected && styles.actionDisabled]}
+                  onPress={() => handleSelectTier(tier, "free")}
+                  disabled={!connected}
+                  activeOpacity={0.9}
+                >
+                  <Text style={styles.freeBtnText}>Play Free</Text>
+                </TouchableOpacity>
+
+                {bettingEnabled ? (
+                  <TouchableOpacity
+                    style={[styles.actionBtn, styles.betBtn, !connected && styles.actionDisabled]}
+                    onPress={() => handleSelectTier(tier, "bet")}
+                    disabled={!connected}
+                    activeOpacity={0.9}
+                  >
+                    <Text style={styles.betBtnText}>Bet ${betAmount}</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <View style={styles.comingSoonWrap}>
+                    <ComingSoonCard label={`Bet $${betAmount}`} index={index} />
+                  </View>
+                )}
+              </View>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
@@ -321,16 +308,19 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 16, color: colors.text.secondary },
   sectionLabel: { fontSize: 16, fontWeight: "700", color: colors.accent.gold, letterSpacing: 1, marginBottom: spacing.sm, textAlign: "center", marginTop: spacing.xxl + spacing.xl },
   content: { width: "100%", paddingHorizontal: spacing.md, paddingTop: spacing.sm },
-  card: { borderRadius: radius.lg, marginBottom: spacing.md, flexDirection: "row", overflow: "hidden", borderWidth: 1, borderColor: colors.border.gold },
-  leftBorder: { width: 4 },
-  cardContent: { flex: 1, padding: spacing.md },
-  cardHeader: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginBottom: spacing.xs },
+  tierBlock: { marginBottom: spacing.md },
+  tierHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: spacing.xs, paddingHorizontal: spacing.xs },
+  tierTitle: { fontSize: 18, fontWeight: "700", color: colors.text.primary },
   starsRow: { flexDirection: "row", gap: 2 },
-  star: { fontSize: 20, fontWeight: "700" },
-  cardTitle: { fontSize: 18, fontWeight: "600", color: colors.text.primary },
-  betText: { fontSize: 14, color: colors.accent.gold, marginTop: 4, fontWeight: "600" },
-  betBadge: { justifyContent: "center", paddingHorizontal: spacing.md },
-  betBadgeText: { fontSize: 20, fontWeight: "800", color: colors.accent.gold },
+  star: { fontSize: 18, fontWeight: "700", color: colors.accent.gold },
+  actionsRow: { flexDirection: "row", gap: spacing.sm },
+  actionBtn: { flex: 1, borderRadius: radius.lg, paddingVertical: spacing.md, alignItems: "center", justifyContent: "center" },
+  actionDisabled: { opacity: 0.5 },
+  freeBtn: { backgroundColor: colors.bg.secondary, borderWidth: 1, borderColor: colors.border.gold },
+  freeBtnText: { color: colors.text.primary, fontSize: 16, fontWeight: "700" },
+  betBtn: { backgroundColor: colors.accent.gold },
+  betBtnText: { color: colors.bg.primary, fontSize: 16, fontWeight: "800" },
+  comingSoonWrap: { flex: 1 },
   // Searching
   searchingSection: { alignItems: "center", gap: spacing.sm, padding: spacing.xl },
   searchText: { fontSize: 16, color: colors.text.primary, marginTop: spacing.md },

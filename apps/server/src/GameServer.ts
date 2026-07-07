@@ -2,8 +2,8 @@ import { Server as SocketServer } from "socket.io";
 import type { Socket } from "socket.io";
 import { v4 as uuid } from "uuid";
 import { GameEngine } from "./GameEngine";
-import type { BotDifficulty, TimeControl, Color, ChatMessage, GameMode } from "@checkker/shared";
-import { isFreeGame, BET_AMOUNTS_USD, DEPOSIT_TIMEOUT_MS } from "@checkker/shared";
+import type { BotDifficulty, TimeControl, Color, ChatMessage, GameMode, StakeLevel } from "@checkker/shared";
+import { isFreeStake, getBetAmountUsd, DEPOSIT_TIMEOUT_MS } from "@checkker/shared";
 import { expectedScore, newRating } from "@checkker/shared";
 import type { BotConfiguration, BotMaturity } from "@checkker/shared";
 import { deserializeBotConfig, serializeBotConfig, deserializeBotMaturity, serializeBotMaturity } from "@checkker/shared";
@@ -16,7 +16,7 @@ import { brain } from "./bot/evaluators";
 import { createChallenge, verifyChallenge, cleanupExpiredChallenges, createSession, verifySession, revokeSession } from "./auth/WalletAuth";
 import { BetManager } from "./betting/BetManager";
 import type { BetSetup } from "./betting/BetManager";
-import { CONTRACT_ADDRESS, BLOCKCHAIN_ENABLED } from "./blockchain/config";
+import { CONTRACT_ADDRESS, BLOCKCHAIN_ENABLED, isBettingEnabled } from "./blockchain/config";
 import { ContractService } from "./blockchain/ContractService";
 import { SocketRateLimiter } from "./rateLimit";
 
@@ -38,6 +38,7 @@ interface Match {
   tc: TimeControl;
   mode: GameMode;
   difficulty: BotDifficulty;
+  stake: StakeLevel;
   rematchRequests: Set<string>;
   chatHistory: ChatMessage[];
   betSetup: BetSetup | null;
@@ -74,13 +75,13 @@ const INVITE_TTL_MS = 5 * 60 * 1000;
 export class GameServer {
   private io: SocketServer;
   private queue: Array<{ player: Player; tc: TimeControl }> = [];
-  private rankedQueues: Record<string, Array<{ player: Player; tc: TimeControl }>> = {
+  private rankedQueues: Record<string, Array<{ player: Player; tc: TimeControl; stake: StakeLevel }>> = {
     beginner: [],
     intermediate: [],
     advanced: [],
     master: [],
   };
-  private casualQueues: Record<string, Array<{ player: Player; tc: TimeControl }>> = {
+  private casualQueues: Record<string, Array<{ player: Player; tc: TimeControl; stake: StakeLevel }>> = {
     beginner: [],
     intermediate: [],
     advanced: [],
@@ -113,6 +114,9 @@ export class GameServer {
 
   handleConnection(socket: Socket): void {
     brain.getPlayerModel(socket.id);
+
+    // Tell the client which server-side features are available.
+    socket.emit("server_features", { bettingEnabled: isBettingEnabled() });
 
     /* ── Authentication Events ──────────────────────────────────────── */
 
@@ -149,10 +153,10 @@ export class GameServer {
           isGuest: false,
         });
         this.userSockets.set(profile.id, socket);
-        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress) });
+        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress), bettingEnabled: isBettingEnabled() });
       } else {
         // Wallet verified but no account yet — client should call set_username
-        socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress, sessionToken: createSession(walletAddress) });
+        socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress, sessionToken: createSession(walletAddress), bettingEnabled: isBettingEnabled() });
       }
     });
 
@@ -168,9 +172,9 @@ export class GameServer {
       if (profile) {
         authenticatedSockets.set(socket.id, { walletAddress, userId: profile.id, isGuest: false });
         this.userSockets.set(profile.id, socket);
-        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: token });
+        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: token, bettingEnabled: isBettingEnabled() });
       } else {
-        socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress, sessionToken: token });
+        socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress, sessionToken: token, bettingEnabled: isBettingEnabled() });
       }
     });
 
@@ -197,7 +201,7 @@ export class GameServer {
         authenticatedSockets.set(socket.id, { userId: user.id, isGuest: true });
         this.userSockets.set(user.id, socket);
         const profile = await playerStore.loadFromUser(socket.id, user);
-        socket.emit("auth_success", { profile, isNewUser: false, isGuest: true });
+        socket.emit("auth_success", { profile, isNewUser: false, isGuest: true, bettingEnabled: isBettingEnabled() });
       } catch (err: any) {
         socket.emit("auth_error", { error: err?.message ?? "Guest identification failed" });
       }
@@ -273,7 +277,7 @@ export class GameServer {
           isGuest: false,
         });
         this.userSockets.set(profile.id, socket);
-        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress) });
+        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress), bettingEnabled: isBettingEnabled() });
       } else {
         socket.emit("auth_error", { error: "Failed to create account" });
       }
@@ -355,12 +359,20 @@ export class GameServer {
 
     /* ── New difficulty-based matchmaking ─────────────────────────────── */
 
-    socket.on("join_ranked", ({ difficulty, tc, isBot }: { difficulty: BotDifficulty; tc: TimeControl; isBot?: boolean }) => {
+    socket.on("join_ranked", ({ difficulty, tc, isBot, stake }: { difficulty: BotDifficulty; tc: TimeControl; isBot?: boolean; stake?: StakeLevel }) => {
       const auth = authenticatedSockets.get(socket.id);
+      const selectedStake: StakeLevel = stake ?? "bet";
+
       if (!auth || auth.isGuest) {
         socket.emit("queue_error", { error: "Ranked games require a connected wallet" });
         return;
       }
+
+      if (selectedStake === "bet" && !isBettingEnabled()) {
+        socket.emit("queue_error", { error: "betting_coming_soon", message: "Real betting is coming soon. Choose 'free' to play now." });
+        return;
+      }
+
       const profile = playerStore.get(socket.id);
       const player: Player = {
         id: socket.id,
@@ -371,16 +383,24 @@ export class GameServer {
         userId: auth.userId,
         isBot: isBot ?? false,
       };
-      this.addToDifficultyQueue(player, tc, "ranked", difficulty);
+      this.addToDifficultyQueue(player, tc, "ranked", difficulty, selectedStake);
     });
 
-    socket.on("join_casual_difficulty", ({ difficulty, tc, isBot }: { difficulty: BotDifficulty; tc: TimeControl; isBot?: boolean }) => {
+    socket.on("join_casual_difficulty", ({ difficulty, tc, isBot, stake }: { difficulty: BotDifficulty; tc: TimeControl; isBot?: boolean; stake?: StakeLevel }) => {
       const auth = authenticatedSockets.get(socket.id);
-      const needsWallet = !isFreeGame("casual", difficulty);
+      const selectedStake: StakeLevel = stake ?? "free";
+      const needsWallet = selectedStake === "bet";
+
       if (needsWallet && (!auth || auth.isGuest)) {
-        socket.emit("queue_error", { error: "This casual tier requires a connected wallet" });
+        socket.emit("queue_error", { error: "This casual tier requires a connected wallet when playing for a bet" });
         return;
       }
+
+      if (selectedStake === "bet" && !isBettingEnabled()) {
+        socket.emit("queue_error", { error: "betting_coming_soon", message: "Real betting is coming soon. Choose 'free' to play now." });
+        return;
+      }
+
       const player: Player = {
         id: socket.id,
         socket,
@@ -390,7 +410,7 @@ export class GameServer {
         userId: auth?.userId,
         isBot: isBot ?? false,
       };
-      this.addToDifficultyQueue(player, tc, "casual", difficulty);
+      this.addToDifficultyQueue(player, tc, "casual", difficulty, selectedStake);
     });
 
     /* ── Leaderboard ─────────────────────────────────────────────────── */
@@ -811,7 +831,7 @@ export class GameServer {
       };
       socket.emit("invite_response_result", { success: true, accepted: true });
       // Private friendly game: casual mode, free tier.
-      this.startGame(inviter, accepter, invite.tc, "casual", "beginner");
+      this.startGame(inviter, accepter, invite.tc, "casual", "beginner", "free");
     });
 
     /* ── LAN host/join handshake ─────────────────────────────────────────
@@ -876,7 +896,7 @@ export class GameServer {
         userId: myAuth?.userId,
       };
       socket.emit("lan_join_result", { success: true });
-      this.startGame(host, guest, entry.tc, "casual", "beginner");
+      this.startGame(host, guest, entry.tc, "casual", "beginner", "free");
     });
 
     /* ── Notifications ───────────────────────────────────────────────── */
@@ -1080,7 +1100,7 @@ export class GameServer {
       otherPlayer.socket.emit("rematch_requested", { gameId });
       if (match.rematchRequests.has(match.white.id) && match.rematchRequests.has(match.black.id)) {
         this.endGame(gameId);
-        this.startGame(match.black, match.white, match.tc, match.mode, match.difficulty);
+        this.startGame(match.black, match.white, match.tc, match.mode, match.difficulty, match.stake);
       }
     });
 
@@ -1156,7 +1176,7 @@ export class GameServer {
         clearTimeout(oppTimeout);
         this.queueTimeouts.delete(opponent.player.id);
       }
-      this.startGame(opponent.player, player, tc, "casual", "beginner");
+      this.startGame(opponent.player, player, tc, "casual", "beginner", "free");
     } else {
       this.queue.push({ player, tc });
       const timeoutMs = player.casual ? 15000 : 30000;
@@ -1174,12 +1194,12 @@ export class GameServer {
 
   /* ── Difficulty-based matchmaking ──────────────────────────────────── */
 
-  private addToDifficultyQueue(player: Player, tc: TimeControl, mode: GameMode, difficulty: BotDifficulty): void {
+  private addToDifficultyQueue(player: Player, tc: TimeControl, mode: GameMode, difficulty: BotDifficulty, stake: StakeLevel): void {
     const queues = mode === "ranked" ? this.rankedQueues : this.casualQueues;
     const queue = queues[difficulty];
 
-    // Find opponent in same difficulty queue with matching time control
-    const opponentIdx = queue.findIndex((q) => q.tc === tc && q.player.id !== player.id);
+    // Find opponent in same difficulty queue with matching time control and stake
+    const opponentIdx = queue.findIndex((q) => q.tc === tc && q.stake === stake && q.player.id !== player.id);
 
     if (opponentIdx >= 0) {
       const opponent = queue.splice(opponentIdx, 1)[0];
@@ -1188,17 +1208,17 @@ export class GameServer {
         clearTimeout(oppTimeout);
         this.queueTimeouts.delete(opponent.player.id);
       }
-      this.startGame(opponent.player, player, tc, mode, difficulty);
+      this.startGame(opponent.player, player, tc, mode, difficulty, stake);
     } else {
-      queue.push({ player, tc });
-      player.socket.emit("queue_joined", { mode, difficulty, tc, betAmountUsd: isFreeGame(mode, difficulty) ? 0 : BET_AMOUNTS_USD[difficulty] });
+      queue.push({ player, tc, stake });
+      player.socket.emit("queue_joined", { mode, difficulty, tc, stake, betAmountUsd: isFreeStake(stake) ? 0 : getBetAmountUsd(difficulty) });
 
       // Bot fallback after 30s
       const timeout = setTimeout(() => {
         const idx = queue.findIndex((q) => q.player.id === player.id);
         if (idx >= 0) {
           queue.splice(idx, 1);
-          player.socket.emit("bot_fallback_offer", { tc, difficulty });
+          player.socket.emit("bot_fallback_offer", { tc, difficulty, stake });
         }
       }, 30000);
       this.queueTimeouts.set(player.id, timeout);
@@ -1218,14 +1238,14 @@ export class GameServer {
 
   /* ── Game Lifecycle ────────────────────────────────────────────────── */
 
-  private async startGame(p1: Player, p2: Player, tc: TimeControl, mode: GameMode = "casual", difficulty: BotDifficulty = "beginner"): Promise<void> {
-    const free = isFreeGame(mode, difficulty);
+  private async startGame(p1: Player, p2: Player, tc: TimeControl, mode: GameMode = "casual", difficulty: BotDifficulty = "beginner", stake: StakeLevel = "free"): Promise<void> {
+    const free = isFreeStake(stake);
 
-    // For non-free games with blockchain enabled, initiate bet escrow first
-    if (!free && BLOCKCHAIN_ENABLED && p1.walletAddress && p2.walletAddress) {
+    // For bet games with blockchain enabled, initiate bet escrow first
+    if (!free && BLOCKCHAIN_ENABLED && isBettingEnabled() && p1.walletAddress && p2.walletAddress) {
       const gameId = uuid();
       const betSetup = await BetManager.initiateBet(
-        gameId, mode, difficulty, p1.walletAddress, p2.walletAddress,
+        gameId, mode, difficulty, stake, p1.walletAddress, p2.walletAddress,
         p1.userId, p2.userId
       );
 
@@ -1288,20 +1308,20 @@ export class GameServer {
         }
 
         // Both deposited — proceed to start the actual game with the same gameId
-        this.launchGame(p1, p2, tc, mode, difficulty, betSetup, gameId);
+        this.launchGame(p1, p2, tc, mode, difficulty, betSetup, stake, gameId);
         return;
       }
     }
 
     // Free game or blockchain not enabled — start immediately
-    this.launchGame(p1, p2, tc, mode, difficulty, null);
+    this.launchGame(p1, p2, tc, mode, difficulty, null, stake);
   }
 
   /** Actually start the game engine and emit game_start events */
   private async launchGame(
     p1: Player, p2: Player, tc: TimeControl,
     mode: GameMode, difficulty: BotDifficulty,
-    betSetup: BetSetup | null, _existingGameId?: string
+    betSetup: BetSetup | null, stake: StakeLevel = "free", _existingGameId?: string
   ): Promise<void> {
     const game = new GameEngine(p1.rating, p2.rating, tc);
     // If we already have a gameId from escrow, we track it via betSetup.gameId
@@ -1313,6 +1333,7 @@ export class GameServer {
       tc,
       mode,
       difficulty,
+      stake,
       rematchRequests: new Set(),
       chatHistory: [],
       betSetup,

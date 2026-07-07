@@ -121,8 +121,8 @@ describe("GameServer socket integration", () => {
     const p2 = await connect();
 
     // Both join the free beginner casual queue.
-    p1.emit("join_casual_difficulty", { difficulty: "beginner", tc: "blitz" });
-    p2.emit("join_casual_difficulty", { difficulty: "beginner", tc: "blitz" });
+    p1.emit("join_casual_difficulty", { difficulty: "beginner", tc: "blitz", stake: "free" });
+    p2.emit("join_casual_difficulty", { difficulty: "beginner", tc: "blitz", stake: "free" });
 
     const p1Start = once<any>(p1, "game_start");
     const p2Start = once<any>(p2, "game_start");
@@ -157,6 +157,45 @@ describe("GameServer socket integration", () => {
     expect(wo.result?.type).toBe("resignation");
     expect(bo.result?.type).toBe("resignation");
   }, 20000);
+
+  it("emits server_features with bettingEnabled on connect", async () => {
+    const client = ioClient(`http://127.0.0.1:${port}`, {
+      transports: ["websocket"],
+      forceNew: true,
+    });
+    clients.push(client);
+
+    const features = once<{ bettingEnabled: boolean }>(client, "server_features");
+    const connected = new Promise<void>((resolve, reject) => {
+      client.once("connect", () => resolve());
+      client.once("connect_error", reject);
+    });
+    await connected;
+
+    const payload = await features;
+    expect(typeof payload.bettingEnabled).toBe("boolean");
+  }, 10000);
+
+  it("does not match players with different stakes in the same tier", async () => {
+    const p1 = await connect();
+    const p2 = await connect();
+
+    p1.emit("join_casual_difficulty", { difficulty: "beginner", tc: "blitz", stake: "free" });
+    p2.emit("join_casual_difficulty", { difficulty: "beginner", tc: "blitz", stake: "bet" });
+
+    // Neither should receive game_start within a short window.
+    const p1Start = once<any>(p1, "game_start").then(() => true).catch(() => false);
+    const p2Start = once<any>(p2, "game_start").then(() => true).catch(() => false);
+
+    const [s1, s2] = await Promise.all([
+      Promise.race([p1Start, new Promise<boolean>((r) => setTimeout(() => r(false), 1500))]),
+      Promise.race([p2Start, new Promise<boolean>((r) => setTimeout(() => r(false), 1500))]),
+    ]);
+
+    expect(s1).toBe(false);
+    expect(s2).toBe(false);
+  }, 10000);
+
 });
 
 function pickLegalMove(hand: Card[], fen: string): { cardId: string; move: string } | null {

@@ -53,6 +53,7 @@ final goRouter = GoRouter(
         mode: state.uri.queryParameters['mode'] ?? 'casual',
         difficulty: state.uri.queryParameters['difficulty'] ?? 'beginner',
         tc: state.uri.queryParameters['tc'] ?? 'blitz',
+        stake: state.uri.queryParameters['stake'] ?? 'free',
         isBot: state.uri.queryParameters['bot'] == 'true',
       ),
     ),
