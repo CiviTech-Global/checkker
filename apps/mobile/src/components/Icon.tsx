@@ -46,6 +46,18 @@ const ICON_MAP = {
   shop: { lib: "ion", name: "storefront" },
   coin: { lib: "mci", name: "circle-multiple" },
   bell: { lib: "ion", name: "notifications" },
+  "play-now": { lib: "mci", name: "play-circle" },
+  lightning: { lib: "mci", name: "lightning-bolt" },
+  star: { lib: "ion", name: "star" },
+  calendar: { lib: "ion", name: "calendar" },
+  gift: { lib: "ion", name: "gift" },
+  crown: { lib: "mci", name: "crown" },
+  swords: { lib: "mci", name: "sword-cross" },
+  cards: { lib: "mci", name: "cards-playing-outline" },
+  users: { lib: "ion", name: "people" },
+  school: { lib: "mci", name: "school" },
+  chart: { lib: "ion", name: "bar-chart" },
+  storefront: { lib: "ion", name: "storefront" },
 } as const;
 
 export type IconName = keyof typeof ICON_MAP;

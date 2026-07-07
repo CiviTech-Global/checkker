@@ -11,8 +11,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Card, cardToPiece } from '@checkker/shared';
-import { colors, spacing, typography, radius, shadows, springConfig, gradients, glassStyle } from '../theme/tokens';
+import { colors, spacing, typography, radius, shadows, springConfig, gradients } from '../theme/tokens';
 import { staggerDelay } from '../utils/animations';
+import { haptics } from '../services/HapticsService';
 
 const SUIT_SYMBOL: Record<string, string> = {
   clubs: '\u2663',
@@ -94,7 +95,10 @@ function CardItem({
       entering={SlideInDown.duration(250).delay(staggerDelay(index, 20)).springify().damping(14)}
     >
       <TouchableOpacity
-        onPress={onTap}
+        onPress={() => {
+          haptics.cardTap();
+          onTap();
+        }}
         disabled={disabled}
         activeOpacity={0.7}
         accessibilityLabel={`${card.rank} of ${card.suit}, moves ${pieceLabel}`}

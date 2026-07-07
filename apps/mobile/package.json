@@ -25,6 +25,7 @@
     "expo": "~52.0.0",
     "expo-av": "^16.0.8",
     "expo-gl": "~15.0.5",
+    "expo-haptics": "^57.0.0",
     "expo-linear-gradient": "~14.0.2",
     "expo-router": "~4.0.0",
     "expo-sqlite": "~14.0.0",

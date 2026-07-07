@@ -56,6 +56,7 @@ import {
   playGameOverSound,
 } from "../../src/utils/sounds";
 import { colors, spacing, radius, glassStyle } from "../../src/theme/tokens";
+import { haptics } from "../../src/services/HapticsService";
 
 /* ── Bot Thinking Indicator ──────────────────────────────────────────── */
 
@@ -319,12 +320,25 @@ export default function GameScreen() {
     const isCastle = mv === "e1g1" || mv === "e1c1" || mv === "e8g8" || mv === "e8c8";
     const isPromotion = mv.length === 5;
 
-    if (latest.mate) playCheckmateSound();
-    else if (latest.check) playCheckSound();
-    else if (isPromotion) playPromotionSound();
-    else if (isCastle) playCastleSound();
-    else if (latest.captured) playCaptureSound();
-    else playMoveSound();
+    if (latest.mate) {
+      playCheckmateSound();
+      haptics.check();
+    } else if (latest.check) {
+      playCheckSound();
+      haptics.check();
+    } else if (isPromotion) {
+      playPromotionSound();
+      haptics.moveConfirm();
+    } else if (isCastle) {
+      playCastleSound();
+      haptics.moveConfirm();
+    } else if (latest.captured) {
+      playCaptureSound();
+      haptics.capture();
+    } else {
+      playMoveSound();
+      haptics.moveConfirm();
+    }
   }, [moveHistory.length]);
 
   // Game start sound
@@ -337,8 +351,16 @@ export default function GameScreen() {
 
   // Game over sound
   useEffect(() => {
-    if (result !== null) playGameOverSound();
-  }, [result]);
+    if (result !== null) {
+      playGameOverSound();
+      const winner = "winner" in result ? result.winner : null;
+      const isDraw = result.type === "draw" || result.type === "deckExhausted";
+      const playerWon = winner === color;
+      if (isDraw) haptics.loss();
+      else if (playerWon) haptics.win();
+      else haptics.loss();
+    }
+  }, [result, color]);
 
   const legalMovesMap = useMemo(() => {
     try {
@@ -367,6 +389,7 @@ export default function GameScreen() {
 
   const handleCardTap = useCallback((idx: number) => {
     if (!myTurn) return;
+    haptics.cardTap();
     setSelectedCardIdx((prev) => (prev === idx ? null : idx));
     setSelectedSourceSquare(null);
   }, [myTurn]);
@@ -390,6 +413,7 @@ export default function GameScreen() {
         setPromotionMoves(matching);
         return;
       }
+      haptics.moveConfirm();
       playMove(cid, matching[0]);
       setSelectedCardIdx(null);
       setSelectedSourceSquare(null);
@@ -402,6 +426,7 @@ export default function GameScreen() {
         setPromotionMoves(matching);
         return;
       }
+      haptics.moveConfirm();
       playMove(cid, matching[0]);
       setSelectedCardIdx(null);
       setSelectedSourceSquare(null);

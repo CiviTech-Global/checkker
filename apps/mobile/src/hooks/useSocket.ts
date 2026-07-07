@@ -52,6 +52,7 @@ export interface DepositStatus {
   betAmountWei: string;
   betAmountUsd: number;
   contractAddress: string;
+  timeoutMs: number;
   myDeposit: boolean;
   opponentDeposit: boolean;
 }
@@ -454,7 +455,7 @@ function attachListeners(s: Socket) {
   });
 
   s.on("awaiting_deposits", (data: { gameId: string; betAmountWei: string; betAmountUsd: number; contractAddress: string }) => {
-    _depositStatus = { ...data, myDeposit: false, opponentDeposit: false };
+    _depositStatus = { timeoutMs: 120000, myDeposit: false, opponentDeposit: false, ...data };
     depositStatusListeners.forEach((fn) => fn(_depositStatus));
   });
 
@@ -922,7 +923,7 @@ export function useSocket() {
     getSocket().emit("get_bot_data");
   }, []);
 
-  const joinRanked = useCallback((difficulty: string, tc: string, isBot = false, stake: "free" | "bet" = "bet") => {
+  const joinRanked = useCallback((difficulty: string, tc: string, isBot = false, stake: "free" | "bet" = "free") => {
     getSocket().emit("join_ranked", { difficulty, tc, isBot, stake });
   }, []);
 

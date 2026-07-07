@@ -62,4 +62,10 @@ export const features = {
 
   /** Dev-only tools (demo data, etc.) — auto-enabled in dev builds */
   devMode: __DEV__,
+
+  /** Show real-money / crypto betting UI. Off in production; server also gates it. */
+  showBettingUI: __DEV__,
+
+  /** Enable the first-run onboarding flow. */
+  onboardingEnabled: true,
 } as const;

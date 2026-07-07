@@ -8,6 +8,7 @@ import Animated, {
   FadeIn,
 } from "react-native-reanimated";
 import { colors, radius, PIECE_UNICODE, springConfig } from "../theme/tokens";
+import { haptics } from "../services/HapticsService";
 
 interface ChessSquareProps {
   square: string;
@@ -86,7 +87,10 @@ export default function ChessSquare({
   return (
     <TouchableOpacity
       style={[styles.square, { width: size, height: size, backgroundColor: bg }]}
-      onPress={() => onPress(square)}
+      onPress={() => {
+        haptics.pieceTap();
+        onPress(square);
+      }}
       activeOpacity={0.7}
     >
       {/* Overlay for selection/lastMove/check */}
