@@ -78,7 +78,6 @@ COPY --from=builder /build/apps/mobile/dist /app/web/
 COPY --from=builder /build/packages/database/prisma /app/prisma/
 COPY --from=builder /build/node_modules/.prisma /app/node_modules/.prisma/
 COPY --from=builder /build/node_modules/@prisma /app/node_modules/@prisma/
-COPY --from=builder /build/node_modules/@checkker/database /app/node_modules/@checkker/database/
 
 # Prisma schema path for runtime
 ENV PRISMA_SCHEMA_PATH=/app/prisma/schema.prisma
