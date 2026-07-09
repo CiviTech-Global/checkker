@@ -42,6 +42,8 @@ COPY packages/database/package.json ./packages/database/package.json
 COPY packages/poker/package.json ./packages/poker/package.json
 COPY packages/shared/package.json ./packages/shared/package.json
 COPY apps/mobile/package.json ./apps/mobile/package.json
+COPY packages/database/prisma ./packages/database/prisma
+COPY packages/ai-brain/package.json
 
 # Install dependencies
 RUN npm ci
@@ -49,11 +51,11 @@ RUN npm ci
 # Copy source code
 COPY packages/chess/src ./packages/chess/src
 COPY packages/database/src ./packages/database/src
-COPY packages/database/prisma ./packages/database/prisma
 COPY packages/poker/src ./packages/poker/src
 COPY packages/shared/src ./packages/shared/src
 COPY apps/server/src ./apps/server/src
 COPY apps/mobile ./apps/mobile
+COPY packages/ai-brain/src
 
 # Generate Prisma client (needed for optional DB support)
 RUN npx prisma generate --schema=./packages/database/prisma/schema.prisma
