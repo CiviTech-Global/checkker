@@ -42,6 +42,7 @@ COPY packages/database/package.json ./packages/database/package.json
 COPY packages/poker/package.json ./packages/poker/package.json
 COPY packages/shared/package.json ./packages/shared/package.json
 COPY apps/mobile/package.json ./apps/mobile/package.json
+COPY packages/database/prisma ./packages/database/prisma
 
 # Install dependencies
 RUN npm ci
@@ -49,7 +50,6 @@ RUN npm ci
 # Copy source code
 COPY packages/chess/src ./packages/chess/src
 COPY packages/database/src ./packages/database/src
-COPY packages/database/prisma ./packages/database/prisma
 COPY packages/poker/src ./packages/poker/src
 COPY packages/shared/src ./packages/shared/src
 COPY apps/server/src ./apps/server/src
