@@ -82,6 +82,10 @@ COPY --from=builder /build/node_modules/@prisma /app/node_modules/@prisma/
 # Prisma schema path for runtime
 ENV PRISMA_SCHEMA_PATH=/app/prisma/schema.prisma
 
+# Run in production mode by default (disables pino-pretty transport and
+# other dev-only paths that aren't installed in the runtime image)
+ENV NODE_ENV=production
+
 EXPOSE 3001
 EXPOSE 47831/udp
 
