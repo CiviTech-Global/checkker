@@ -4,7 +4,6 @@
 **/build
 .git
 .github
-apps/mobile
 apps/desktop
 checkker_mobile
 plans
