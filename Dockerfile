@@ -41,6 +41,7 @@ COPY packages/chess/package.json ./packages/chess/package.json
 COPY packages/database/package.json ./packages/database/package.json
 COPY packages/poker/package.json ./packages/poker/package.json
 COPY packages/shared/package.json ./packages/shared/package.json
+COPY packages/ai-brain/package.json ./packages/ai-brain/package.json
 COPY apps/mobile/package.json ./apps/mobile/package.json
 COPY packages/database/prisma ./packages/database/prisma
 
@@ -52,6 +53,7 @@ COPY packages/chess/src ./packages/chess/src
 COPY packages/database/src ./packages/database/src
 COPY packages/poker/src ./packages/poker/src
 COPY packages/shared/src ./packages/shared/src
+COPY packages/ai-brain/src ./packages/ai-brain/src
 COPY apps/server/src ./apps/server/src
 COPY apps/mobile ./apps/mobile
 
