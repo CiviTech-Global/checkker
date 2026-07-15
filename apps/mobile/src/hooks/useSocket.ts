@@ -364,6 +364,21 @@ function attachListeners(s: Socket) {
     gameStateListeners.forEach((fn) => fn(_gameState));
   });
 
+  s.on("clock_tick", (data: { gameId: string; whiteTimeRemainingMs: number; blackTimeRemainingMs: number; turn: Color }) => {
+    if (!_gameState || _gameState.id !== data.gameId) return;
+    const isWhite = _gameState.color === "white";
+    _gameState = {
+      ..._gameState,
+      timeRemainingMs: isWhite ? data.whiteTimeRemainingMs : data.blackTimeRemainingMs,
+      opponent: {
+        ..._gameState.opponent,
+        timeRemainingMs: isWhite ? data.blackTimeRemainingMs : data.whiteTimeRemainingMs,
+      },
+      turn: data.turn,
+    };
+    gameStateListeners.forEach((fn) => fn(_gameState));
+  });
+
   s.on("game_over", (data: GameOverPayload) => {
     if (_gameState) {
       _gameState = { ..._gameState, result: data.result };

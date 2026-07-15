@@ -780,6 +780,25 @@ class SocketService {
       _gameStateController.add(_gameState);
     });
 
+    s.on('clock_tick', (data) {
+      final json = _toMap(data);
+      final state = _gameState;
+      if (state == null) return;
+      final whiteTime = json['whiteTimeRemainingMs'] as int?;
+      final blackTime = json['blackTimeRemainingMs'] as int?;
+      if (whiteTime == null || blackTime == null) return;
+      final isWhite = state.color == PlayerColor.white;
+      _gameState = state.copyWith(
+        timeRemainingMs: isWhite ? whiteTime : blackTime,
+        opponent: OpponentState(
+          handCount: state.opponent.handCount,
+          scorePile: state.opponent.scorePile,
+          timeRemainingMs: isWhite ? blackTime : whiteTime,
+        ),
+      );
+      _gameStateController.add(_gameState);
+    });
+
     s.on('game_over', (data) {
       final json = _toMap(data);
       final payload = GameOverPayload.fromJson(json);

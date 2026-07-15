@@ -40,10 +40,16 @@ class PieceGlyph extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Soft drop shadow.
-          _maskedGlyph(fontSize, const Color(0x55000000), scale: 1.12, dy: 1.5),
+          // Soft shadow/glow. Dark pieces get a light halo so they pop on
+          // dark squares; light pieces get a dark drop shadow.
+          _maskedGlyph(
+            fontSize,
+            lightPiece ? const Color(0x55000000) : const Color(0x55F2ECFF),
+            scale: 1.14,
+            dy: lightPiece ? 1.5 : 0,
+          ),
           // Outline rim (slightly larger silhouette behind the fill).
-          _maskedGlyph(fontSize, outline, scale: 1.12),
+          _maskedGlyph(fontSize, outline, scale: 1.14),
           // Fill.
           _maskedGlyph(fontSize, fill, scale: 1.0),
         ],

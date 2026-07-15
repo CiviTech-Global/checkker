@@ -99,13 +99,16 @@ export class HeuristicEngine implements Engine {
     const moves = chess.moves({ verbose: false });
     if (moves.length === 0) return null;
 
+    // evaluateChess returns a White-relative score, so we orient the maximization
+    // to the side that is actually moving.
+    const isWhiteToMove = fen.includes(" w ");
     let bestScore = -Infinity;
     let bestMove: string | null = null;
 
     for (const move of moves) {
       chess.move(move);
       const evalResult = this.evaluateChess(chess);
-      const score = chess.turn() === "w" ? -evalResult.score : evalResult.score;
+      const score = isWhiteToMove ? evalResult.score : -evalResult.score;
       chess.undo();
 
       if (score > bestScore) {
@@ -245,9 +248,10 @@ export class HeuristicEngine implements Engine {
       score += chess.turn() === "w" ? -30 : 30;
     }
 
-    const turnSign = fen.includes(" w ") ? 1 : -1;
+    // Return the score from White's absolute perspective. Callers that need a
+    // different orientation (e.g., Black choosing a move) must negate it.
     return {
-      score: score * turnSign,
+      score,
       isMate: false,
       mateIn: 0,
       depth: 12,

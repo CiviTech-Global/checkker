@@ -9,6 +9,7 @@ import {
   type TimeControl,
   type GameResult,
   type ScoredGame,
+  type PokerResult,
   TIME_CONTROL_SECONDS,
   createDeck,
   cardToPiece,
@@ -18,6 +19,25 @@ import {
 import { getLegalMovesForHand, getCaptureBonus } from "@checkker/chess";
 import { evaluateScorePile } from "@checkker/poker";
 import { getTopMoves, type MoveEvaluation } from "./bot/evaluators";
+
+export type PublicGameState = {
+  id: string;
+  fen: string;
+  turn: Color;
+  color: Color;
+  hand: Card[];
+  scorePile: Card[];
+  timeRemainingMs: number;
+  opponent: {
+    hand: (Card | null)[];
+    scorePile: Card[];
+    timeRemainingMs: number;
+  };
+  drawPileCount: number;
+  moveHistory: MoveRecord[];
+  result: GameResult | null;
+  timeControl: TimeControl;
+};
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -43,6 +63,7 @@ export class GameEngine {
   private lastMoveTimestamp: number;
   private timeoutInterval: ReturnType<typeof setInterval> | null;
   private onTimeoutCallback: (() => void) | null;
+  private onTickCallback: (() => void) | null;
   private stateHistory: Array<{
     chess: string;
     turn: Color;
@@ -87,6 +108,7 @@ export class GameEngine {
     this.lastMoveTimestamp = Date.now();
     this.timeoutInterval = null;
     this.onTimeoutCallback = null;
+    this.onTickCallback = null;
 
     this.drawToFull("white");
     this.drawToFull("black");
@@ -144,10 +166,23 @@ export class GameEngine {
     };
   }
 
-  getPublicState(color: Color): object {
+  getPublicState(color: Color): PublicGameState {
     const state = this.getState();
     const player = state[color];
     const opp = state[color === "white" ? "black" : "white"];
+
+    // Compute authoritative live remaining time for snapshots (e.g., reconnect,
+    // initial state) without mutating engine state. The periodic tick keeps the
+    // canonical timeRemainingMs up to date between snapshots.
+    const elapsed = !this.result ? Date.now() - this.lastMoveTimestamp : 0;
+    const activeIsPlayer = state.turn === color;
+    const playerTime = activeIsPlayer
+      ? Math.max(0, player.timeRemainingMs - elapsed)
+      : player.timeRemainingMs;
+    const opponentTime = !activeIsPlayer
+      ? Math.max(0, opp.timeRemainingMs - elapsed)
+      : opp.timeRemainingMs;
+
     return {
       id: state.id,
       fen: state.fen,
@@ -155,11 +190,11 @@ export class GameEngine {
       color,
       hand: player.hand,
       scorePile: player.scorePile,
-      timeRemainingMs: player.timeRemainingMs,
+      timeRemainingMs: playerTime,
       opponent: {
         hand: opp.hand.map(() => null),
         scorePile: opp.scorePile,
-        timeRemainingMs: opp.timeRemainingMs,
+        timeRemainingMs: opponentTime,
       },
       drawPileCount: state.drawPile.length,
       moveHistory: state.moveHistory,
@@ -314,16 +349,23 @@ export class GameEngine {
     return this.result;
   }
 
-  startTimeoutCheck(callback: () => void): void {
-    this.onTimeoutCallback = callback;
+  startTimeoutCheck(callbacks: { onTimeout: () => void; onTick?: () => void }): void {
+    this.onTimeoutCallback = callbacks.onTimeout;
+    this.onTickCallback = callbacks.onTick ?? null;
     this.timeoutInterval = setInterval(() => {
       if (this.result) return;
-      const elapsed = Date.now() - this.lastMoveTimestamp;
-      const remaining = this.currentPlayer.timeRemainingMs - elapsed;
-      if (remaining <= 0) {
-        this.currentPlayer.timeRemainingMs = 0;
+
+      const now = Date.now();
+      const elapsed = now - this.lastMoveTimestamp;
+      const player = this.currentPlayer;
+      player.timeRemainingMs = Math.max(0, player.timeRemainingMs - elapsed);
+      this.lastMoveTimestamp = now;
+
+      if (player.timeRemainingMs <= 0) {
         this.timeOut(this.turn);
         this.onTimeoutCallback?.();
+      } else {
+        this.onTickCallback?.();
       }
     }, 1000);
   }
@@ -390,11 +432,26 @@ export class GameEngine {
     };
   }
 
-  /** Live poker totals for both sides (for the in-game score display). */
-  getLiveScores(): { whitePoker: number; blackPoker: number } {
+  /** Authoritative clock state for lightweight clock_tick broadcasts. */
+  getClockState(): { whiteTimeRemainingMs: number; blackTimeRemainingMs: number; turn: Color } {
+    const elapsed = !this.result ? Date.now() - this.lastMoveTimestamp : 0;
+    const whiteActive = this.turn === "white";
     return {
-      whitePoker: evaluateScorePile(this.white.scorePile).total,
-      blackPoker: evaluateScorePile(this.black.scorePile).total,
+      whiteTimeRemainingMs: whiteActive
+        ? Math.max(0, this.white.timeRemainingMs - elapsed)
+        : this.white.timeRemainingMs,
+      blackTimeRemainingMs: !whiteActive
+        ? Math.max(0, this.black.timeRemainingMs - elapsed)
+        : this.black.timeRemainingMs,
+      turn: this.turn,
+    };
+  }
+
+  /** Live poker results for both sides (for the in-game score display). */
+  getLiveScores(): { whitePoker: PokerResult; blackPoker: PokerResult } {
+    return {
+      whitePoker: evaluateScorePile(this.white.scorePile),
+      blackPoker: evaluateScorePile(this.black.scorePile),
     };
   }
 }

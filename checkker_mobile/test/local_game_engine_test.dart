@@ -80,6 +80,15 @@ void main() {
       final engine = LocalGameEngine();
       expect(engine.getScores(), isNull);
     });
+
+    test('getLiveScores returns poker results for both sides', () {
+      final engine = LocalGameEngine();
+      final liveScores = engine.getLiveScores();
+      expect(liveScores.whitePoker.total, 0);
+      expect(liveScores.blackPoker.total, 0);
+      expect(liveScores.whitePoker.hands, isEmpty);
+      expect(liveScores.blackPoker.hands, isEmpty);
+    });
   });
 
   group('pickLocalBotMove', () {

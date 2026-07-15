@@ -476,7 +476,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       const SizedBox(height: AppSpacing.xs),
 
                       // Opponent score pile
-                      ScorePile(cards: gs.opponent.scorePile, label: 'Captured', points: gs.opponentPokerScore),
+                      ScorePile(
+                        cards: gs.opponent.scorePile,
+                        label: 'Captured',
+                        points: gs.opponentPokerScore,
+                        result: gs.opponentPokerResult,
+                      ),
                       const SizedBox(height: AppSpacing.sm),
 
                       // Chess board
@@ -540,7 +545,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       const SizedBox(height: AppSpacing.xs),
 
                       // Player score pile
-                      ScorePile(cards: gs.scorePile, label: 'Your Captures', points: gs.myPokerScore),
+                      ScorePile(
+                        cards: gs.scorePile,
+                        label: 'Your Captures',
+                        points: gs.myPokerScore,
+                        result: gs.myPokerResult,
+                      ),
                       const SizedBox(height: AppSpacing.sm),
 
                       // Best moves
@@ -660,7 +670,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           disabled: !myTurn,
                         ),
                         const SizedBox(height: AppSpacing.xs),
-                        ScorePile(cards: gs.scorePile, label: 'Your Captures', points: gs.myPokerScore),
+                        ScorePile(
+                          cards: gs.scorePile,
+                          label: 'Your Captures',
+                          points: gs.myPokerScore,
+                          result: gs.myPokerResult,
+                        ),
                         const SizedBox(height: AppSpacing.sm),
                         BestMovesPanel(moves: myBestMoves, visible: myBestMoves.isNotEmpty),
                         const SizedBox(height: AppSpacing.sm),
@@ -738,7 +753,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         const SizedBox(height: AppSpacing.xs),
                         OpponentHand(cardCount: gs.opponent.handCount),
                         const SizedBox(height: AppSpacing.xs),
-                        ScorePile(cards: gs.opponent.scorePile, label: 'Captured', points: gs.opponentPokerScore),
+                        ScorePile(
+                          cards: gs.opponent.scorePile,
+                          label: 'Captured',
+                          points: gs.opponentPokerScore,
+                          result: gs.opponentPokerResult,
+                        ),
                         const SizedBox(height: AppSpacing.sm),
                         PlayerMoveHistory(label: 'Opponent Moves', color: opponentColorStr, moves: gs.moveHistory),
                       ],

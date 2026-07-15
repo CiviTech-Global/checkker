@@ -42,6 +42,19 @@ describe("calculateOdds", () => {
     expect(odds.whiteWinPct + odds.blackWinPct + odds.drawPct).toBe(100);
   });
 
+  it("returns identical odds regardless of side to move", async () => {
+    const baseFen = "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R";
+    const whiteToMove = `${baseFen} w KQkq - 0 1`;
+    const blackToMove = `${baseFen} b KQkq - 0 1`;
+
+    const whiteOdds = await calculateOdds(whiteToMove);
+    const blackOdds = await calculateOdds(blackToMove);
+
+    expect(whiteOdds.whiteWinPct).toBe(blackOdds.whiteWinPct);
+    expect(whiteOdds.blackWinPct).toBe(blackOdds.blackWinPct);
+    expect(whiteOdds.drawPct).toBe(blackOdds.drawPct);
+  });
+
   it("always returns valid percentages that sum to 100", async () => {
     const positions = [
       "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",

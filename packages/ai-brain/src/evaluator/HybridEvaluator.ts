@@ -211,8 +211,10 @@ export class HybridEvaluator {
         continue;
       }
 
+      // engine.evaluate now returns a White-relative score. When Black is
+      // moving we want a Black-relative score for maximization.
       let score = (await engine.evaluate(chess.fen())).score;
-      if (color === "white") score = -score;
+      if (color === "black") score = -score;
 
       if (config.horizon > 0) {
         const opponentReplies = chess.moves({ verbose: false });

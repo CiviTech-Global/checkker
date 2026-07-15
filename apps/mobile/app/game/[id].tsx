@@ -20,7 +20,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Chess } from "chess.js";
-import type { Card, Color, GameResult } from "@checkker/shared";
+import type { Card, Color, GameResult, PokerResult } from "@checkker/shared";
 import { cardToPiece, cardId } from "@checkker/shared";
 import { getLegalMovesForHand } from "@checkker/chess";
 import ChessBoard from "../../src/components/ChessBoard";
@@ -241,12 +241,14 @@ export default function GameScreen() {
   const opponentProfile = gs?.opponentProfile ?? null;
   const bestMoves = gs?.bestMoves ?? { white: [], black: [] };
   const liveScores = gs?.liveScores ?? null;
-  const myPoints: number | undefined = liveScores
+  const myPoker: PokerResult | undefined = liveScores
     ? (color === "white" ? liveScores.whitePoker : liveScores.blackPoker)
     : undefined;
-  const opponentPoints: number | undefined = liveScores
+  const opponentPoker: PokerResult | undefined = liveScores
     ? (color === "white" ? liveScores.blackPoker : liveScores.whitePoker)
     : undefined;
+  const myPoints: number | undefined = myPoker?.total;
+  const opponentPoints: number | undefined = opponentPoker?.total;
 
   const myBestMoves = bestMoves[color] ?? [];
   const opponentColor: Color = color === "white" ? "black" : "white";
@@ -616,7 +618,7 @@ export default function GameScreen() {
             />
           )}
           <View style={styles.fullWidthRow}>
-            <ScorePile cards={opponentScorePile} label="Captured" points={opponentPoints} />
+            <ScorePile cards={opponentScorePile} label="Captured" points={opponentPoints} result={opponentPoker} />
           </View>
 
           {/* Board */}
@@ -667,7 +669,7 @@ export default function GameScreen() {
             />
           </View>
           <View style={styles.fullWidthRow}>
-            <ScorePile cards={myScorePile} label="Your Captures" points={myPoints} />
+            <ScorePile cards={myScorePile} label="Your Captures" points={myPoints} result={myPoker} />
           </View>
 
           {/* Best Moves */}

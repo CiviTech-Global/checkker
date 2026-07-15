@@ -90,6 +90,14 @@ class LocalGameEngine {
   int get drawPileCount => _drawPile.length;
   LocalGameResult? get result => _result;
   bool get isOver => _result != null;
+
+  /// Live poker results for both sides (mirrors server GameEngine.getLiveScores).
+  ({PokerResult whitePoker, PokerResult blackPoker}) getLiveScores() {
+    return (
+      whitePoker: evaluateScorePile(_white.scorePile),
+      blackPoker: evaluateScorePile(_black.scorePile),
+    );
+  }
   String? get lastMoveFrom => _lastMove?.substring(0, 2);
   String? get lastMoveTo => _lastMove?.substring(2, 4);
   chess_lib.Chess get chess => _chess;

@@ -39,7 +39,7 @@ export const COSMETICS_CATALOG: CosmeticDef[] = [
   { key: "board_neon", type: "board", name: "Neon Underground", description: "Backroom arcade glow", price: 500, rarity: "epic", board: { light: "#3dd6c3", dark: "#23104a" } },
 
   /* ── Piece themes ──────────────────────────────────────────────── */
-  { key: "piece_classic", type: "piece", name: "Classic", description: "Standard ivory and onyx", price: 0, rarity: "common", isDefault: true, piece: { white: "#ffffff", black: "#111111" } },
+  { key: "piece_classic", type: "piece", name: "Classic", description: "Readable ivory and near-black", price: 0, rarity: "common", isDefault: true, piece: { white: "#F5F2FC", black: "#15101F" } },
   { key: "piece_bone", type: "piece", name: "Bone & Coal", description: "Aged bone, raw coal", price: 100, rarity: "common", piece: { white: "#efe6d0", black: "#2e2620" } },
   { key: "piece_navy", type: "piece", name: "Naval Brass", description: "Cream against navy blue", price: 100, rarity: "common", piece: { white: "#f4ead6", black: "#16365c" } },
   { key: "piece_crimson", type: "piece", name: "Crimson Guard", description: "Bone white versus blood red", price: 150, rarity: "common", piece: { white: "#f5efe0", black: "#7a1622" } },

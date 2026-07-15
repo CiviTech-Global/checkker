@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/card.dart';
+import '../models/poker.dart';
 import '../theme/tokens.dart';
 
 const _suitSymbol = {
@@ -15,13 +16,28 @@ class ScorePile extends StatelessWidget {
   final String label;
   /// Live poker points from the server's authoritative score evaluation.
   final int? points;
+  /// Optional live poker result. When provided the widget shows the hand
+  /// breakdown (pair, straight, flush, ...) in addition to the total.
+  final PokerResult? result;
 
-  const ScorePile({super.key, required this.cards, this.label = 'Captured', this.points});
+  const ScorePile({
+    super.key,
+    required this.cards,
+    this.label = 'Captured',
+    this.points,
+    this.result,
+  });
+
+  int? get _effectivePoints => result?.total ?? points;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: const Color(0x14A855F7), border: Border.all(color: AppColors.border.gold), borderRadius: BorderRadius.circular(AppRadius.md)),
+      decoration: BoxDecoration(
+        color: const Color(0x14A855F7),
+        border: Border.all(color: AppColors.border.gold),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
       padding: const EdgeInsets.all(AppSpacing.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,7 +52,7 @@ class ScorePile extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              if (points != null) ...[
+              if (_effectivePoints != null) ...[
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
@@ -45,7 +61,7 @@ class ScorePile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Text(
-                    '$points pts',
+                    '$_effectivePoints pts',
                     style: TextStyle(
                       fontSize: 11,
                       color: AppColors.accent.gold,
@@ -57,6 +73,31 @@ class ScorePile extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.xxs),
+          if (result != null && result!.hands.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xxs),
+              child: Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                children: result!.hands.map((hand) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.gold.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    child: Text(
+                      '${pokerHandNames[hand.hand]} +${hand.points}',
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: AppColors.accent.gold,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           if (cards.isEmpty)
             Text(
               'None',

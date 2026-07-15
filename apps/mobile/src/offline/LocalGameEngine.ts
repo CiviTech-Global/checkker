@@ -5,6 +5,7 @@ import {
   type GameResult,
   type MoveRecord,
   type ScoredGame,
+  type PokerResult,
   createDeck,
   cardToPiece,
   cardId,
@@ -259,6 +260,14 @@ export class LocalGameEngine {
     const whitePoker = evaluateScorePile(this.white.scorePile);
     const blackPoker = evaluateScorePile(this.black.scorePile);
     return scoreGame(this.result, whitePoker, blackPoker);
+  }
+
+  /** Live poker results for both sides (mirrors server GameEngine.getLiveScores). */
+  getLiveScores(): { whitePoker: PokerResult; blackPoker: PokerResult } {
+    return {
+      whitePoker: evaluateScorePile(this.white.scorePile),
+      blackPoker: evaluateScorePile(this.black.scorePile),
+    };
   }
 
   /** Internal chess instance, used by the local bot for evaluation. */

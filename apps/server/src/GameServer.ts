@@ -1362,8 +1362,13 @@ export class GameServer {
 
     this.matches.set(game.id, match);
 
-    game.startTimeoutCheck(() => {
-      this.broadcastGame(game.id);
+    game.startTimeoutCheck({
+      onTimeout: () => {
+        this.broadcastGame(game.id);
+      },
+      onTick: () => {
+        this.broadcastClock(game.id);
+      },
     });
 
     const whiteProfile = playerStore.getOrCreate(p1.id);
@@ -1447,6 +1452,18 @@ export class GameServer {
       white.socket.emit("game_over", payload);
       black.socket.emit("game_over", payload);
     }
+  }
+
+  private broadcastClock(gameId: string): void {
+    const match = this.matches.get(gameId);
+    if (!match) return;
+    const { game, white, black } = match;
+    if (game.isOver()) return;
+
+    const clock = game.getClockState();
+    const payload = { gameId, ...clock };
+    white.socket.emit("clock_tick", payload);
+    black.socket.emit("clock_tick", payload);
   }
 
   /** Handle post-game: settle bet, update ratings, persist to DB */

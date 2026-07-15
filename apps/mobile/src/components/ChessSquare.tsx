@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
   FadeIn,
 } from "react-native-reanimated";
-import { colors, radius, PIECE_UNICODE, springConfig } from "../theme/tokens";
+import { colors, PIECE_UNICODE, springConfig } from "../theme/tokens";
 import { haptics } from "../services/HapticsService";
 
 interface ChessSquareProps {
@@ -109,7 +109,16 @@ export default function ChessSquare({
           style={[
             styles.piece,
             { fontSize: size * 0.65 },
-            pieceColors && { color: pieceColor === "white" ? pieceColors.white : pieceColors.black },
+            {
+              color: pieceColor === "white"
+                ? (pieceColors?.white ?? colors.piece.white)
+                : (pieceColors?.black ?? colors.piece.black),
+              textShadowColor: pieceColor === "white"
+                ? "rgba(0,0,0,0.55)"
+                : "rgba(245,242,252,0.85)",
+              textShadowOffset: { width: 0, height: 0 },
+              textShadowRadius: pieceColor === "white" ? 2 : 4,
+            },
             pieceAnimStyle,
           ]}
         >

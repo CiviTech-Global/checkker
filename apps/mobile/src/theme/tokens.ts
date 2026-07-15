@@ -36,6 +36,10 @@ export const colors = {
     light: "#D7CFEC",         // pale lavender squares
     dark: "#4B3F77",          // violet squares
   },
+  piece: {
+    white: "#F5F2FC",         // near-white for white army
+    black: "#15101F",         // near-black silhouette; contrast on dark squares via light outline/shadow
+  },
   highlight: {
     legal: "rgba(52,229,161,0.45)",
     selected: "rgba(168,85,247,0.55)",
@@ -114,11 +118,15 @@ export const glassStyle = {
   borderColor: "rgba(168,85,247,0.28)",
 } as const;
 
+// Both armies use the SAME solid (filled) chess glyphs (U+265A–U+265F) so every
+// piece shares one consistent silhouette/design. White vs black is conveyed by
+// the fill color (see colors.piece), not by mixing Unicode's hollow "white"
+// glyphs with the solid "black" ones.
 export const PIECE_UNICODE: Record<string, { white: string; black: string }> = {
-  k: { white: "\u2654", black: "\u265A" },
-  q: { white: "\u2655", black: "\u265B" },
-  r: { white: "\u2656", black: "\u265C" },
-  b: { white: "\u2657", black: "\u265D" },
-  n: { white: "\u2658", black: "\u265E" },
-  p: { white: "\u2659", black: "\u265F" },
+  k: { white: "\u265A", black: "\u265A" },
+  q: { white: "\u265B", black: "\u265B" },
+  r: { white: "\u265C", black: "\u265C" },
+  b: { white: "\u265D", black: "\u265D" },
+  n: { white: "\u265E", black: "\u265E" },
+  p: { white: "\u265F", black: "\u265F" },
 };

@@ -67,9 +67,14 @@ export class BotManager {
     };
     this.botGames.set(gameId, entry);
 
-    game.startTimeoutCheck(() => {
-      this.broadcastToHuman(gameId);
-      this.disposeBotGame(gameId);
+    game.startTimeoutCheck({
+      onTimeout: () => {
+        this.broadcastToHuman(gameId);
+        this.disposeBotGame(gameId);
+      },
+      onTick: () => {
+        this.broadcastClock(gameId);
+      },
     });
 
     this.setupHandlers(gameId, entry);
@@ -254,6 +259,16 @@ export class BotManager {
     if (game.isOver()) {
       humanSocket.emit("game_over", { result: game.getResult(), scores: game.getScores() });
     }
+  }
+
+  private broadcastClock(gameId: string): void {
+    const entry = this.botGames.get(gameId);
+    if (!entry) return;
+    const { game, humanSocket } = entry;
+    if (game.isOver()) return;
+
+    const clock = game.getClockState();
+    humanSocket.emit("clock_tick", { gameId, ...clock });
   }
 
   private scheduleBotTurn(gameId: string): void {

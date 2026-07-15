@@ -198,4 +198,6 @@ const Map<String, Map<String, String>> pieceUnicode = {
 /// color differs, so the two sides read clearly without looking like two
 /// different piece sets.
 const Color kDefaultWhitePiece = Color(0xFFF5F2FC);
+/// Default fill for the black army. Near-black silhouette; visibility on the
+/// dark violet board is handled by the light outline rim in [PieceGlyph].
 const Color kDefaultBlackPiece = Color(0xFF15101F);

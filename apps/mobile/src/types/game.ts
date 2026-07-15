@@ -4,12 +4,12 @@ import type {
   MoveRecord,
   GameResult,
   TimeControl,
-  PlayerState,
   ScoredGame,
   MoveEvaluation,
   GameOdds,
   PlayerProfile,
   ChatMessage,
+  PokerResult,
 } from "@checkker/shared";
 
 export type { MoveEvaluation, GameOdds, PlayerProfile, ChatMessage };
@@ -35,6 +35,11 @@ export interface GameClientState {
   odds?: GameOdds;
   playerProfile?: PlayerProfile;
   opponentProfile?: PlayerProfile;
+  /** Live poker results for both sides (authoritative from server). */
+  liveScores?: {
+    whitePoker: PokerResult;
+    blackPoker: PokerResult;
+  };
 }
 
 export interface GameStartPayload extends GameClientState {

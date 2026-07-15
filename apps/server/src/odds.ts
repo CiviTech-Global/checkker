@@ -76,6 +76,8 @@ export async function calculateOdds(ctx: OddsContext | string): Promise<GameOdds
   }
 
   // ── Chess dimension (white-relative centipawns; + = good for White) ──────
+  // evaluatePosition now always returns a White-relative score, so no
+  // side-to-move normalization is required.
   const cp = await brain.evaluatePosition(fen);
   const pWhiteBetter = logistic(0.0035 * cp);
   // Closer-to-equal positions are likelier to end drawn on the board.

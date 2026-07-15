@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Card, cardToPiece } from '@checkker/shared';
+import { Card, cardToPiece, PokerResult, PokerHand } from '@checkker/shared';
 import { colors, spacing, typography, radius } from '../theme/tokens';
 
 const SUIT_SYMBOL: Record<string, string> = {
@@ -27,12 +27,28 @@ const PIECE_LABEL: Record<string, string> = {
   wild: 'W',
 };
 
+const POKER_HAND_NAME: Record<PokerHand, string> = {
+  [PokerHand.HIGH_CARD]: 'High Card',
+  [PokerHand.ONE_PAIR]: 'Pair',
+  [PokerHand.TWO_PAIR]: 'Two Pair',
+  [PokerHand.THREE_OF_A_KIND]: 'Three of a Kind',
+  [PokerHand.STRAIGHT]: 'Straight',
+  [PokerHand.FLUSH]: 'Flush',
+  [PokerHand.FULL_HOUSE]: 'Full House',
+  [PokerHand.FOUR_OF_A_KIND]: 'Four of a Kind',
+  [PokerHand.STRAIGHT_FLUSH]: 'Straight Flush',
+  [PokerHand.ROYAL_FLUSH]: 'Royal Flush',
+};
+
 interface ScorePileProps {
   cards: Card[];
   label: string;
   maxVisible?: number;
   /** Live poker points from the server's authoritative score evaluation. */
   points?: number;
+  /** Optional live poker result. When provided the widget shows the hand
+   *  breakdown (pair, straight, flush, ...) in addition to the total. */
+  result?: PokerResult;
 }
 
 function MiniCard({ card }: { card: Card }) {
@@ -47,18 +63,32 @@ function MiniCard({ card }: { card: Card }) {
   );
 }
 
-export default function ScorePile({ cards, label, maxVisible = 3, points }: ScorePileProps) {
+export default function ScorePile({ cards, label, maxVisible = 3, points, result }: ScorePileProps) {
   const visible = cards.slice(0, maxVisible);
   const overflow = cards.length - maxVisible;
+  const effectivePoints = result?.total ?? points;
 
   return (
-    <View style={styles.container} accessibilityLabel={`${label}, ${cards.length} cards, ${points ?? 0} points`}>
-      <Text style={styles.label}>{label}</Text>
-      {points != null && (
-        <View style={styles.pointsBadge}>
-          <Text style={styles.pointsText}>{points} pts</Text>
+    <View style={styles.container} accessibilityLabel={`${label}, ${cards.length} cards, ${effectivePoints ?? 0} points`}>
+      <View style={styles.topRow}>
+        <Text style={styles.label}>{label}</Text>
+        {effectivePoints != null && (
+          <View style={styles.pointsBadge}>
+            <Text style={styles.pointsText}>{effectivePoints} pts</Text>
+          </View>
+        )}
+      </View>
+
+      {result && result.hands.length > 0 && (
+        <View style={styles.handsRow}>
+          {result.hands.map((hand, i) => (
+            <View key={i} style={styles.handBadge}>
+              <Text style={styles.handText}>{POKER_HAND_NAME[hand.hand]} +{hand.points}</Text>
+            </View>
+          ))}
         </View>
       )}
+
       {cards.length === 0 ? (
         <Text style={styles.empty}>No captures yet</Text>
       ) : (
@@ -81,6 +111,9 @@ export default function ScorePile({ cards, label, maxVisible = 3, points }: Scor
 
 const styles = StyleSheet.create({
   container: {
+    gap: spacing.xxs,
+  },
+  topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
@@ -100,6 +133,22 @@ const styles = StyleSheet.create({
     fontSize: typography.size.xs,
     color: colors.accent.gold,
     fontWeight: typography.weight.bold,
+  },
+  handsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xxs,
+  },
+  handBadge: {
+    backgroundColor: colors.accent.gold + "20",
+    borderRadius: radius.sm,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+  },
+  handText: {
+    fontSize: typography.size.xs,
+    color: colors.accent.gold,
+    fontWeight: typography.weight.semiBold,
   },
   empty: {
     fontSize: typography.size.xs,
@@ -136,11 +185,13 @@ const styles = StyleSheet.create({
   miniSuit: {
     fontSize: 12,
     lineHeight: 14,
+    color: colors.text.dark,
   },
   miniPiece: {
     fontSize: 8,
     fontWeight: typography.weight.medium,
     lineHeight: 10,
+    color: colors.text.dark,
   },
   badge: {
     backgroundColor: colors.bg.tertiary,

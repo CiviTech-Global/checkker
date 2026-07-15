@@ -1,5 +1,18 @@
 import 'card.dart';
 import 'game.dart';
+import 'poker.dart';
+
+PokerResult? _parsePokerResult(dynamic value) {
+  if (value == null) return null;
+  if (value is Map<String, dynamic>) {
+    return PokerResult.fromJson(value);
+  }
+  if (value is int) {
+    // Backwards compatibility with servers that sent a raw point total.
+    return PokerResult(hands: const [], leftover: const [], total: value);
+  }
+  return null;
+}
 
 class OpponentState {
   final int handCount;
@@ -39,9 +52,12 @@ class GameClientState {
   final GameOdds? odds;
   final PlayerProfile? playerProfile;
   final PlayerProfile? opponentProfile;
-  /// Live poker points from the server's authoritative score evaluation.
-  final int? whitePokerScore;
-  final int? blackPokerScore;
+  /// Live poker evaluation from the server's authoritative score evaluation.
+  final PokerResult? whitePokerResult;
+  final PokerResult? blackPokerResult;
+
+  int? get whitePokerScore => whitePokerResult?.total;
+  int? get blackPokerScore => blackPokerResult?.total;
 
   const GameClientState({
     required this.id, required this.fen, required this.turn, required this.color,
@@ -49,12 +65,16 @@ class GameClientState {
     required this.opponent, required this.drawPileCount, required this.moveHistory,
     this.result, required this.timeControl, this.bestMoves, this.odds,
     this.playerProfile, this.opponentProfile,
-    this.whitePokerScore, this.blackPokerScore,
+    this.whitePokerResult, this.blackPokerResult,
   });
 
+  /// Poker result for the side this client is playing / viewing as.
+  PokerResult? get myPokerResult => color == PlayerColor.white ? whitePokerResult : blackPokerResult;
+  PokerResult? get opponentPokerResult => color == PlayerColor.white ? blackPokerResult : whitePokerResult;
+
   /// Poker points for the side this client is playing / viewing as.
-  int? get myPokerScore => color == PlayerColor.white ? whitePokerScore : blackPokerScore;
-  int? get opponentPokerScore => color == PlayerColor.white ? blackPokerScore : whitePokerScore;
+  int? get myPokerScore => myPokerResult?.total;
+  int? get opponentPokerScore => opponentPokerResult?.total;
 
   GameClientState copyWith({
     String? id,
@@ -73,8 +93,8 @@ class GameClientState {
     GameOdds? odds,
     PlayerProfile? playerProfile,
     PlayerProfile? opponentProfile,
-    int? whitePokerScore,
-    int? blackPokerScore,
+    PokerResult? whitePokerResult,
+    PokerResult? blackPokerResult,
   }) {
     return GameClientState(
       id: id ?? this.id,
@@ -93,8 +113,8 @@ class GameClientState {
       odds: odds ?? this.odds,
       playerProfile: playerProfile ?? this.playerProfile,
       opponentProfile: opponentProfile ?? this.opponentProfile,
-      whitePokerScore: whitePokerScore ?? this.whitePokerScore,
-      blackPokerScore: blackPokerScore ?? this.blackPokerScore,
+      whitePokerResult: whitePokerResult ?? this.whitePokerResult,
+      blackPokerResult: blackPokerResult ?? this.blackPokerResult,
     );
   }
 
@@ -141,8 +161,12 @@ class GameClientState {
       opponentProfile: json['opponentProfile'] != null
           ? PlayerProfile.fromJson(json['opponentProfile'] as Map<String, dynamic>)
           : null,
-      whitePokerScore: (json['liveScores'] as Map<String, dynamic>?)?['whitePoker'] as int?,
-      blackPokerScore: (json['liveScores'] as Map<String, dynamic>?)?['blackPoker'] as int?,
+      whitePokerResult: _parsePokerResult(
+        (json['liveScores'] as Map<String, dynamic>?)?['whitePoker'],
+      ),
+      blackPokerResult: _parsePokerResult(
+        (json['liveScores'] as Map<String, dynamic>?)?['blackPoker'],
+      ),
     );
   }
 }

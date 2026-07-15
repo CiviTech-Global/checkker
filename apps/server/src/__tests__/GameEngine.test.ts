@@ -105,6 +105,35 @@ describe("GameEngine — playCard", () => {
   });
 });
 
+/* ── Live scores ─────────────────────────────────────────────────────── */
+
+describe("GameEngine — live scores", () => {
+  it("returns PokerResult objects for both colors", () => {
+    const engine = createTestEngine();
+    const liveScores = engine.getLiveScores();
+    expect(liveScores).toHaveProperty("whitePoker");
+    expect(liveScores).toHaveProperty("blackPoker");
+    expect(liveScores.whitePoker).toEqual({ hands: [], leftover: [], total: 0 });
+    expect(liveScores.blackPoker).toEqual({ hands: [], leftover: [], total: 0 });
+    engine.dispose();
+  });
+
+  it("updates live scores after a capture", () => {
+    const wh: Card[] = [c("A", "clubs"), c("5", "hearts"), c("6", "spades")];
+    const bh: Card[] = [c("3", "diamonds"), c("4", "clubs"), c("8", "hearts")];
+    const engine = new GameEngine(1200, 1200, "blitz", testDeck(wh, bh));
+
+    engine.playCard(cardId(c("5", "hearts")), "e2e4");
+    engine.playCard(cardId(c("3", "diamonds")), "d7d5");
+    engine.playCard(cardId(c("6", "spades")), "e4d5");
+
+    const liveScores = engine.getLiveScores();
+    expect(liveScores.whitePoker.leftover.length).toBe(1);
+    expect(liveScores.blackPoker.leftover.length).toBe(0);
+    engine.dispose();
+  });
+});
+
 /* ── Captures and scoring ────────────────────────────────────────────── */
 
 describe("GameEngine — captures", () => {
@@ -288,6 +317,53 @@ describe("GameEngine — game endings", () => {
     const scores = engine.getScores()!;
     expect(scores).not.toBeNull();
     expect(scores.whiteTotal).toBeGreaterThanOrEqual(25);
+    engine.dispose();
+  });
+});
+
+/* ── Live timers ─────────────────────────────────────────────────────── */
+
+describe("GameEngine — live timers", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it("getPublicState subtracts elapsed time from the player to move", () => {
+    const engine = createTestEngine();
+    const initial = engine.getPublicState("white").timeRemainingMs;
+    jest.advanceTimersByTime(5000);
+    const after = engine.getPublicState("white").timeRemainingMs;
+    expect(initial - after).toBe(5000);
+    engine.dispose();
+  });
+
+  it("getPublicState does not subtract time after the game ends", () => {
+    const engine = createTestEngine();
+    engine.resign("black");
+    const initial = engine.getPublicState("white").timeRemainingMs;
+    jest.advanceTimersByTime(5000);
+    const after = engine.getPublicState("white").timeRemainingMs;
+    expect(after).toBe(initial);
+    engine.dispose();
+  });
+
+  it("startTimeoutCheck fires onTick each second and onTimeout when the clock expires", () => {
+    const onTick = jest.fn();
+    const onTimeout = jest.fn();
+    const engine = createTestEngine();
+    engine.startTimeoutCheck({ onTick, onTimeout });
+
+    jest.advanceTimersByTime(1000);
+    expect(onTick).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(420000);
+    expect(onTimeout).toHaveBeenCalledTimes(1);
+    expect(engine.getPublicState("white").timeRemainingMs).toBe(0);
+    expect(engine.isOver()).toBe(true);
     engine.dispose();
   });
 });

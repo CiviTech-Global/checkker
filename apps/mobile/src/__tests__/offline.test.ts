@@ -64,6 +64,15 @@ describe("LocalGameEngine", () => {
     expect(scores!.blackTotal).toBeGreaterThanOrEqual(25);
     expect(scores!.winner).toBe("black");
   });
+
+  test("getLiveScores returns poker results for both sides", () => {
+    const engine = new LocalGameEngine("white");
+    const liveScores = engine.getLiveScores();
+    expect(liveScores.whitePoker.total).toBe(0);
+    expect(liveScores.blackPoker.total).toBe(0);
+    expect(liveScores.whitePoker.hands).toHaveLength(0);
+    expect(liveScores.blackPoker.hands).toHaveLength(0);
+  });
 });
 
 describe("LocalBot", () => {
