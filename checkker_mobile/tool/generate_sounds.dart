@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
+import 'package:logging/logging.dart';
 
 const int _sampleRate = 22050;
 
 enum _Waveform { sine, triangle, square, sawtooth }
+
+final _log = Logger('GenerateSounds');
 
 class _Tone {
   final int freq;
@@ -143,6 +146,8 @@ List<int> _u32(int value) => [
 ];
 
 void main() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) => stdout.writeln(record.message));
   final outDir = Directory('assets/sounds');
   if (!outDir.existsSync()) {
     outDir.createSync(recursive: true);
@@ -219,8 +224,8 @@ void main() {
     final wav = _synthesizeWav(entry.value);
     final file = File('${outDir.path}/${entry.key}.wav');
     file.writeAsBytesSync(wav);
-    print('Generated ${file.path} (${wav.length} bytes)');
+    _log.info('Generated ${file.path} (${wav.length} bytes)');
   }
 
-  print('Done — ${sounds.length} sound assets generated.');
+  _log.info('Done — ${sounds.length} sound assets generated.');
 }
