@@ -41,7 +41,9 @@ COPY packages/chess/package.json ./packages/chess/package.json
 COPY packages/database/package.json ./packages/database/package.json
 COPY packages/poker/package.json ./packages/poker/package.json
 COPY packages/shared/package.json ./packages/shared/package.json
+COPY packages/ai-brain/package.json ./packages/ai-brain/package.json
 COPY apps/mobile/package.json ./apps/mobile/package.json
+COPY packages/database/prisma ./packages/database/prisma
 
 # Install dependencies
 RUN npm ci
@@ -49,9 +51,9 @@ RUN npm ci
 # Copy source code
 COPY packages/chess/src ./packages/chess/src
 COPY packages/database/src ./packages/database/src
-COPY packages/database/prisma ./packages/database/prisma
 COPY packages/poker/src ./packages/poker/src
 COPY packages/shared/src ./packages/shared/src
+COPY packages/ai-brain/src ./packages/ai-brain/src
 COPY apps/server/src ./apps/server/src
 COPY apps/mobile ./apps/mobile
 
@@ -76,10 +78,13 @@ COPY --from=builder /build/apps/mobile/dist /app/web/
 COPY --from=builder /build/packages/database/prisma /app/prisma/
 COPY --from=builder /build/node_modules/.prisma /app/node_modules/.prisma/
 COPY --from=builder /build/node_modules/@prisma /app/node_modules/@prisma/
-COPY --from=builder /build/node_modules/@checkker/database /app/node_modules/@checkker/database/
 
 # Prisma schema path for runtime
 ENV PRISMA_SCHEMA_PATH=/app/prisma/schema.prisma
+
+# Run in production mode by default (disables pino-pretty transport and
+# other dev-only paths that aren't installed in the runtime image)
+ENV NODE_ENV=production
 
 EXPOSE 3001
 EXPOSE 47831/udp

@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "clean": "rm -rf .turbo dist",
-    "bundle": "esbuild src/index.ts --bundle --platform=node --target=node18 --outfile=dist/server.bundle.js --external:stockfish --external:@checkker/database --external:@prisma/client"
+    "bundle": "esbuild src/index.ts --bundle --platform=node --target=node18 --outfile=dist/server.bundle.js --external:stockfish --external:@prisma/client"
   },
   "dependencies": {
     "@checkker/chess": "*",
