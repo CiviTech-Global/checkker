@@ -22,11 +22,11 @@ function resolveServerUrl(): string {
     if (port === "8081" || port === "19006") {
       return `${protocol}//${hostname}:3001`;
     }
-    if (hostname !== "localhost" && hostname !== "127.0.0.1") {
-      return window.location.origin;
-    }
+    // Any other host (including localhost/127.0.0.1 when the game server
+    // itself is serving this page, e.g. a local Docker run) — same origin.
+    return window.location.origin;
   }
-  return "http://192.168.1.105:3001";
+  return "http://localhost:3001";
 }
 
 export const ADDRESS_OF_SERVER = resolveServerUrl();

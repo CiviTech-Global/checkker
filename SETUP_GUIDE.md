@@ -57,7 +57,7 @@ sudo apt-get install -y \
 ## 2. Clone & install
 
 ```bash
-git clone https://github.com/civitechglobal/checkker.git
+git clone https://github.com/civitech-global/checkker.git
 cd checkker
 npm install
 ```
