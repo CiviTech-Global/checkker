@@ -19,6 +19,7 @@ import type { BetSetup } from "./betting/BetManager";
 import { CONTRACT_ADDRESS, BLOCKCHAIN_ENABLED, isBettingEnabled } from "./blockchain/config";
 import { ContractService } from "./blockchain/ContractService";
 import { SocketRateLimiter } from "./rateLimit";
+import { addGameBreadcrumb, setSentryUser, clearSentryUser, setSentryTag } from "./monitoring";
 
 interface Player {
   id: string; // socket ID (or user UUID when authenticated)
@@ -152,18 +153,20 @@ export class GameServer {
           userId: profile.id,
           isGuest: false,
         });
+        setSentryUser(profile.id, { wallet: walletAddress.toLowerCase() });
+        addGameBreadcrumb("auth", "wallet authenticated", { userId: profile.id });
         this.userSockets.set(profile.id, socket);
-        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress), bettingEnabled: isBettingEnabled() });
+        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress, socket.handshake.address), bettingEnabled: isBettingEnabled() });
       } else {
         // Wallet verified but no account yet — client should call set_username
-        socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress, sessionToken: createSession(walletAddress), bettingEnabled: isBettingEnabled() });
+        socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress, sessionToken: createSession(walletAddress, socket.handshake.address), bettingEnabled: isBettingEnabled() });
       }
     });
 
     // Silent re-auth with a session token from a previous signature login,
     // so page reloads / reconnects don't prompt the wallet to sign again.
     socket.on("auth_token", async ({ token }: { token: string }) => {
-      const walletAddress = typeof token === "string" ? verifySession(token) : null;
+      const walletAddress = typeof token === "string" ? verifySession(token, socket.handshake.address) : null;
       if (!walletAddress) {
         socket.emit("auth_error", { error: "Session expired", sessionExpired: true });
         return;
@@ -276,8 +279,10 @@ export class GameServer {
           userId: profile.id,
           isGuest: false,
         });
+        setSentryUser(profile.id, { wallet: walletAddress.toLowerCase() });
+        addGameBreadcrumb("auth", "wallet authenticated", { userId: profile.id });
         this.userSockets.set(profile.id, socket);
-        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress), bettingEnabled: isBettingEnabled() });
+        socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress, socket.handshake.address), bettingEnabled: isBettingEnabled() });
       } else {
         socket.emit("auth_error", { error: "Failed to create account" });
       }
@@ -482,22 +487,27 @@ export class GameServer {
     });
 
     socket.on("spectate_pause", ({ gameId }: { gameId: string }) => {
+      if (!this.spectateManager.isOwner(gameId, socket.id)) return;
       this.spectateManager.pause(gameId);
     });
 
     socket.on("spectate_resume", ({ gameId }: { gameId: string }) => {
+      if (!this.spectateManager.isOwner(gameId, socket.id)) return;
       this.spectateManager.resume(gameId);
     });
 
     socket.on("spectate_step_forward", ({ gameId }: { gameId: string }) => {
+      if (!this.spectateManager.isOwner(gameId, socket.id)) return;
       this.spectateManager.stepForward(gameId);
     });
 
     socket.on("spectate_step_backward", ({ gameId, currentIndex }: { gameId: string; currentIndex: number }) => {
+      if (!this.spectateManager.isOwner(gameId, socket.id)) return;
       this.spectateManager.stepBackward(gameId, currentIndex);
     });
 
     socket.on("spectate_leave", ({ gameId }: { gameId: string }) => {
+      if (!this.spectateManager.isOwner(gameId, socket.id)) return;
       this.spectateManager.dispose(gameId);
     });
 
@@ -519,6 +529,7 @@ export class GameServer {
     socket.on("request_coaching_tip", async ({ gameId }: { gameId: string }) => {
       const match = this.matches.get(gameId);
       if (!match) return;
+      if (socket.id !== match.white.id && socket.id !== match.black.id) return;
 
       const color: Color = socket.id === match.white.id ? "white" : "black";
       const state = match.game.getPublicState(color) as any;
@@ -934,8 +945,18 @@ export class GameServer {
     /* ── Replays ─────────────────────────────────────────────────────── */
 
     socket.on("get_game_moves", async ({ gameId }: { gameId: string }) => {
+      const auth = authenticatedSockets.get(socket.id);
+      if (!auth) {
+        socket.emit("game_moves", { gameId, moves: [] });
+        return;
+      }
       try {
-        const { GameMoveRepository } = await import("@checkker/database");
+        const { GameMoveRepository, GameRepository } = await import("@checkker/database");
+        const gameRecord = await GameRepository.findById(gameId);
+        if (!gameRecord || (gameRecord.whiteUserId !== auth.userId && gameRecord.blackUserId !== auth.userId)) {
+          socket.emit("game_moves", { gameId, moves: [] });
+          return;
+        }
         const moves = await GameMoveRepository.getByGameId(gameId);
         socket.emit("game_moves", { gameId, moves });
       } catch {
@@ -1084,7 +1105,8 @@ export class GameServer {
     socket.on("resign", ({ gameId }: { gameId: string }) => {
       const match = this.matches.get(gameId);
       if (!match) return;
-      const { game, white } = match;
+      const { game, white, black } = match;
+      if (socket.id !== white.id && socket.id !== black.id) return;
       const color: Color = socket.id === white.id ? "white" : "black";
       game.resign(color);
       this.broadcastGame(gameId);
@@ -1109,6 +1131,8 @@ export class GameServer {
     });
 
     socket.on("disconnect", () => {
+      addGameBreadcrumb("connection", "player disconnected", { socketId: socket.id });
+      clearSentryUser();
       brain.persistPlayer(socket.id);
       this.removeFromQueue(socket.id);
       this.removeFromDifficultyQueues(socket.id);
@@ -1394,6 +1418,17 @@ export class GameServer {
       escrowGameId: betSetup?.gameId ?? null,
     };
 
+    addGameBreadcrumb("game", "game started", {
+      gameId: game.id,
+      mode,
+      difficulty,
+      tc,
+      white: p1.id,
+      black: p2.id,
+    });
+    setSentryTag("game.mode", mode);
+    setSentryTag("game.difficulty", difficulty);
+
     p1.socket.emit("game_start", {
       ...game.getPublicState("white"),
       liveScores: game.getLiveScores(),
@@ -1448,6 +1483,11 @@ export class GameServer {
     });
 
     if (game.getResult()) {
+      addGameBreadcrumb("game", "game over", {
+        gameId,
+        result: JSON.stringify(game.getResult()),
+        scores: JSON.stringify(game.getScores()),
+      });
       const payload = { gameId, result: game.getResult(), scores: game.getScores() };
       white.socket.emit("game_over", payload);
       black.socket.emit("game_over", payload);

@@ -1,4 +1,4 @@
-﻿name: CI - Tests
+name: CI - Tests
 
 on:
   push:
@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   checks: write
+  security-events: write
 
 jobs:
   test:
@@ -36,6 +37,9 @@ jobs:
 
       - name: Run typecheck
         run: npm run typecheck
+
+      - name: Run prettier check
+        run: npx prettier --check "**/*.{ts,tsx,js,mjs,json,md}"
 
       # Each workspace runs its own pinned jest binary; a root-level
       # `npx jest` resolves a different hoisted major version and breaks.
@@ -112,3 +116,25 @@ jobs:
           path: test-results/*-junit.xml
           reporter: java-junit
           fail-on-error: false
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run npm audit (strict)
+        if: github.event_name == 'push'
+        run: npm audit --audit-level=critical

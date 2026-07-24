@@ -15,6 +15,9 @@ import 'theme/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize Sentry crash reporting before anything else.
+  await AnalyticsService().init();
+
   // Crash reporting: route framework and platform errors through the
   // analytics service so a backend can be attached in one place.
   FlutterError.onError = (details) {

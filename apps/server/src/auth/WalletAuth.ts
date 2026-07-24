@@ -71,25 +71,40 @@ export function cleanupExpiredChallenges(): void {
  * on reconnect/page reload without prompting the wallet to sign again.
  */
 
-const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours (reduced from 7 days)
 
-const sessions = new Map<string, { walletAddress: string; expiresAt: number }>();
+interface Session {
+  walletAddress: string;
+  expiresAt: number;
+  /** IP at creation time — used as a lightweight theft deterrent. */
+  ip: string;
+}
+
+const sessions = new Map<string, Session>();
 
 /** Create a session token for an authenticated wallet. */
-export function createSession(walletAddress: string): string {
+export function createSession(walletAddress: string, ip: string = "unknown"): string {
   const token = uuid() + uuid().replace(/-/g, "");
   sessions.set(token, {
     walletAddress: walletAddress.toLowerCase(),
     expiresAt: Date.now() + SESSION_TTL_MS,
+    ip,
   });
   return token;
 }
 
 /** Resolve a session token to its wallet address, or null if invalid/expired. */
-export function verifySession(token: string): string | null {
+export function verifySession(token: string, currentIp?: string): string | null {
   const session = sessions.get(token);
   if (!session) return null;
   if (Date.now() > session.expiresAt) {
+    sessions.delete(token);
+    return null;
+  }
+  // IP mismatch: if both the creation IP and current IP are known and differ,
+  // reject the session (potential token theft). Skip check when IP is unknown
+  // (e.g. server-to-server calls or clients behind changing NAT).
+  if (currentIp && session.ip !== "unknown" && currentIp !== session.ip) {
     sessions.delete(token);
     return null;
   }
@@ -99,4 +114,14 @@ export function verifySession(token: string): string | null {
 /** Invalidate a session token (logout). */
 export function revokeSession(token: string): void {
   sessions.delete(token);
+}
+
+/** Revoke all sessions for a wallet address (force re-auth everywhere). */
+export function revokeAllSessionsForWallet(walletAddress: string): void {
+  const lower = walletAddress.toLowerCase();
+  for (const [token, session] of sessions) {
+    if (session.walletAddress === lower) {
+      sessions.delete(token);
+    }
+  }
 }

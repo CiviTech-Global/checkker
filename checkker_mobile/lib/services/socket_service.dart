@@ -856,6 +856,14 @@ class SocketService {
       final json = _toMap(data);
       _authState = AuthState.fromJson(json);
       _authStateController.add(_authState);
+      // Set Sentry user context for crash reports
+      final profile = json['profile'] as Map<String, dynamic>?;
+      if (profile != null) {
+        AnalyticsService().setUser(
+          id: profile['id'] as String? ?? '',
+          extra: {'username': profile['displayName'] as String? ?? ''},
+        );
+      }
       final token = json['sessionToken'] as String?;
       if (token != null) _storeSessionToken(token);
       final features = json['serverFeatures'] as Map<String, dynamic>?;

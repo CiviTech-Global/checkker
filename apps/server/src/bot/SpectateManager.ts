@@ -215,6 +215,11 @@ export class SpectateManager {
     }
   }
 
+  isOwner(gameId: string, socketId: string): boolean {
+    const entry = this.games.get(gameId);
+    return !!entry && !entry.disposed && entry.spectatorSocket.id === socketId;
+  }
+
   pause(gameId: string): void {
     const entry = this.games.get(gameId);
     if (!entry || entry.disposed) return;

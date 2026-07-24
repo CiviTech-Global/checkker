@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Enforce conventional commit messages: type(scope): description
+# Allowed types: feat, fix, refactor, test, docs, chore, ci, perf, build
+pattern="^(feat|fix|refactor|test|docs|chore|ci|perf|build)(\(.+\))?: .{1,72}"
+
+if ! echo "$1" | grep -qE "$pattern"; then
+  echo ""
+  echo "  Commit message does not follow Conventional Commits format."
+  echo ""
+  echo "  Expected: <type>(<scope>): <description>"
+  echo "  Types:    feat | fix | refactor | test | docs | chore | ci | perf | build"
+  echo "  Example:  feat(game): add tournament matchmaking"
+  echo ""
+  exit 1
+fi

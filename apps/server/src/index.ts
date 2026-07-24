@@ -6,13 +6,16 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { GameServer } from "./GameServer";
 import { initPlayerStoreDb } from "./PlayerStore";
-import { initMonitoring } from "./monitoring";
+import { initMonitoring, sentryRequestHandler, sentryErrorHandler, flushSentry } from "./monitoring";
 import { parseArgs } from "./cli-args";
 import { logger } from "./logger";
 
 const cli = parseArgs();
 const PORT = cli.port ?? (process.env.PORT ? parseInt(process.env.PORT, 10) : 3001);
-const CORS_ORIGIN = process.env.CORS_ORIGIN ?? "*";
+const CORS_ORIGIN = process.env.CORS_ORIGIN;
+if (!CORS_ORIGIN && process.env.NODE_ENV === "production") {
+  logger.warn("[security] CORS_ORIGIN not set in production — all origins will be blocked");
+}
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
 
 initMonitoring();
@@ -22,11 +25,23 @@ const app = express();
 // Trust the first proxy when running behind a load balancer / reverse proxy.
 app.set("trust proxy", 1);
 
+app.use(sentryRequestHandler());
 app.use(helmet({
   contentSecurityPolicy: false, // web export supplies its own CSP via meta tags
   crossOriginEmbedderPolicy: false,
 }));
-app.use(cors({ origin: CORS_ORIGIN }));
+app.use(cors({
+  origin: CORS_ORIGIN
+    ? (origin, callback) => {
+        // Allow requests with no origin (mobile apps, curl, server-to-server)
+        if (!origin || CORS_ORIGIN === origin || CORS_ORIGIN === "*") {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      }
+    : false,
+}));
 app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
@@ -93,7 +108,10 @@ if (process.env.DATABASE_URL) {
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: { origin: CORS_ORIGIN, methods: ["GET", "POST"] },
+  cors: {
+    origin: CORS_ORIGIN || false,
+    methods: ["GET", "POST"],
+  },
 });
 
 const gameServer = new GameServer(io);
@@ -130,9 +148,14 @@ app.get("/health", (_req, res) => {
 
 app.use("/admin", adminLimiter, (req, res, next) => {
   if (!ADMIN_API_KEY) {
-    // In development without an admin key, restrict admin routes to loopback.
-    const ip = req.ip ?? "unknown";
-    if (ip === "127.0.0.1" || ip === "::1" || ip === "unknown") {
+    // In production, block all admin access if no key is configured.
+    if (process.env.NODE_ENV === "production") {
+      return res.status(403).json({ status: "error", message: "Admin API key not configured" });
+    }
+    // In development, restrict to loopback only. Use socket.remoteAddress
+    // (unaffected by trust proxy) to prevent IP spoofing via X-Forwarded-For.
+    const ip = (req.socket as any).remoteAddress ?? "unknown";
+    if (ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1" || ip === "unknown") {
       return next();
     }
     return res.status(403).json({ status: "error", message: "Admin API key not configured" });
@@ -214,6 +237,9 @@ const LAN_DISCOVERY_PROBE = "CHECKKER_DISCOVER";
   }
 })();
 
+// Sentry error handler — must be registered after all routes.
+app.use(sentryErrorHandler());
+
 httpServer.listen(PORT, () => {
   const actualPort = (httpServer.address() as any)?.port ?? PORT;
   // eslint-disable-next-line no-console
@@ -228,6 +254,7 @@ httpServer.listen(PORT, () => {
 process.on("SIGTERM", async () => {
   logger.info("Shutting down gracefully...");
   await gameServer.dispose();
+  await flushSentry();
   httpServer.close();
   process.exit(0);
 });
@@ -235,6 +262,7 @@ process.on("SIGTERM", async () => {
 process.on("SIGINT", async () => {
   logger.info("Shutting down gracefully...");
   await gameServer.dispose();
+  await flushSentry();
   httpServer.close();
   process.exit(0);
 });

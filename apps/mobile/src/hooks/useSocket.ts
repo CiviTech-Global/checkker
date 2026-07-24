@@ -444,6 +444,13 @@ function attachListeners(s: Socket) {
       _serverFeatures = { ...(_serverFeatures ?? {}), bettingEnabled: data.bettingEnabled } as { bettingEnabled: boolean };
       serverFeaturesListeners.forEach((fn) => fn(_serverFeatures));
     }
+    // Set Sentry user context for crash reports
+    if (data.profile) {
+      try {
+        const { setSentryUser } = require("../utils/analytics");
+        setSentryUser(data.profile.id, { username: data.profile.displayName });
+      } catch { /* analytics not available */ }
+    }
     authStateListeners.forEach((fn) => fn(_authState));
     if (data.sessionToken) storeSessionToken(data.sessionToken);
     // Load cosmetics so equipped themes apply in-game right away.

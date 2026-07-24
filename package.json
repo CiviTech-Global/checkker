@@ -9,7 +9,27 @@
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "clean": "turbo clean",
-    "deploy:wizard": "node scripts/deploy-wizard.mjs"
+    "deploy:wizard": "node scripts/deploy-wizard.mjs",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{js,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ],
+    "*.md": [
+      "prettier --write"
+    ],
+    "*.dart": [
+      "dart format"
+    ]
   },
   "workspaces": [
     "apps/*",
@@ -17,7 +37,10 @@
   ],
   "devDependencies": {
     "@playwright/test": "^1.61.1",
+    "husky": "^9.1.0",
     "jest-junit": "^17.0.0",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.3.0",
     "turbo": "^2.5.0",
     "typescript": "^5.8.0"
   },
