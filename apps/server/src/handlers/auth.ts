@@ -1,10 +1,11 @@
 import type { Socket } from "socket.io";
 import type { AuthEntry } from "./types";
-import { createChallenge, verifyChallenge, createSession, verifySession, revokeSession } from "../auth/WalletAuth";
+import { createChallenge, verifyChallenge } from "../auth/WalletAuth";
 import { playerStore } from "../PlayerStore";
-import { UserRepository } from "@checkker/database";
+import { UserRepository, AccountRepository } from "@checkker/database";
 import { isBettingEnabled } from "../blockchain/config";
 import { addGameBreadcrumb, setSentryUser } from "../monitoring";
+import { SessionService } from "../services/SessionService";
 
 /**
  * Shared auth state: maps socket ID to the authenticated user identity.
@@ -12,10 +13,26 @@ import { addGameBreadcrumb, setSentryUser } from "../monitoring";
  */
 export const authenticatedSockets = new Map<string, AuthEntry>();
 
+async function buildAuthSuccessPayload(
+  socket: Socket,
+  profile: Awaited<ReturnType<typeof playerStore.loadFromWallet>>,
+  sessionToken: string,
+  options: { isNewUser?: boolean; isGuest?: boolean; walletAddress?: string } = {}
+) {
+  return {
+    profile,
+    isNewUser: options.isNewUser ?? false,
+    isGuest: options.isGuest ?? false,
+    walletAddress: options.walletAddress,
+    sessionToken,
+    bettingEnabled: isBettingEnabled(),
+  };
+}
+
 export function registerAuthHandlers(
   socket: Socket,
   rateLimiter: { allow: (id: string, key: string) => boolean },
-  userSockets: Map<string, Socket>,
+  userSockets: Map<string, Socket>
 ) {
   socket.on("auth_request", ({ walletAddress }: { walletAddress: string }) => {
     if (!rateLimiter.allow(socket.id, "auth_request")) {
@@ -43,6 +60,11 @@ export function registerAuthHandlers(
 
     const profile = await playerStore.loadFromWallet(socket.id, walletAddress);
     if (profile) {
+      const account = await AccountRepository.findById(profile.id);
+      const { token } = account
+        ? await SessionService.createSession(account, { ip: socket.handshake.address, userAgent: socket.handshake.headers["user-agent"] })
+        : { token: "" };
+
       authenticatedSockets.set(socket.id, {
         walletAddress: walletAddress.toLowerCase(),
         userId: profile.id,
@@ -51,25 +73,26 @@ export function registerAuthHandlers(
       setSentryUser(profile.id, { wallet: walletAddress.toLowerCase() });
       addGameBreadcrumb("auth", "wallet authenticated", { userId: profile.id });
       userSockets.set(profile.id, socket);
-      socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress, socket.handshake.address), bettingEnabled: isBettingEnabled() });
+      socket.emit("auth_success", await buildAuthSuccessPayload(socket, profile, token));
     } else {
-      socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress, sessionToken: createSession(walletAddress, socket.handshake.address), bettingEnabled: isBettingEnabled() });
+      // New wallet: no account exists yet; no session token until set_username completes.
+      socket.emit("auth_success", await buildAuthSuccessPayload(socket, null, "", { isNewUser: true, walletAddress }));
     }
   });
 
   socket.on("auth_token", async ({ token }: { token: string }) => {
-    const walletAddress = typeof token === "string" ? verifySession(token, socket.handshake.address) : null;
-    if (!walletAddress) {
+    const account = await SessionService.validateToken(token);
+    if (!account) {
       socket.emit("auth_error", { error: "Session expired", sessionExpired: true });
       return;
     }
-    const profile = await playerStore.loadFromWallet(socket.id, walletAddress);
+    const profile = await playerStore.loadFromWallet(socket.id, account.walletAddress ?? "");
     if (profile) {
-      authenticatedSockets.set(socket.id, { walletAddress, userId: profile.id, isGuest: false });
+      authenticatedSockets.set(socket.id, { walletAddress: account.walletAddress ?? undefined, userId: profile.id, isGuest: false });
       userSockets.set(profile.id, socket);
-      socket.emit("auth_success", { profile, isNewUser: false, sessionToken: token, bettingEnabled: isBettingEnabled() });
+      socket.emit("auth_success", await buildAuthSuccessPayload(socket, profile, token));
     } else {
-      socket.emit("auth_success", { profile: null, isNewUser: true, walletAddress, sessionToken: token, bettingEnabled: isBettingEnabled() });
+      socket.emit("auth_success", await buildAuthSuccessPayload(socket, null, token, { isNewUser: true, walletAddress: account.walletAddress ?? undefined }));
     }
   });
 
@@ -94,14 +117,23 @@ export function registerAuthHandlers(
       authenticatedSockets.set(socket.id, { userId: user.id, isGuest: true });
       userSockets.set(user.id, socket);
       const profile = await playerStore.loadFromUser(socket.id, user);
-      socket.emit("auth_success", { profile, isNewUser: false, isGuest: true, bettingEnabled: isBettingEnabled() });
+
+      const account = await AccountRepository.findById(user.id);
+      const { token } = account
+        ? await SessionService.createSession(account, { ip: socket.handshake.address, userAgent: socket.handshake.headers["user-agent"] })
+        : { token: "" };
+
+      socket.emit("auth_success", await buildAuthSuccessPayload(socket, profile, token, { isGuest: true }));
     } catch (err: any) {
       socket.emit("auth_error", { error: err?.message ?? "Guest identification failed" });
     }
   });
 
   socket.on("auth_logout", ({ token }: { token?: string } = {}) => {
-    if (token) revokeSession(token);
+    const auth = authenticatedSockets.get(socket.id);
+    if (token && auth) {
+      SessionService.logout(auth.userId, token, { ip: socket.handshake.address, userAgent: socket.handshake.headers["user-agent"] }).catch(() => {});
+    }
     authenticatedSockets.delete(socket.id);
   });
 
@@ -131,7 +163,13 @@ export function registerAuthHandlers(
       setSentryUser(profile.id, { wallet: walletAddress.toLowerCase() });
       addGameBreadcrumb("auth", "wallet authenticated", { userId: profile.id });
       userSockets.set(profile.id, socket);
-      socket.emit("auth_success", { profile, isNewUser: false, sessionToken: createSession(walletAddress, socket.handshake.address), bettingEnabled: isBettingEnabled() });
+
+      const account = await AccountRepository.findById(profile.id);
+      const { token } = account
+        ? await SessionService.createSession(account, { ip: socket.handshake.address, userAgent: socket.handshake.headers["user-agent"] })
+        : { token: "" };
+
+      socket.emit("auth_success", await buildAuthSuccessPayload(socket, profile, token));
     } else {
       socket.emit("auth_error", { error: "Failed to create account" });
     }
@@ -149,7 +187,6 @@ export function registerAuthHandlers(
       return;
     }
     try {
-      const { UserRepository } = await import("@checkker/database");
       await UserRepository.updateAvatar(auth.userId, avatarId);
       const profile = playerStore.get(socket.id);
       if (profile) profile.avatarId = avatarId;

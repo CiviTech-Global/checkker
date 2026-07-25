@@ -1364,5 +1364,6 @@ export function useSocket() {
     // Server reconnection (LAN support)
     connectToServer,
     reconnectToDefault,
+    sessionToken: _sessionToken,
   };
 }

@@ -12,6 +12,7 @@ import '../models/game_client.dart';
 import '../models/puzzle.dart';
 import '../models/replay.dart';
 import '../models/cosmetic.dart';
+import 'analytics_service.dart';
 
 /// The host machine's LAN address — the IPv4 address shown by `ipconfig` on the
 /// computer running the game server. A physical phone must reach the server by
@@ -585,6 +586,9 @@ class SocketService {
       }
     }).catchError((_) {});
   }
+
+  /// Exposes the current session token for REST API calls (e.g. profile module).
+  String? get sessionToken => _sessionToken;
 
   // Internal state
   String? _gameId;

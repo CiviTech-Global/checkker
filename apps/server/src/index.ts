@@ -6,9 +6,12 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { GameServer } from "./GameServer";
 import { initPlayerStoreDb } from "./PlayerStore";
+import usersRouter from "./routes/users";
+import adminRouter from "./routes/admin";
 import { initMonitoring, sentryRequestHandler, sentryErrorHandler, flushSentry } from "./monitoring";
 import { parseArgs } from "./cli-args";
 import { logger } from "./logger";
+import { startAccountDeletionWorker } from "./workers/accountDeletion";
 
 const cli = parseArgs();
 const PORT = cli.port ?? (process.env.PORT ? parseInt(process.env.PORT, 10) : 3001);
@@ -83,6 +86,9 @@ if (process.env.DATABASE_URL) {
   rotateDaily();
   setInterval(rotateDaily, 60 * 60 * 1000).unref();
 
+  // Start background worker for account deletion grace periods and session cleanup.
+  startAccountDeletionWorker();
+
   // Seed the cosmetics catalog (idempotent — only inserts missing keys).
   (async () => {
     try {
@@ -146,26 +152,37 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "checkker", version: 1 });
 });
 
-app.use("/admin", adminLimiter, (req, res, next) => {
+function adminGate(req: express.Request, res: express.Response, next: express.NextFunction): void {
   if (!ADMIN_API_KEY) {
     // In production, block all admin access if no key is configured.
     if (process.env.NODE_ENV === "production") {
-      return res.status(403).json({ status: "error", message: "Admin API key not configured" });
+      res.status(403).json({ status: "error", message: "Admin API key not configured" });
+      return;
     }
     // In development, restrict to loopback only. Use socket.remoteAddress
     // (unaffected by trust proxy) to prevent IP spoofing via X-Forwarded-For.
     const ip = (req.socket as any).remoteAddress ?? "unknown";
     if (ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1" || ip === "unknown") {
-      return next();
+      next();
+      return;
     }
-    return res.status(403).json({ status: "error", message: "Admin API key not configured" });
+    res.status(403).json({ status: "error", message: "Admin API key not configured" });
+    return;
   }
   const key = req.headers["x-admin-api-key"];
   if (key !== ADMIN_API_KEY) {
-    return res.status(401).json({ status: "error", message: "Unauthorized" });
+    res.status(401).json({ status: "error", message: "Unauthorized" });
+    return;
   }
   next();
-});
+}
+
+app.use("/admin", adminLimiter, adminGate);
+
+app.use("/uploads/avatars", express.static(process.env.AVATAR_STORAGE_PATH || "./uploads/avatars"));
+
+app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/admin", adminLimiter, adminGate, adminRouter);
 
 app.post("/admin/seed-puzzles", async (_req, res) => {
   try {
@@ -187,7 +204,7 @@ if (webDist) {
   const path = require("path") as typeof import("path");
   app.use(express.static(webDist));
   // SPA fallback for client-side routes (skip API + socket paths).
-  app.get(/^\/(?!socket\.io|health|admin).*/, (_req, res) => {
+  app.get(/^\/(?!socket\.io|health|admin|api|uploads).*/, (_req, res) => {
     res.sendFile(path.join(webDist, "index.html"));
   });
   logger.info({ webDist }, "[web] Serving web client");

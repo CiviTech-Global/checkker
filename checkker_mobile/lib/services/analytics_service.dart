@@ -49,7 +49,7 @@ class AnalyticsService {
   /// Set the Sentry user context (call after wallet auth).
   void setUser({required String id, Map<String, String>? extra}) {
     Sentry.configureScope((scope) {
-      scope.setUser(SentryUser(id: id, extras: extra));
+      scope.setUser(SentryUser(id: id, data: extra));
     });
   }
 

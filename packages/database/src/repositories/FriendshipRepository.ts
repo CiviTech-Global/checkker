@@ -1,5 +1,12 @@
 import { getDb } from "../client";
-import type { Friendship, User } from "@prisma/client";
+import type { Friendship, Prisma } from "@prisma/client";
+
+const accountInclude = {
+  profile: { select: { username: true, avatarId: true } },
+  stats: { select: { rating: true } },
+} as const;
+
+type AccountWithProfileAndStats = Prisma.AccountGetPayload<{ include: typeof accountInclude }>;
 
 export interface FriendSummary {
   friendshipId: string;
@@ -17,13 +24,13 @@ export interface PendingRequest {
   createdAt: Date;
 }
 
-function toSummary(friendshipId: string, user: User): FriendSummary {
+function toSummary(friendshipId: string, account: AccountWithProfileAndStats): FriendSummary {
   return {
     friendshipId,
-    userId: user.id,
-    username: user.username,
-    avatarId: user.avatarId,
-    rating: user.rating,
+    userId: account.id,
+    username: account.profile?.username ?? "unknown",
+    avatarId: account.profile?.avatarId ?? "king_white",
+    rating: account.stats?.rating ?? 1000,
   };
 }
 
@@ -78,7 +85,7 @@ export const FriendshipRepository = {
         status: "accepted",
         OR: [{ requesterId: userId }, { addresseeId: userId }],
       },
-      include: { requester: true, addressee: true },
+      include: { requester: { include: accountInclude }, addressee: { include: accountInclude } },
       orderBy: { respondedAt: "desc" },
     });
     return friendships.map((f) =>
@@ -89,14 +96,14 @@ export const FriendshipRepository = {
   async listPendingFor(userId: string): Promise<PendingRequest[]> {
     const pending = await getDb().friendship.findMany({
       where: { addresseeId: userId, status: "pending" },
-      include: { requester: true },
+      include: { requester: { include: accountInclude } },
       orderBy: { createdAt: "desc" },
     });
     return pending.map((f) => ({
       friendshipId: f.id,
       fromUserId: f.requesterId,
-      fromUsername: f.requester.username,
-      fromAvatarId: f.requester.avatarId,
+      fromUsername: f.requester.profile?.username ?? "unknown",
+      fromAvatarId: f.requester.profile?.avatarId ?? "king_white",
       createdAt: f.createdAt,
     }));
   },
