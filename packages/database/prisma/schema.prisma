@@ -7,13 +7,79 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+// Account is the canonical identity and authentication record.
+// It is the successor to the monolithic User model.
+model Account {
   id            String   @id @default(uuid()) @db.Uuid
   walletAddress String?  @unique @map("wallet_address") @db.VarChar(42)
   guestDeviceId String?  @unique @map("guest_device_id") @db.VarChar(64)
   isGuest       Boolean  @default(false) @map("is_guest")
-  username      String   @unique @db.VarChar(32)
-  avatarId      String   @default("king_white") @map("avatar_id") @db.VarChar(32)
+  email         String?  @unique @db.VarChar(256)
+  emailVerified Boolean  @default(false) @map("email_verified")
+  roles         String[] @default(["player"]) @db.VarChar(32)
+  status        String   @default("active") @db.VarChar(16) // active | suspended | banned | pending_deletion | deleted
+  statusReason  String?  @map("status_reason") @db.Text
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz()
+  lastLoginAt   DateTime? @map("last_login_at") @db.Timestamptz()
+  lastLoginIp   String?  @map("last_login_ip") @db.VarChar(45)
+  fcmToken      String?  @map("fcm_token")
+  botConfig     String?  @map("bot_config")
+  botMaturity   String?  @map("bot_maturity")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  // Profile and stats (1:1)
+  profile       Profile?
+  stats         UserStats?
+
+  // Auth and lifecycle (1:N)
+  sessions      UserSession[]
+  usernameHistory UsernameHistory[]
+  auditLogsAsActor AuditLog[] @relation("AuditLogActor")
+  auditLogsAsTarget AuditLog[] @relation("AuditLogTarget")
+  accountRoles  AccountRole[]
+
+  // Game and social relations (legacy User successors)
+  whiteGames    Game[]         @relation("WhitePlayer")
+  blackGames    Game[]         @relation("BlackPlayer")
+  wonGames      Game[]         @relation("Winner")
+  bets          Bet[]
+  puzzleAttempts PuzzleAttempt[]
+  cosmetics     AccountCosmetic[]
+  sentFriendRequests     Friendship[]  @relation("FriendRequester")
+  receivedFriendRequests Friendship[]  @relation("FriendAddressee")
+  notifications Notification[]
+
+  @@index([status])
+  @@map("accounts")
+}
+
+// Public persona and editable profile fields.
+model Profile {
+  id           String   @id @default(uuid()) @db.Uuid
+  accountId    String   @unique @map("account_id") @db.Uuid
+  username     String   @unique @db.VarChar(32)
+  displayName  String?  @map("display_name") @db.VarChar(64)
+  bio          String?  @db.Text
+  avatarUrl    String?  @map("avatar_url") @db.VarChar(512)
+  avatarType   String   @default("preset") @map("avatar_type") @db.VarChar(16) // preset | custom | nft
+  avatarId     String   @default("king_white") @map("avatar_id") @db.VarChar(32)
+  country      String?  @db.VarChar(2)
+  socialLinks  Json?    @default("[]") @map("social_links") @db.JsonB
+  privacyFlags Json?    @default("{}") @map("privacy_flags") @db.JsonB
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([username])
+  @@map("profiles")
+}
+
+// Game statistics and in-game currency.
+model UserStats {
+  id            String   @id @default(uuid()) @db.Uuid
+  accountId     String   @unique @map("account_id") @db.Uuid
   rating        Int      @default(1000)
   gamesPlayed   Int      @default(0) @map("games_played")
   wins          Int      @default(0)
@@ -22,24 +88,88 @@ model User {
   currentStreak Int      @default(0) @map("current_streak")
   bestStreak    Int      @default(0) @map("best_streak")
   coins         Int      @default(200)
-  fcmToken      String?  @map("fcm_token")
-  botConfig     String?  @map("bot_config")
-  botMaturity   String?  @map("bot_maturity")
-  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  whiteGames    Game[]         @relation("WhitePlayer")
-  blackGames    Game[]         @relation("BlackPlayer")
-  wonGames      Game[]         @relation("Winner")
-  bets          Bet[]
-  puzzleAttempts PuzzleAttempt[]
-  cosmetics     UserCosmetic[]
-  sentFriendRequests     Friendship[]  @relation("FriendRequester")
-  receivedFriendRequests Friendship[]  @relation("FriendAddressee")
-  notifications Notification[]
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@index([rating(sort: Desc)])
-  @@map("users")
+  @@map("user_stats")
+}
+
+// Active and revoked sessions for multi-device support.
+model UserSession {
+  id          String    @id @default(uuid()) @db.Uuid
+  accountId   String    @map("account_id") @db.Uuid
+  tokenHash   String    @unique @map("token_hash") @db.VarChar(64)
+  deviceId    String?   @map("device_id") @db.VarChar(64)
+  deviceName  String?   @map("device_name") @db.VarChar(128)
+  ip          String?   @db.VarChar(45)
+  userAgent   String?   @map("user_agent") @db.Text
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz()
+  revokedAt   DateTime? @map("revoked_at") @db.Timestamptz()
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, revokedAt, expiresAt])
+  @@map("user_sessions")
+}
+
+// Tracks username changes and enforces cooldown/release rules.
+model UsernameHistory {
+  id         String    @id @default(uuid()) @db.Uuid
+  accountId  String    @map("account_id") @db.Uuid
+  username   String    @db.VarChar(32)
+  changedAt  DateTime  @default(now()) @map("changed_at") @db.Timestamptz()
+  releasedAt DateTime? @map("released_at") @db.Timestamptz()
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([username, releasedAt])
+  @@index([accountId, changedAt])
+  @@map("username_history")
+}
+
+// Role definitions for RBAC.
+model Role {
+  id          String   @id @db.VarChar(32)
+  description String?
+  permissions String[] @db.VarChar(64)
+
+  accountRoles AccountRole[]
+
+  @@map("roles")
+}
+
+// Many-to-many link between accounts and roles.
+model AccountRole {
+  accountId String  @map("account_id") @db.Uuid
+  roleId    String  @map("role_id") @db.VarChar(32)
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  role    Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([accountId, roleId])
+  @@map("account_roles")
+}
+
+// Append-only audit log for security and compliance.
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  actorId   String?  @map("actor_id") @db.Uuid
+  targetId  String?  @map("target_id") @db.Uuid
+  action    String   @db.VarChar(64)
+  ip        String?  @db.VarChar(45)
+  userAgent String?  @map("user_agent") @db.Text
+  metadata  Json?    @db.JsonB
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  actor  Account? @relation("AuditLogActor", fields: [actorId], references: [id], onDelete: SetNull)
+  target Account? @relation("AuditLogTarget", fields: [targetId], references: [id], onDelete: SetNull)
+
+  @@index([targetId, action, createdAt])
+  @@index([actorId, createdAt])
+  @@map("audit_logs")
 }
 
 model Friendship {
@@ -50,8 +180,8 @@ model Friendship {
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   respondedAt DateTime? @map("responded_at") @db.Timestamptz()
 
-  requester User @relation("FriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
-  addressee User @relation("FriendAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+  requester Account @relation("FriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee Account @relation("FriendAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
 
   @@unique([requesterId, addresseeId])
   @@index([addresseeId, status])
@@ -66,7 +196,7 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user Account @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, read, createdAt(sort: Desc)])
   @@map("notifications")
@@ -92,9 +222,9 @@ model Game {
   startedAt         DateTime  @default(now()) @map("started_at") @db.Timestamptz()
   endedAt           DateTime? @map("ended_at") @db.Timestamptz()
 
-  whitePlayer User     @relation("WhitePlayer", fields: [whiteUserId], references: [id])
-  blackPlayer User     @relation("BlackPlayer", fields: [blackUserId], references: [id])
-  winner      User?    @relation("Winner", fields: [winnerUserId], references: [id])
+  whitePlayer Account     @relation("WhitePlayer", fields: [whiteUserId], references: [id])
+  blackPlayer Account     @relation("BlackPlayer", fields: [blackUserId], references: [id])
+  winner      Account?    @relation("Winner", fields: [winnerUserId], references: [id])
   bets        Bet[]
   moves       GameMove[]
 
@@ -137,8 +267,8 @@ model Bet {
   createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt       DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  game Game @relation(fields: [gameId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  game Game     @relation(fields: [gameId], references: [id])
+  user Account @relation(fields: [userId], references: [id])
 
   @@index([gameId])
   @@index([userId])
@@ -176,8 +306,8 @@ model PuzzleAttempt {
   usedHint    Boolean  @default(false) @map("used_hint")
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
 
-  puzzle Puzzle @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  puzzle Puzzle  @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
+  user   Account @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@map("puzzle_attempts")
@@ -194,23 +324,23 @@ model Cosmetic {
   isDefault   Boolean        @default(false) @map("is_default")
   createdAt   DateTime       @default(now()) @map("created_at")
 
-  owners UserCosmetic[]
+  owners AccountCosmetic[]
 
   @@map("cosmetics")
 }
 
-model UserCosmetic {
+model AccountCosmetic {
   id          String   @id @default(uuid()) @db.Uuid
-  userId      String   @map("user_id") @db.Uuid
+  accountId   String   @map("account_id") @db.Uuid
   cosmeticId  String   @map("cosmetic_id") @db.Uuid
   equipped    Boolean  @default(false)
   purchasedAt DateTime @default(now()) @map("purchased_at")
 
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account  Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   cosmetic Cosmetic @relation(fields: [cosmeticId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, cosmeticId])
-  @@map("user_cosmetics")
+  @@unique([accountId, cosmeticId])
+  @@map("account_cosmetics")
 }
 
 model TransactionLog {

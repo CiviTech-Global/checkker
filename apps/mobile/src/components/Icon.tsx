@@ -58,6 +58,7 @@ const ICON_MAP = {
   school: { lib: "mci", name: "school" },
   chart: { lib: "ion", name: "bar-chart" },
   storefront: { lib: "ion", name: "storefront" },
+  pencil: { lib: "ion", name: "pencil" },
 } as const;
 
 export type IconName = keyof typeof ICON_MAP;

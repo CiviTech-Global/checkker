@@ -1,5 +1,5 @@
 import { getDb } from "../client";
-import type { Cosmetic, UserCosmetic } from "@prisma/client";
+import type { Cosmetic, AccountCosmetic } from "@prisma/client";
 
 export type SeedCosmeticInput = {
   type: string;
@@ -41,26 +41,29 @@ export const CosmeticRepository = {
   },
 
   /** Buy a cosmetic with coins. Free/default items are claimed at no cost. */
-  async purchase(userId: string, cosmeticId: string): Promise<PurchaseResult> {
+  async purchase(accountId: string, cosmeticId: string): Promise<PurchaseResult> {
     const db = getDb();
     const cosmetic = await db.cosmetic.findUnique({ where: { id: cosmeticId } });
     if (!cosmetic) return { success: false, error: "Item not found" };
 
-    const owned = await db.userCosmetic.findUnique({
-      where: { userId_cosmeticId: { userId, cosmeticId } },
+    const owned = await db.accountCosmetic.findUnique({
+      where: { accountId_cosmeticId: { accountId, cosmeticId } },
     });
     if (owned) return { success: false, error: "Already owned" };
 
     const price = cosmetic.isDefault ? 0 : cosmetic.price;
-    const user = await db.user.findUnique({ where: { id: userId }, select: { coins: true } });
-    if (!user) return { success: false, error: "User not found" };
-    if (user.coins < price) return { success: false, error: "Not enough coins" };
+    const stats = await db.userStats.findUnique({
+      where: { accountId },
+      select: { coins: true },
+    });
+    if (!stats) return { success: false, error: "Account not found" };
+    if (stats.coins < price) return { success: false, error: "Not enough coins" };
 
-    const [updatedUser] = await db.$transaction([
-      db.user.update({ where: { id: userId }, data: { coins: { decrement: price } } }),
-      db.userCosmetic.create({ data: { userId, cosmeticId } }),
+    const [updatedStats] = await db.$transaction([
+      db.userStats.update({ where: { accountId }, data: { coins: { decrement: price } } }),
+      db.accountCosmetic.create({ data: { accountId, cosmeticId } }),
     ]);
-    return { success: true, coins: updatedUser.coins };
+    return { success: true, coins: updatedStats.coins };
   },
 
   async getAll(): Promise<Cosmetic[]> {
@@ -75,33 +78,33 @@ export const CosmeticRepository = {
     return getDb().cosmetic.findMany({ where: { isDefault: true } });
   },
 
-  async getByUser(userId: string): Promise<Array<UserCosmetic & { cosmetic: Cosmetic }>> {
-    return getDb().userCosmetic.findMany({
-      where: { userId },
+  async getByAccount(accountId: string): Promise<Array<AccountCosmetic & { cosmetic: Cosmetic }>> {
+    return getDb().accountCosmetic.findMany({
+      where: { accountId },
       include: { cosmetic: true },
     });
   },
 
-  async equip(userId: string, cosmeticId: string): Promise<void> {
+  async equip(accountId: string, cosmeticId: string): Promise<void> {
     // Unequip any currently equipped cosmetic of the same type
     const cosmetic = await getDb().cosmetic.findUnique({ where: { id: cosmeticId } });
     if (!cosmetic) return;
 
     await getDb().$transaction([
-      getDb().userCosmetic.updateMany({
-        where: { userId, cosmetic: { type: cosmetic.type }, equipped: true },
+      getDb().accountCosmetic.updateMany({
+        where: { accountId, cosmetic: { type: cosmetic.type }, equipped: true },
         data: { equipped: false },
       }),
-      getDb().userCosmetic.updateMany({
-        where: { userId, cosmeticId },
+      getDb().accountCosmetic.updateMany({
+        where: { accountId, cosmeticId },
         data: { equipped: true },
       }),
     ]);
   },
 
-  async getEquipped(userId: string): Promise<Array<UserCosmetic & { cosmetic: Cosmetic }>> {
-    return getDb().userCosmetic.findMany({
-      where: { userId, equipped: true },
+  async getEquipped(accountId: string): Promise<Array<AccountCosmetic & { cosmetic: Cosmetic }>> {
+    return getDb().accountCosmetic.findMany({
+      where: { accountId, equipped: true },
       include: { cosmetic: true },
     });
   },
