@@ -4,7 +4,6 @@ import type { GameServer } from "../GameServer";
 import type { BotDifficulty, TimeControl, StakeLevel } from "@checkker/shared";
 import { playerStore } from "../PlayerStore";
 import { isBettingEnabled } from "../blockchain/config";
-import { brain } from "../bot/evaluators";
 import { authenticatedSockets } from "./auth";
 
 export function registerMatchmakingHandlers(

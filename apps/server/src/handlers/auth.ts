@@ -1,5 +1,5 @@
 import type { Socket } from "socket.io";
-import type { Player, AuthEntry } from "./types";
+import type { AuthEntry } from "./types";
 import { createChallenge, verifyChallenge, createSession, verifySession, revokeSession } from "../auth/WalletAuth";
 import { playerStore } from "../PlayerStore";
 import { UserRepository } from "@checkker/database";

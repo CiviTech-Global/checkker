@@ -9,7 +9,6 @@ export function registerLanHandlers(
   socket: Socket,
   server: GameServer,
   lanHosts: Map<string, { hostSocketId: string; tc: TimeControl; createdAt: number }>,
-  userSockets: Map<string, Socket>,
 ) {
   socket.on("host_lan_game", ({ tc }: { tc?: TimeControl } = {}) => {
     for (const [code, entry] of lanHosts) {

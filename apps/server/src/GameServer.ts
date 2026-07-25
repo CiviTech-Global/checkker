@@ -36,7 +36,6 @@ import {
   authenticatedSockets,
 } from "./handlers";
 import type { Player, Match, PendingBetGame, PrivateInvite } from "./handlers";
-import { INVITE_TTL_MS } from "./handlers";
 
 export class GameServer {
   private io: SocketServer;
@@ -87,7 +86,7 @@ export class GameServer {
     registerCoachingHandlers(socket, () => this.matches);
     registerPuzzleHandlers(socket);
     registerFriendHandlers(socket, this, this.privateInvites, this.userSockets);
-    registerLanHandlers(socket, this, this.lanHosts, this.userSockets);
+    registerLanHandlers(socket, this, this.lanHosts);
     registerNotificationHandlers(socket);
     registerReplayHandlers(socket);
     registerPushHandlers(socket);
