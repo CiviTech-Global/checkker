@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
 import type { PlayerProfile } from "@checkker/shared";
-import type { User } from "@prisma/client";
+import type { User } from "@checkker/database";
 
 /** Whether the database is available (set by server startup) */
 let dbEnabled = false;

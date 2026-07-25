@@ -7,7 +7,7 @@ export function registerCosmeticHandlers(socket: Socket) {
       const { CosmeticRepository, UserRepository } = await import("@checkker/database");
       const auth = authenticatedSockets.get(socket.id);
       const cosmetics = await CosmeticRepository.getAll();
-      const userCosmetics = auth ? await CosmeticRepository.getByUser(auth.userId) : [];
+      const userCosmetics = auth ? await CosmeticRepository.getByAccount(auth.userId) : [];
       const coins = auth ? await UserRepository.getCoins(auth.userId) : 0;
       socket.emit("cosmetics", { cosmetics, userCosmetics, coins });
     } catch {
@@ -25,7 +25,7 @@ export function registerCosmeticHandlers(socket: Socket) {
       const { CosmeticRepository } = await import("@checkker/database");
       const result = await CosmeticRepository.purchase(auth.userId, cosmeticId);
       if (result.success) {
-        const userCosmetics = await CosmeticRepository.getByUser(auth.userId);
+        const userCosmetics = await CosmeticRepository.getByAccount(auth.userId);
         socket.emit("cosmetic_purchased", { success: true, cosmeticId, coins: result.coins, userCosmetics });
       } else {
         socket.emit("cosmetic_purchased", { success: false, cosmeticId, error: result.error });

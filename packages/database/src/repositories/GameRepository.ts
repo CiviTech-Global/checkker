@@ -27,6 +27,12 @@ export type RecentGame = Game & {
   blackPlayer: { id: string; username: string; avatarId: string; rating: number };
 };
 
+const playerSelect = {
+  id: true,
+  profile: { select: { username: true, avatarId: true } },
+  stats: { select: { rating: true } },
+} as const;
+
 export const GameRepository = {
   async create(input: CreateGameInput): Promise<Game> {
     return getDb().game.create({ data: input });
@@ -47,7 +53,7 @@ export const GameRepository = {
   },
 
   async getRecentByUser(userId: string, limit = 10): Promise<RecentGame[]> {
-    return getDb().game.findMany({
+    const games = await getDb().game.findMany({
       where: {
         OR: [{ whiteUserId: userId }, { blackUserId: userId }],
         endedAt: { not: null },
@@ -55,9 +61,25 @@ export const GameRepository = {
       orderBy: { endedAt: "desc" },
       take: limit,
       include: {
-        whitePlayer: { select: { id: true, username: true, avatarId: true, rating: true } },
-        blackPlayer: { select: { id: true, username: true, avatarId: true, rating: true } },
+        whitePlayer: { select: playerSelect },
+        blackPlayer: { select: playerSelect },
       },
-    }) as Promise<RecentGame[]>;
+    });
+
+    return games.map((game) => ({
+      ...game,
+      whitePlayer: {
+        id: game.whitePlayer.id,
+        username: game.whitePlayer.profile?.username ?? "unknown",
+        avatarId: game.whitePlayer.profile?.avatarId ?? "king_white",
+        rating: game.whitePlayer.stats?.rating ?? 1000,
+      },
+      blackPlayer: {
+        id: game.blackPlayer.id,
+        username: game.blackPlayer.profile?.username ?? "unknown",
+        avatarId: game.blackPlayer.profile?.avatarId ?? "king_white",
+        rating: game.blackPlayer.stats?.rating ?? 1000,
+      },
+    })) as RecentGame[];
   },
 };

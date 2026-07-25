@@ -232,7 +232,9 @@ export default function ProfileScreen() {
           <Icon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Profile</Text>
-        <View style={{ width: 40 }} />
+        <TouchableOpacity onPress={() => router.push("/profile/edit")} style={styles.backBtn}>
+          <Icon name="pencil" size={22} color={colors.text.primary} />
+        </TouchableOpacity>
       </Animated.View>
 
       {/* Avatar & Name */}

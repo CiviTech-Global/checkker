@@ -9,3 +9,5 @@ export * from "./contract";
 export * from "./replay";
 export * from "./cosmetics";
 export * from "./bot";
+export * from "./profile";
+export * from "./account";

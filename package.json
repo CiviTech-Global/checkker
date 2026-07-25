@@ -44,5 +44,14 @@
     "turbo": "^2.5.0",
     "typescript": "^5.8.0"
   },
+  "overrides": {
+    "express": {
+      "body-parser": "^1.20.6"
+    },
+    "engine.io": "^6.6.9",
+    "engine.io-client": "^6.6.6",
+    "socket.io-adapter": "^2.5.8",
+    "ws": "^8.21.0"
+  },
   "packageManager": "npm@11.6.2"
 }
