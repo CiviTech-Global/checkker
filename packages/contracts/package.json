@@ -10,9 +10,9 @@
     "clean": "hardhat clean"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^7.0.0",
     "@openzeppelin/contracts": "^5.0.0",
-    "hardhat": "^2.22.0",
+    "hardhat": "^3.11.1",
     "typescript": "^5.8.0"
   }
 }
