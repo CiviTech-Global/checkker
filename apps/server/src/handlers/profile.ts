@@ -4,6 +4,7 @@ import { playerStore } from "../PlayerStore";
 import { ProfileService } from "../services/ProfileService";
 import { AccountService } from "../services/AccountService";
 import { SessionService } from "../services/SessionService";
+import { createChallenge, verifyChallenge } from "../auth/WalletAuth";
 import { UserRepository, GameRepository, PuzzleRepository, AccountRepository } from "@checkker/database";
 import type { UpdateProfileRequest } from "@checkker/shared";
 
@@ -136,7 +137,7 @@ export function registerProfileHandlers(socket: Socket) {
     }
   });
 
-  socket.on("link_wallet", async ({ walletAddress }: { walletAddress: string; signature?: string }) => {
+  socket.on("link_wallet", async ({ walletAddress, signature }: { walletAddress: string; signature?: string }) => {
     const auth = authenticatedSockets.get(socket.id);
     if (!auth) {
       socket.emit("profile_error", { error: "Not authenticated" });
@@ -146,7 +147,21 @@ export function registerProfileHandlers(socket: Socket) {
       socket.emit("profile_error", { error: "Invalid wallet address" });
       return;
     }
-    // TODO: verify signature with WalletAuth challenge before linking.
+
+    // Step 1: No signature → create a challenge for the client to sign.
+    if (!signature) {
+      const { nonce, message } = createChallenge(walletAddress);
+      socket.emit("link_wallet_challenge", { walletAddress, nonce, message });
+      return;
+    }
+
+    // Step 2: Signature provided → verify it against the pending challenge.
+    const result = verifyChallenge(walletAddress, signature);
+    if (!result.valid) {
+      socket.emit("profile_error", { error: result.error ?? "Signature verification failed" });
+      return;
+    }
+
     try {
       const account = await AccountRepository.findById(auth.userId);
       if (!account) throw new Error("Account not found");
