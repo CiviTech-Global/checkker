@@ -19,6 +19,7 @@ interface BotGame {
 }
 
 interface BotGameHandlers {
+  humanSocket: Socket;
   playMove: (...args: any[]) => void;
   resign: (...args: any[]) => void;
   rematchRequest: (...args: any[]) => void;
@@ -70,7 +71,7 @@ export class BotManager {
     game.startTimeoutCheck({
       onTimeout: () => {
         this.broadcastToHuman(gameId);
-        this.disposeBotGame(gameId);
+        this.disposeGameEngine(gameId);
       },
       onTick: () => {
         this.broadcastClock(gameId);
@@ -123,7 +124,7 @@ export class BotManager {
 
         if (entry.game.isOver()) {
           await this.handleGameOver(gameId, entry);
-          this.disposeBotGame(gameId);
+          this.disposeGameEngine(gameId);
         } else {
           const tip = await brain.getCoachingTip(
             entry.game.getState().fen,
@@ -146,8 +147,7 @@ export class BotManager {
       if (gid !== gameId) return;
       entry.game.resign(humanColor);
       this.broadcastToHuman(gameId);
-      this.handleGameOver(gameId, entry);
-      this.disposeBotGame(gameId);
+      this.handleGameOver(gameId, entry).finally(() => this.disposeGameEngine(gameId));
     };
 
     const rematchRequestHandler = ({ gameId: gid }: { gameId: string }) => {
@@ -195,7 +195,7 @@ export class BotManager {
     humanSocket.on("chat_message", chatMessageHandler);
     humanSocket.on("disconnect", disconnectHandler);
 
-    this.socketHandlers.set(gameId, { playMove: playMoveHandler, resign: resignHandler, rematchRequest: rematchRequestHandler, undoMove: undoMoveHandler, chatMessage: chatMessageHandler, disconnect: disconnectHandler });
+    this.socketHandlers.set(gameId, { humanSocket, playMove: playMoveHandler, resign: resignHandler, rematchRequest: rematchRequestHandler, undoMove: undoMoveHandler, chatMessage: chatMessageHandler, disconnect: disconnectHandler });
   }
 
   private async handleGameOver(gameId: string, entry: BotGame): Promise<void> {
@@ -283,13 +283,17 @@ export class BotManager {
       if (!this.botGames.has(gameId)) return;
       this.broadcastToHuman(gameId);
       if (entry.game.isOver()) {
-        this.handleGameOver(gameId, entry);
-        this.disposeBotGame(gameId);
+        this.handleGameOver(gameId, entry).finally(() => this.disposeGameEngine(gameId));
       }
     });
   }
 
-  disposeBotGame(gameId: string): void {
+  /**
+   * Frees the GameEngine/BotPlayer and detaches the listeners that no longer
+   * apply once a game is over, but keeps rematch_request and disconnect live
+   * so the player can still act from the game-over screen.
+   */
+  private disposeGameEngine(gameId: string): void {
     const entry = this.botGames.get(gameId);
     if (!entry) return;
 
@@ -300,10 +304,29 @@ export class BotManager {
     if (handlers) {
       entry.humanSocket.off("play_move", handlers.playMove);
       entry.humanSocket.off("resign", handlers.resign);
-      entry.humanSocket.off("rematch_request", handlers.rematchRequest);
       entry.humanSocket.off("undo_move", handlers.undoMove);
       entry.humanSocket.off("chat_message", handlers.chatMessage);
-      entry.humanSocket.off("disconnect", handlers.disconnect);
+      // rematch_request and disconnect stay attached — the player still needs them.
+    }
+
+    this.botGames.delete(gameId);
+  }
+
+  disposeBotGame(gameId: string): void {
+    const entry = this.botGames.get(gameId);
+    if (entry) {
+      entry.game.dispose();
+      entry.bot.dispose();
+    }
+
+    const handlers = this.socketHandlers.get(gameId);
+    if (handlers) {
+      handlers.humanSocket.off("play_move", handlers.playMove);
+      handlers.humanSocket.off("resign", handlers.resign);
+      handlers.humanSocket.off("rematch_request", handlers.rematchRequest);
+      handlers.humanSocket.off("undo_move", handlers.undoMove);
+      handlers.humanSocket.off("chat_message", handlers.chatMessage);
+      handlers.humanSocket.off("disconnect", handlers.disconnect);
       this.socketHandlers.delete(gameId);
     }
 
@@ -312,8 +335,8 @@ export class BotManager {
 
   disposeByHumanId(humanPlayerId: string): void {
     const toRemove: string[] = [];
-    for (const [gameId, entry] of this.botGames) {
-      if (entry.humanSocket.id === humanPlayerId) {
+    for (const [gameId, handlers] of this.socketHandlers) {
+      if (handlers.humanSocket.id === humanPlayerId) {
         toRemove.push(gameId);
       }
     }
@@ -336,8 +359,7 @@ export class BotManager {
         if (this.botGames.has(gameId)) {
           this.broadcastToHuman(gameId);
           if (entry.game.isOver()) {
-            this.handleGameOver(gameId, entry);
-            this.disposeBotGame(gameId);
+            this.handleGameOver(gameId, entry).finally(() => this.disposeGameEngine(gameId));
           }
         }
       });
