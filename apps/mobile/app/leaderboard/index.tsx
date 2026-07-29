@@ -155,7 +155,7 @@ export default function LeaderboardScreen() {
         </View>
       ) : entries.length === 0 ? (
         <View style={styles.loadingSection}>
-          <Text style={styles.emptyText}>No players ranked yet.</Text>
+          <Text style={styles.emptyText}>No player ranks</Text>
           <Text style={styles.emptySubtext}>Play ranked games to appear here!</Text>
         </View>
       ) : (
