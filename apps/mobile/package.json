@@ -23,7 +23,7 @@
     "@walletconnect/ethereum-provider": "^2.23.9",
     "chess.js": "^1.0.0-beta.8",
     "ethers": "^6.13.0",
-    "expo": "~52.0.0",
+    "expo": "~57.0.8",
     "expo-av": "^16.0.8",
     "expo-gl": "~15.0.5",
     "expo-haptics": "^57.0.0",
