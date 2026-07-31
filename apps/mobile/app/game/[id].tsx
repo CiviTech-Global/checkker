@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef, lazy, Suspense } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
@@ -24,7 +25,7 @@ import type { Card, Color, GameResult, PokerResult } from "@checkker/shared";
 import { cardToPiece, cardId } from "@checkker/shared";
 import { getLegalMovesForHand } from "@checkker/chess";
 import ChessBoard from "../../src/components/ChessBoard";
-import ChessBoardGL from "../../src/components/ChessBoardGL";
+const ChessBoardGL = lazy(() => import("../../src/components/ChessBoardGL"));
 import { features } from "../../src/config/features";
 import CardHand from "../../src/components/CardHand";
 import OpponentHand from "../../src/components/OpponentHand";
@@ -144,6 +145,14 @@ function BotThinkingIndicator() {
       <Animated.Text style={[styles.botDot, dot2]}>.</Animated.Text>
       <Animated.Text style={[styles.botDot, dot3]}>.</Animated.Text>
     </Animated.View>
+  );
+}
+
+function BoardLoadingPlaceholder() {
+  return (
+    <View style={styles.boardLoadingPlaceholder}>
+      <ActivityIndicator size="large" />
+    </View>
   );
 }
 
@@ -518,14 +527,16 @@ export default function GameScreen() {
                 />
               )}
               <View style={styles.boardWrapper}>
-                <BoardComponent
-                  fen={fen}
-                  orientation={color}
-                  highlightedSquares={highlightedSquares}
-                  lastMove={lastMove}
-                  interactive={myTurn}
-                  onSquarePress={handleSquarePress}
-                />
+                <Suspense fallback={<BoardLoadingPlaceholder />}>
+                  <BoardComponent
+                    fen={fen}
+                    orientation={color}
+                    highlightedSquares={highlightedSquares}
+                    lastMove={lastMove}
+                    interactive={myTurn}
+                    onSquarePress={handleSquarePress}
+                  />
+                </Suspense>
                 <Text style={styles.deckCount}>Deck: {gs?.drawPileCount ?? 0}</Text>
               </View>
               {isBotGame && !myTurn && <BotThinkingIndicator />}
@@ -623,14 +634,16 @@ export default function GameScreen() {
 
           {/* Board */}
           <View style={styles.boardContainerPortrait}>
-            <BoardComponent
-              fen={fen}
-              orientation={color}
-              highlightedSquares={highlightedSquares}
-              lastMove={lastMove}
-              interactive={myTurn}
-              onSquarePress={handleSquarePress}
-            />
+            <Suspense fallback={<BoardLoadingPlaceholder />}>
+              <BoardComponent
+                fen={fen}
+                orientation={color}
+                highlightedSquares={highlightedSquares}
+                lastMove={lastMove}
+                interactive={myTurn}
+                onSquarePress={handleSquarePress}
+              />
+            </Suspense>
           </View>
           <Text style={styles.deckCount}>Deck: {gs?.drawPileCount ?? 0}</Text>
 
@@ -756,6 +769,12 @@ const styles = StyleSheet.create({
   boardWrapper: {
     width: "100%",
     maxWidth: 480,
+  },
+  boardLoadingPlaceholder: {
+    width: "100%",
+    aspectRatio: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   /* Portrait */

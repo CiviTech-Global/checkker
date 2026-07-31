@@ -1,5 +1,5 @@
 import { Router } from "express";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import { authenticateRequest, type AuthenticatedRequest } from "../middleware/auth";
 import { validateBody, validateParams } from "../middleware/validate";
 import { ProfileService } from "../services/ProfileService";
@@ -21,7 +21,7 @@ const updateProfileLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: AuthenticatedRequest) => req.account?.id ?? req.ip ?? "anonymous",
+  keyGenerator: (req: AuthenticatedRequest) => req.account?.id ?? ipKeyGenerator(req.ip ?? "anonymous"),
   handler: (_req, res) => res.status(429).json({ error: "Profile edit rate limit exceeded" }),
 });
 
@@ -30,7 +30,7 @@ const usernameChangeLimiter = rateLimit({
   max: 5,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: AuthenticatedRequest) => req.account?.id ?? req.ip ?? "anonymous",
+  keyGenerator: (req: AuthenticatedRequest) => req.account?.id ?? ipKeyGenerator(req.ip ?? "anonymous"),
   handler: (_req, res) => res.status(429).json({ error: "Username change rate limit exceeded" }),
 });
 
