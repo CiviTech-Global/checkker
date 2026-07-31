@@ -1,10 +1,10 @@
 export const galleryImages = {
-  king: require("./king.png"),
-  queen: require("./queen.png"),
-  knight: require("./knight.png"),
-  rook: require("./rook.png"),
-  bishop: require("./bishop.png"),
-  pawns: require("./pawns.png"),
-  aceWild: require("./ace-wild.png"),
+  king: require("./king.webp"),
+  queen: require("./queen.webp"),
+  knight: require("./knight.webp"),
+  rook: require("./rook.webp"),
+  bishop: require("./bishop.webp"),
+  pawns: require("./pawns.webp"),
+  aceWild: require("./ace-wild.webp"),
 } as const;
 export type GalleryImageKey = keyof typeof galleryImages;

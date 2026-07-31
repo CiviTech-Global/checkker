@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo, lazy, Suspense } from "react";
 import {
   View,
   Text,
@@ -26,7 +26,7 @@ import { TutorialEngine } from "../../src/tutorial/TutorialEngine";
 import { TutorialStorage } from "../../src/tutorial/TutorialStorage";
 import { LESSONS } from "../../src/tutorial/lessons";
 import ChessBoard from "../../src/components/ChessBoard";
-import ChessBoardGL from "../../src/components/ChessBoardGL";
+const ChessBoardGL = lazy(() => import("../../src/components/ChessBoardGL"));
 import { features } from "../../src/config/features";
 import CardHand from "../../src/components/CardHand";
 import type { LessonConfig, LessonStep } from "../../src/tutorial/types";
@@ -459,13 +459,15 @@ export default function TutorialLessonScreen() {
         {/* Board */}
         <View style={styles.boardContainer}>
           {features.use3DBoard ? (
-            <ChessBoardGL
-              fen={fen}
-              orientation={lesson.color}
-              highlightedSquares={highlightedSquares}
-              interactive={boardInteractive}
-              onSquarePress={handleSquarePress}
-            />
+            <Suspense fallback={<ActivityIndicator size="large" />}>
+              <ChessBoardGL
+                fen={fen}
+                orientation={lesson.color}
+                highlightedSquares={highlightedSquares}
+                interactive={boardInteractive}
+                onSquarePress={handleSquarePress}
+              />
+            </Suspense>
           ) : (
             <ChessBoard
               fen={fen}

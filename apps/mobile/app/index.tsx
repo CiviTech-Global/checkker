@@ -235,7 +235,7 @@ export default function HomeScreen() {
         />
 
         <View style={styles.logoRow}>
-          <Image source={require("../assets/logo.png")} style={styles.logo} />
+          <Image source={require("../assets/logo.webp")} style={styles.logo} />
           <Text style={styles.logoText}>Checkker</Text>
         </View>
 
