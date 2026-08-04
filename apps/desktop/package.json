@@ -18,7 +18,9 @@
     "protocols": [
       {
         "name": "Checkker",
-        "schemes": ["checkker"]
+        "schemes": [
+          "checkker"
+        ]
       }
     ],
     "files": [
@@ -29,7 +31,9 @@
       {
         "from": "../mobile/dist",
         "to": "web",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "../server/dist/server.bundle.js",
@@ -46,7 +50,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "electron": "42.3.3",
-    "electron-builder": "^26",
+    "electron-builder": "^26.15.3",
     "typescript": "^5.8.0"
   }
 }
