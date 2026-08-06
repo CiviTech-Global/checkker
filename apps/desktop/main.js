@@ -75,7 +75,9 @@ function startLocalServer(webDir) {
 
   return new Promise((resolve) => {
     server = http.createServer((req, res) => {
-      let pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
+      let pathname = decodeURIComponent(
+        new URL(req.url, "http://localhost").pathname,
+      );
       let filePath = path.join(webDir, pathname);
 
       // SPA fallback: serve index.html for routes that aren't real files
@@ -126,7 +128,7 @@ function startLocalServer(webDir) {
 }
 
 function startGameServer() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const bundlePath = path.join(process.resourcesPath, "server.bundle.js");
     if (!fs.existsSync(bundlePath)) {
       console.warn("Server bundle not found at", bundlePath);
@@ -256,7 +258,7 @@ if (!gotLock) {
     setupAutoUpdater();
     // Windows passes a deep link in argv on first launch.
     const link = process.argv.find((a) =>
-      a.startsWith(`${DEEP_LINK_PROTOCOL}://`)
+      a.startsWith(`${DEEP_LINK_PROTOCOL}://`),
     );
     if (link) handleDeepLink(link);
   });
