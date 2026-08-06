@@ -16,9 +16,11 @@ import {
   cardId,
   scoreGame,
 } from "@checkker/shared";
-import { getLegalMovesForHand, getCaptureBonus } from "@checkker/chess";
+import { getLegalMovesForHand, getCaptureBonus, pseudoLegalMoves, applyPseudoLegalMove, hasAnyPlayableCard} from "@checkker/chess";
 import { evaluateScorePile } from "@checkker/poker";
 import { getTopMoves, type MoveEvaluation } from "./bot/evaluators";
+import type { Move } from "chess.js";
+
 
 export type PublicGameState = {
   id: string;
@@ -238,16 +240,42 @@ export class GameEngine {
       }
     }
 
-    let moveResult;
-    try {
-      moveResult = this.chess.move(moveStr);
-    } catch {
+    // let moveResult;
+    // try {
+    //   moveResult = this.chess.move(moveStr);
+    // } catch {
+    //   return { success: false, error: "Invalid chess move" };
+    // }
+
+    let moveResult: Move;
+    const promotion = moveStr.length > 4 ? moveStr.slice(4) : undefined;
+    const candidate = pseudoLegalMoves(this.chess).find((m) => m.lan === moveStr);
+
+    if (!candidate) {
       return { success: false, error: "Invalid chess move" };
     }
+    applyPseudoLegalMove(this.chess, candidate);
+    moveResult = candidate;
 
     player.hand.splice(cardIdx, 1);
 
     const wasCapture = moveResult.captured !== undefined;
+
+    if (moveResult.captured === "k") {
+      this.moveHistory.push({
+        move: moveStr,
+        card,
+        color: this.turn,
+        captured: { type: "k", color: this.turn === "white" ? "black" : "white" },
+        bonusCards: 0,
+        check: false,
+        mate: true,
+      });
+      player.hand.splice(cardIdx, 1);
+      this.result = { type: "checkmate", winner: this.turn };
+      return { success: true };
+    }
+
     const isCheckMove = this.chess.isCheck();
     const isMate = this.chess.isCheckmate();
     let bonusCards = 0;
@@ -286,12 +314,10 @@ export class GameEngine {
       return { success: true };
     }
 
-    this.checkGameEnd();
+    this.turn = this.turn === "white" ? "black" : "white";
+    this.drawToFull(this.turn);
 
-    if (!this.result) {
-      this.turn = this.turn === "white" ? "black" : "white";
-      this.drawToFull(this.turn);
-    }
+    this.checkGameEnd();
 
     return { success: true };
   }
@@ -311,12 +337,12 @@ export class GameEngine {
   }
 
   private checkGameEnd(): void {
-    if (this.chess.isCheckmate()) {
-      this.result = { type: "checkmate", winner: this.turn };
-      return;
-    }
-    if (this.chess.isStalemate()) {
-      this.result = { type: "draw", reason: "stalemate" };
+    const boardHasMoves = pseudoLegalMoves(this.chess).length > 0;
+    const handHasPlayableCard = hasAnyPlayableCard(this.chess, this.currentPlayer.hand);
+
+
+    if (!boardHasMoves || !handHasPlayableCard) {
+      this.result = { type: "checkmate", winner: this.turn === "white" ? "black" : "white" };
       return;
     }
     if (this.chess.isThreefoldRepetition()) {

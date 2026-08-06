@@ -1,5 +1,7 @@
 import { Chess } from "chess.js";
 import { cardToPiece, type Card, type PieceType } from "@checkker/shared";
+import { pseudoLegalMoves, applyPseudoLegalMove } from "./pseudoLegal";
+export { pseudoLegalMoves, applyPseudoLegalMove };
 
 export { Chess };
 export type { PieceType };
@@ -12,7 +14,7 @@ export interface LegalMovesForCard {
 
 export function getLegalMovesForCard(game: Chess, card: Card): string[] {
   const piece = cardToPiece(card);
-  const allMoves = game.moves({ verbose: true });
+  const allMoves = pseudoLegalMoves(game);
 
   if (piece === "wild") {
     return allMoves.map((m) => m.from + m.to + (m.promotion ?? ""));
@@ -43,6 +45,10 @@ export function getLegalMovesForHand(
     piece: cardToPiece(card),
     moves: getLegalMovesForCard(game, card),
   }));
+}
+
+export function hasAnyPlayableCard(game: Chess, hand: Card[]): boolean {
+  return getLegalMovesForHand(game, hand).some((entry) => entry.moves.length > 0);
 }
 
 export function getCaptureBonus(capturedPiece: string, isCheck: boolean): number {

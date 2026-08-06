@@ -90,13 +90,33 @@ export class HeuristicEngine implements Engine {
   private readonly FILES = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
   async evaluate(fen: string, _depth: number = 12): Promise<EngineEval> {
-    const chess = new Chess(fen);
+    let chess: Chess;
+    try {
+      chess = new Chess(fen);
+    } catch {
+      // A king has been captured — terminal position, unparseable by chess.js.
+      // Score decisively for whichever side still has a king.
+      const whiteHasKing = fen.split(" ")[0].includes("K");
+      return {
+        score: whiteHasKing ? 100000 : -100000,
+        isMate: true,
+        mateIn: 0,
+        depth: 0,
+        bestLine: [],
+      };
+    }
     return this.evaluateChess(chess);
   }
 
   async getBestMove(fen: string, depth: number = 12): Promise<string | null> {
-    const chess = new Chess(fen);
+    let chess: Chess;
+    try {
+      chess = new Chess(fen);
+    } catch {
+      return null;   // terminal position — no move to make
+    }
     const moves = chess.moves({ verbose: false });
+    
     if (moves.length === 0) return null;
 
     // evaluateChess returns a White-relative score, so we orient the maximization

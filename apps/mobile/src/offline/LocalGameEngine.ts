@@ -11,7 +11,9 @@ import {
   cardId,
   scoreGame,
 } from "@checkker/shared";
-import { getLegalMovesForHand, getCaptureBonus } from "@checkker/chess";
+import { getLegalMovesForHand, getCaptureBonus, pseudoLegalMoves,
+  applyPseudoLegalMove,
+  hasAnyPlayableCard, } from "@checkker/chess";
 import { evaluateScorePile } from "@checkker/poker";
 
 /**
@@ -172,16 +174,22 @@ export class LocalGameEngine {
       }
     }
 
-    let moveResult;
-    try {
-      moveResult = this.chess.move(moveStr);
-    } catch {
+    const candidate = pseudoLegalMoves(this.chess).find((m) => m.lan === moveStr);
+    if (!candidate) {
       return { success: false, error: "Invalid chess move" };
     }
+    applyPseudoLegalMove(this.chess, candidate);
+    const moveResult = candidate;
 
     player.hand.splice(cardIdx, 1);
 
     const wasCapture = moveResult.captured !== undefined;
+
+    if (moveResult.captured === "k") {
+      this.result = { type: "checkmate", winner: this.turn };
+      return { success: true };
+    }
+
     const isCheckMove = this.chess.isCheck();
     let bonusCards = 0;
 
@@ -209,24 +217,19 @@ export class LocalGameEngine {
       bonusCards,
     });
 
+    this.turn = this.turn === "white" ? "black" : "white";
+    this.drawToFull(this.turn);
     this.checkGameEnd();
-
-    if (!this.result) {
-      this.turn = this.turn === "white" ? "black" : "white";
-      this.drawToFull(this.turn);
-      this.ensurePlayableHand();
-    }
 
     return { success: true };
   }
 
   private checkGameEnd(): void {
-    if (this.chess.isCheckmate()) {
-      this.result = { type: "checkmate", winner: this.turn };
-      return;
-    }
-    if (this.chess.isStalemate()) {
-      this.result = { type: "draw", reason: "stalemate" };
+    const boardHasMoves = pseudoLegalMoves(this.chess).length > 0;
+    const handHasPlayableCard = hasAnyPlayableCard(this.chess, this.currentPlayer.hand);
+
+    if (!boardHasMoves || !handHasPlayableCard) {
+      this.result = { type: "checkmate", winner: this.turn === "white" ? "black" : "white" };
       return;
     }
     if (this.chess.isThreefoldRepetition()) {
