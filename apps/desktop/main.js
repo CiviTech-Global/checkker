@@ -126,7 +126,7 @@ function startLocalServer(webDir) {
 }
 
 function startGameServer() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const bundlePath = path.join(process.resourcesPath, "server.bundle.js");
     if (!fs.existsSync(bundlePath)) {
       console.warn("Server bundle not found at", bundlePath);
