@@ -1,5 +1,6 @@
 import type { Socket } from "socket.io";
 import { authenticatedSockets } from "./auth";
+import { purchaseCosmeticSchema } from "../services/validation";
 
 export function registerCosmeticHandlers(socket: Socket) {
   socket.on("get_cosmetics", async () => {
@@ -15,8 +16,21 @@ export function registerCosmeticHandlers(socket: Socket) {
     }
   });
 
-  socket.on("purchase_cosmetic", async ({ cosmeticId }: { cosmeticId: string }) => {
+  socket.on("purchase_cosmetic", async (payload: unknown) => {
+    const parsed = purchaseCosmeticSchema.safeParse(payload);
+
+    if (!parsed.success) {
+      socket.emit("cosmetic_purchased", {
+        success: false,
+        error: "Invalid purchase payload",
+      });
+      return;
+    }
+
+    const { cosmeticId } = parsed.data;
+
     const auth = authenticatedSockets.get(socket.id);
+
     if (!auth) {
       socket.emit("cosmetic_purchased", { success: false, error: "Not authenticated" });
       return;
