@@ -233,6 +233,9 @@ export default function GameScreen() {
 
   const gs = gameState as any;
   const color: Color = gs?.color ?? "white";
+  const drawPileCount = gs?.drawPileCount ?? 0;
+  const showLastCardTension =
+    gs?.drawPileCount != null && drawPileCount <= 5;
   const fen = gs?.fen ?? "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
   const turn = gs?.turn ?? "white";
   const myTurn = turn === color;
@@ -537,7 +540,11 @@ export default function GameScreen() {
                     onSquarePress={handleSquarePress}
                   />
                 </Suspense>
-                <Text style={styles.deckCount}>Deck: {gs?.drawPileCount ?? 0}</Text>
+                {showLastCardTension && (
+                  <Text style={styles.lastCardCounter}>
+                    {drawPileCount} cards left
+                  </Text>
+                )}
               </View>
               {isBotGame && !myTurn && <BotThinkingIndicator />}
               <OddsIndicator odds={odds} playerColor={color} />
@@ -645,7 +652,11 @@ export default function GameScreen() {
               />
             </Suspense>
           </View>
-          <Text style={styles.deckCount}>Deck: {gs?.drawPileCount ?? 0}</Text>
+          {showLastCardTension && (
+            <Text style={styles.lastCardCounter}>
+              {drawPileCount} cards left
+            </Text>
+          )}
 
           {isBotGame && !myTurn && <BotThinkingIndicator />}
 
@@ -795,7 +806,13 @@ const styles = StyleSheet.create({
 
   /* Shared */
   selectedInfo: { fontSize: 12, color: colors.text.secondary },
-  deckCount: { fontSize: 12, color: colors.text.muted, textAlign: "center", marginTop: 4 },
+  lastCardCounter: {
+    fontSize: 12,
+    color: colors.accent.gold,
+    fontWeight: "700",
+    textAlign: "center",
+    marginTop: 4,
+  },
   actionRow: {
     flexDirection: "row",
     alignItems: "center",
