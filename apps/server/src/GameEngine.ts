@@ -248,7 +248,6 @@ export class GameEngine {
     // }
 
     let moveResult: Move;
-    const promotion = moveStr.length > 4 ? moveStr.slice(4) : undefined;
     const candidate = pseudoLegalMoves(this.chess).find((m) => m.lan === moveStr);
 
     if (!candidate) {
@@ -262,6 +261,11 @@ export class GameEngine {
     const wasCapture = moveResult.captured !== undefined;
 
     if (moveResult.captured === "k") {
+      if (piece !== "wild") {
+        player.scorePile.push(card);
+      } else {
+        this.deadPile.push(card);
+      }
       this.moveHistory.push({
         move: moveStr,
         card,
@@ -271,7 +275,6 @@ export class GameEngine {
         check: false,
         mate: true,
       });
-      player.hand.splice(cardIdx, 1);
       this.result = { type: "checkmate", winner: this.turn };
       return { success: true };
     }
