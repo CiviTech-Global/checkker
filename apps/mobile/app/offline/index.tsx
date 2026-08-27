@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { findCardForSquare } from "@checkker/chess";
 import { cardId, type ScoredGame } from "@checkker/shared";
 import { colors, spacing, radius, glassStyle } from "../../src/theme/tokens";
 import { LocalGameEngine, type LocalGameSnapshot } from "../../src/offline/LocalGameEngine";
@@ -95,7 +96,16 @@ export default function OfflineGameScreen() {
     (square: string) => {
       if (snapshot.result || snapshot.turn !== engine.playerColor) return;
       if (selectedCard === null) {
-        setError("Select a card first.");
+        const all = engine.getLegalMoves();
+        const idx = findCardForSquare(all, square);
+        if (idx === null) {
+          setError("No card in hand can move that piece.");
+          return;
+        }
+        setError(null);
+        setSelectedCard(idx);
+        setLegalForCard(all[idx].moves);
+        setSelectedSquare(square);
         return;
       }
       setError(null);
