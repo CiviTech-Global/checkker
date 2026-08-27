@@ -1,5 +1,5 @@
 import { Chess } from "chess.js";
-import { getLegalMovesForHand } from "@checkker/chess";
+import { getLegalMovesForHand, pseudoLegalMoves, applyPseudoLegalMove } from "@checkker/chess";
 import { evaluateScorePile } from "@checkker/poker";
 import type { Card, Color, BotDifficulty, MoveEvaluation } from "@checkker/shared";
 import type { LegalMovesForCard } from "@checkker/chess";
@@ -66,11 +66,9 @@ export class HybridEvaluator {
     color: Color,
   ): Promise<{ chessScore: number; pokerImpact: number }> {
     const chess = new Chess(fen);
-    try {
-      chess.move(move);
-    } catch {
-      return { chessScore: -Infinity, pokerImpact: 0 };
-    }
+    const candidate = pseudoLegalMoves(chess).find((m) => m.lan === move);
+    if (!candidate) return { chessScore: -Infinity, pokerImpact: 0 };
+    applyPseudoLegalMove(chess, candidate);
 
     const afterEval = await this.evaluateChess(chess.fen());
     const beforeEval = await this.evaluateChess(fen);
@@ -114,11 +112,27 @@ export class HybridEvaluator {
 
     for (const entry of allMoves) {
       const chess = new Chess(fen);
-      try {
-        chess.move(entry.move);
-      } catch {
+      const destSquare = entry.move.slice(2, 4);
+      const capturesKing = chess.get(destSquare as any)?.type === "k";
+
+      if (capturesKing) {
+        analyzed.push({
+          cardId: entry.cardId,
+          move: entry.move,
+          chessScore: Number.POSITIVE_INFINITY,
+          pokerPotential: 0,
+          hybridScore: Number.POSITIVE_INFINITY,
+          rank: 0,
+          isBlunder: false,
+          isBestMove: true,
+          explanation: "Captures the king — wins immediately.",
+        });
         continue;
       }
+
+      const candidate = pseudoLegalMoves(chess).find((m) => m.lan === entry.move);
+      if (!candidate) continue;
+      applyPseudoLegalMove(chess, candidate);
 
       const evalBefore = await this.evaluateChess(fen);
       const evalAfter = await this.evaluateChess(chess.fen());
@@ -205,11 +219,17 @@ export class HybridEvaluator {
 
     for (const entry of allMoves) {
       const chess = new Chess(fen);
-      try {
-        chess.move(entry.move);
-      } catch {
-        continue;
+      const candidate = pseudoLegalMoves(chess).find((m) => m.lan === entry.move);
+      if (!candidate) continue;
+
+      // Capturing the king wins immediately. Check before applying the move:
+      // the resulting position has no king, so it cannot be re-parsed by
+      // chess.js (`new Chess(fen)` throws) nor scored by the engine.
+      if (candidate.captured === "k") {
+        return { cardId: entry.cardId, move: entry.move, score: Infinity };
       }
+
+      applyPseudoLegalMove(chess, candidate);
 
       // engine.evaluate now returns a White-relative score. When Black is
       // moving we want a Black-relative score for maximization.
