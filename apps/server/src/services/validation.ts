@@ -54,3 +54,7 @@ export const adminForceUsernameSchema = z.object({
 export const accountIdParamSchema = z.object({
   id: z.string().uuid(),
 });
+
+export const purchaseCosmeticSchema = z.object({
+  cosmeticId: z.string(),
+});
