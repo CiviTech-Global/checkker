@@ -23,7 +23,7 @@ import { useSocket } from "../../src/hooks/useSocket";
 import { useWallet } from "../../src/hooks/useWallet";
 import { useLocalProfile, type SimpleStats } from "../../src/context/LocalProfileContext";
 import Icon from "../../src/components/Icon";
-import { getAvatar, AVATARS } from "@checkker/shared";
+import { getAvatar, AVATARS, getTier } from "@checkker/shared";
 
 type StatsTab = "all" | "offline" | "online";
 
@@ -160,6 +160,7 @@ export default function ProfileScreen() {
       : activeTab === "offline"
       ? offlineStats
       : onlineStats;
+  const ratingTier = getTier(currentStats.rating);
 
   const winRate =
     currentStats.gamesPlayed > 0
@@ -278,7 +279,10 @@ export default function ProfileScreen() {
           <Text style={styles.offlineNameHint}>Offline: {localProfile.offlineName}</Text>
         )}
 
-        <Text style={styles.ratingBadge}>{currentStats.rating} ELO</Text>
+        <View style={styles.ratingRow}>
+          <Text style={styles.ratingBadge}>{currentStats.rating} ELO</Text>
+          <Text style={styles.tierBadge}>{ratingTier.label}</Text>
+        </View>
 
         {walletAddress && (
           <Text style={styles.walletText}>
@@ -573,6 +577,12 @@ const styles = StyleSheet.create({
     minWidth: 150,
     textAlign: "center",
   },
+  ratingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+  },
+  
   ratingBadge: {
     fontSize: 14,
     color: colors.accent.bronze,
@@ -585,6 +595,20 @@ const styles = StyleSheet.create({
     borderColor: colors.border.gold,
     overflow: "hidden",
   },
+  
+  tierBadge: {
+    fontSize: 12,
+    color: colors.accent.gold,
+    fontWeight: "700",
+    backgroundColor: "rgba(212,168,67,0.1)",
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: colors.border.gold,
+    overflow: "hidden",
+  },
+  
   walletText: {
     fontSize: 12,
     color: colors.text.muted,
