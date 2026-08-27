@@ -8,6 +8,7 @@ import { useBot } from "../../src/context/BotContext";
 import { lastPlayed, type LastPlayedMatch } from "../../src/services/LastPlayedService";
 import { haptics } from "../../src/services/HapticsService";
 import Icon from "../../src/components/Icon";
+import { trackEvent } from "../../src/utils/analytics";
 
 /* ── Deposit countdown ───────────────────────────────────────────────── */
 
@@ -84,7 +85,7 @@ export default function QueueScreen() {
   const stake = (params.stake ?? "free") as "free" | "bet";
   const isBot = params.bot === "true";
 
-  const { connected, joinRanked, joinCasualDifficulty, gameState, requestBot, onBotFallbackOffer, onQueueError, depositStatus } = useSocket();
+  const { connected, joinRanked, joinCasualDifficulty, gameState, requestBot, onBotFallbackOffer, startBotGame, onQueueError, depositStatus } = useSocket();
   const { setInBotMatch } = useBot();
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -139,6 +140,16 @@ export default function QueueScreen() {
     requestBot("intermediate", botOffer.tc);
     setBotOffer(null);
   }, [botOffer, requestBot]);
+
+  const handlePlayBotNow = useCallback(() => {
+    trackEvent("play_vs_bot_now", {
+      difficulty,
+      tc,
+      mode,
+    });
+  
+    startBotGame(difficulty, tc);
+  }, [difficulty, tc, mode, startBotGame]);
 
   const handleKeepSearching = useCallback(() => {
     if (!botOffer) return;
@@ -203,11 +214,23 @@ export default function QueueScreen() {
           </TouchableOpacity>
         </Animated.View>
       )}
-
+      
       {!depositStatus && (
-        <TouchableOpacity style={styles.cancelBtn} onPress={() => router.replace("/")}>
-          <Text style={styles.cancelText}>Cancel Search</Text>
-        </TouchableOpacity>
+        <View style={styles.queueActions}>
+          <TouchableOpacity
+            style={styles.acceptBtn}
+            onPress={handlePlayBotNow}
+          >
+            <Text style={styles.acceptText}>Play vs Bot Now</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.cancelBtn}
+            onPress={() => router.replace("/")}
+          >
+            <Text style={styles.cancelText}>Cancel Search</Text>
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );
@@ -221,6 +244,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: spacing.lg,
     gap: spacing.md,
+  },
+  queueActions: {
+    alignItems: "center",
+    gap: spacing.sm,
   },
   title: {
     fontSize: typography.size.lg,
