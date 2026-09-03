@@ -2,6 +2,7 @@ import { Chess } from "chess.js";
 import { cardToPiece, type Card, type PieceType } from "@checkker/shared";
 import { pseudoLegalMoves, applyPseudoLegalMove } from "./pseudoLegal";
 export { pseudoLegalMoves, applyPseudoLegalMove };
+import { RANKS } from "@checkker/shared";
 
 export { Chess };
 export type { PieceType };
@@ -45,6 +46,32 @@ export function getLegalMovesForHand(
     piece: cardToPiece(card),
     moves: getLegalMovesForCard(game, card),
   }));
+}
+
+export function findCardForSquare(
+  legalMoves: LegalMovesForCard[],
+  square: string
+): number | null {
+  let best: number | null = null;
+  let bestRank = Infinity;
+  let wildIdx: number | null = null;
+
+  for (let i = 0; i < legalMoves.length; i++) {
+    const entry = legalMoves[i];
+    if (!entry.moves.some((m) => m.startsWith(square))) continue;
+
+    if (entry.piece === "wild") {
+      if (wildIdx === null) wildIdx = i;
+      continue;
+    }
+    const rank = RANKS.indexOf(entry.card.rank);
+    if (rank < bestRank) {
+      bestRank = rank;
+      best = i;
+    }
+  }
+
+  return best ?? wildIdx;
 }
 
 export function hasAnyPlayableCard(game: Chess, hand: Card[]): boolean {

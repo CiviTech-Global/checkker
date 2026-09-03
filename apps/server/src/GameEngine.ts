@@ -114,6 +114,8 @@ export class GameEngine {
 
     this.drawToFull("white");
     this.drawToFull("black");
+    this.ensurePlayableOpeningHand("white");
+    this.ensurePlayableOpeningHand("black");
   }
 
   private get currentPlayer(): PlayerState {
@@ -141,6 +143,28 @@ export class GameEngine {
       }
     }
     return drawn;
+  }
+
+  /**
+   * Redeals an opening hand that has no legal move at all. Only pawns and
+   * knights can move from the starting position, so ~2.5% of three-card hands
+   * are dead on arrival — without this the holder loses instantly via
+   * checkGameEnd. Opening deal only; a dead hand later in the game is a loss.
+   *
+   * Rejected cards go under the draw pile rather than the dead pile, so the
+   * deck composition is unchanged and reshuffleDead stays untouched.
+   */
+  private ensurePlayableOpeningHand(color: Color): void {
+    const player = color === "white" ? this.white : this.black;
+    let guard = 0;
+    while (
+      guard++ < 20 &&
+      this.drawPile.length > 0 &&
+      !hasAnyPlayableCard(this.chess, player.hand)
+    ) {
+      this.drawPile.unshift(...player.hand.splice(0, player.hand.length));
+      this.drawToFull(color);
+    }
   }
 
   private reshuffleDead(): void {
@@ -248,7 +272,6 @@ export class GameEngine {
     // }
 
     let moveResult: Move;
-    const promotion = moveStr.length > 4 ? moveStr.slice(4) : undefined;
     const candidate = pseudoLegalMoves(this.chess).find((m) => m.lan === moveStr);
 
     if (!candidate) {
@@ -262,6 +285,11 @@ export class GameEngine {
     const wasCapture = moveResult.captured !== undefined;
 
     if (moveResult.captured === "k") {
+      if (piece !== "wild") {
+        player.scorePile.push(card);
+      } else {
+        this.deadPile.push(card);
+      }
       this.moveHistory.push({
         move: moveStr,
         card,
@@ -271,7 +299,6 @@ export class GameEngine {
         check: false,
         mate: true,
       });
-      player.hand.splice(cardIdx, 1);
       this.result = { type: "checkmate", winner: this.turn };
       return { success: true };
     }
