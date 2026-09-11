@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -8,16 +11,24 @@ import { GameServer } from "./GameServer";
 import { initPlayerStoreDb } from "./PlayerStore";
 import usersRouter from "./routes/users";
 import adminRouter from "./routes/admin";
-import { initMonitoring, sentryRequestHandler, sentryErrorHandler, flushSentry } from "./monitoring";
+import {
+  initMonitoring,
+  sentryRequestHandler,
+  sentryErrorHandler,
+  flushSentry,
+} from "./monitoring";
 import { parseArgs } from "./cli-args";
 import { logger } from "./logger";
 import { startAccountDeletionWorker } from "./workers/accountDeletion";
 
 const cli = parseArgs();
-const PORT = cli.port ?? (process.env.PORT ? parseInt(process.env.PORT, 10) : 3001);
+const PORT =
+  cli.port ?? (process.env.PORT ? parseInt(process.env.PORT, 10) : 3001);
 const CORS_ORIGIN = process.env.CORS_ORIGIN;
 if (!CORS_ORIGIN && process.env.NODE_ENV === "production") {
-  logger.warn("[security] CORS_ORIGIN not set in production — all origins will be blocked");
+  logger.warn(
+    "[security] CORS_ORIGIN not set in production — all origins will be blocked",
+  );
 }
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
 
@@ -29,22 +40,26 @@ const app = express();
 app.set("trust proxy", 1);
 
 app.use(sentryRequestHandler());
-app.use(helmet({
-  contentSecurityPolicy: false, // web export supplies its own CSP via meta tags
-  crossOriginEmbedderPolicy: false,
-}));
-app.use(cors({
-  origin: CORS_ORIGIN
-    ? (origin, callback) => {
-        // Allow requests with no origin (mobile apps, curl, server-to-server)
-        if (!origin || CORS_ORIGIN === origin || CORS_ORIGIN === "*") {
-          callback(null, true);
-        } else {
-          callback(new Error("Not allowed by CORS"));
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // web export supplies its own CSP via meta tags
+    crossOriginEmbedderPolicy: false,
+  }),
+);
+app.use(
+  cors({
+    origin: CORS_ORIGIN
+      ? (origin, callback) => {
+          // Allow requests with no origin (mobile apps, curl, server-to-server)
+          if (!origin || CORS_ORIGIN === origin || CORS_ORIGIN === "*") {
+            callback(null, true);
+          } else {
+            callback(new Error("Not allowed by CORS"));
+          }
         }
-      }
-    : false,
-}));
+      : false,
+  }),
+);
 app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
@@ -60,7 +75,7 @@ app.use((req, res, next) => {
         statusCode: res.statusCode,
         durationMs: Math.round(durationMs * 100) / 100,
       },
-      "http request"
+      "http request",
     );
   });
   next();
@@ -78,7 +93,11 @@ if (process.env.DATABASE_URL) {
     try {
       const { PuzzleRepository } = await import("@checkker/database");
       const puzzle = await PuzzleRepository.ensureDaily();
-      if (puzzle) logger.info({ puzzleId: puzzle.id, category: puzzle.category }, "[puzzles] Daily puzzle ready");
+      if (puzzle)
+        logger.info(
+          { puzzleId: puzzle.id, category: puzzle.category },
+          "[puzzles] Daily puzzle ready",
+        );
     } catch (err) {
       logger.error({ err }, "[puzzles] Daily rotation failed");
     }
@@ -103,9 +122,10 @@ if (process.env.DATABASE_URL) {
           rarity: c.rarity,
           assetUrl: c.key,
           isDefault: c.isDefault,
-        }))
+        })),
       );
-      if (created > 0) logger.info({ created }, "[cosmetics] Seeded catalog items");
+      if (created > 0)
+        logger.info({ created }, "[cosmetics] Seeded catalog items");
     } catch (err) {
       logger.error({ err }, "[cosmetics] Catalog seed failed");
     }
@@ -142,7 +162,9 @@ const adminLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req, res) => {
-    res.status(429).json({ status: "error", message: "Too many admin requests" });
+    res
+      .status(429)
+      .json({ status: "error", message: "Too many admin requests" });
   },
 });
 
@@ -152,21 +174,34 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "checkker", version: 1 });
 });
 
-function adminGate(req: express.Request, res: express.Response, next: express.NextFunction): void {
+function adminGate(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+): void {
   if (!ADMIN_API_KEY) {
     // In production, block all admin access if no key is configured.
     if (process.env.NODE_ENV === "production") {
-      res.status(403).json({ status: "error", message: "Admin API key not configured" });
+      res
+        .status(403)
+        .json({ status: "error", message: "Admin API key not configured" });
       return;
     }
     // In development, restrict to loopback only. Use socket.remoteAddress
     // (unaffected by trust proxy) to prevent IP spoofing via X-Forwarded-For.
-    const ip = (req.socket as any).remoteAddress ?? "unknown";
-    if (ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1" || ip === "unknown") {
+    const ip = req.socket.remoteAddress ?? "unknown";
+    if (
+      ip === "127.0.0.1" ||
+      ip === "::1" ||
+      ip === "::ffff:127.0.0.1" ||
+      ip === "unknown"
+    ) {
       next();
       return;
     }
-    res.status(403).json({ status: "error", message: "Admin API key not configured" });
+    res
+      .status(403)
+      .json({ status: "error", message: "Admin API key not configured" });
     return;
   }
   const key = req.headers["x-admin-api-key"];
@@ -179,7 +214,10 @@ function adminGate(req: express.Request, res: express.Response, next: express.Ne
 
 app.use("/admin", adminLimiter, adminGate);
 
-app.use("/uploads/avatars", express.static(process.env.AVATAR_STORAGE_PATH || "./uploads/avatars"));
+app.use(
+  "/uploads/avatars",
+  express.static(process.env.AVATAR_STORAGE_PATH || "./uploads/avatars"),
+);
 
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/admin", adminLimiter, adminGate, adminRouter);
@@ -224,7 +262,9 @@ function resolveWebDist(cliPath?: string): string | null {
     path.join(__dirname, "../../mobile/dist"),
     path.join(process.cwd(), "../mobile/dist"),
   ].filter((p): p is string => !!p);
-  return candidates.find((p) => fs.existsSync(path.join(p, "index.html"))) ?? null;
+  return (
+    candidates.find((p) => fs.existsSync(path.join(p, "index.html"))) ?? null
+  );
 }
 
 // LAN discovery beacon: answer UDP broadcasts so mobile clients on the same
@@ -237,16 +277,27 @@ const LAN_DISCOVERY_PROBE = "CHECKKER_DISCOVER";
     const udp = dgram.createSocket({ type: "udp4", reuseAddr: true });
     udp.on("message", (msg, rinfo) => {
       if (msg.toString().trim() !== LAN_DISCOVERY_PROBE) return;
-      const actualPort = (httpServer.address() as any)?.port ?? PORT;
-      const reply = Buffer.from(JSON.stringify({ service: "checkker", port: actualPort }));
+      const addr = httpServer.address();
+      const actualPort =
+        typeof addr === "object" && addr !== null ? addr.port : PORT;
+      const reply = Buffer.from(
+        JSON.stringify({ service: "checkker", port: actualPort }),
+      );
       udp.send(reply, rinfo.port, rinfo.address);
     });
     udp.on("error", (err) => {
       logger.warn({ err: err.message }, "[lan] Discovery beacon error");
-      try { udp.close(); } catch { /* already closed */ }
+      try {
+        udp.close();
+      } catch {
+        /* already closed */
+      }
     });
     udp.bind(LAN_DISCOVERY_PORT, () => {
-      logger.info({ port: LAN_DISCOVERY_PORT }, "[lan] Discovery beacon listening");
+      logger.info(
+        { port: LAN_DISCOVERY_PORT },
+        "[lan] Discovery beacon listening",
+      );
     });
     udp.unref();
   } catch (err) {
@@ -258,14 +309,22 @@ const LAN_DISCOVERY_PROBE = "CHECKKER_DISCOVER";
 app.use(sentryErrorHandler());
 
 httpServer.listen(PORT, () => {
-  const actualPort = (httpServer.address() as any)?.port ?? PORT;
+  const addr = httpServer.address();
+  const actualPort =
+    typeof addr === "object" && addr !== null ? addr.port : PORT;
   // eslint-disable-next-line no-console
   console.log(`__CHECKKER_PORT__=${actualPort}`);
   logger.info({ port: actualPort }, "Checkker server running");
   logger.info("[AIBrain] Set STOCKFISH_PATH to enable Stockfish engine");
-  logger.info("[AIBrain] Set AI_COACH_PROVIDER + AI_COACH_API_KEY to enable LLM Coach");
-  logger.info(`[AIBrain] Set AI_BRAIN_PERSISTENCE=true to persist player models (dir: ${process.env.AI_BRAIN_STORAGE ?? "./data/player-models"})`);
-  logger.info("[AIBrain] Set SMART_MATCHMAKING=true to enable playstyle-based pairing");
+  logger.info(
+    "[AIBrain] Set AI_COACH_PROVIDER + AI_COACH_API_KEY to enable LLM Coach",
+  );
+  logger.info(
+    `[AIBrain] Set AI_BRAIN_PERSISTENCE=true to persist player models (dir: ${process.env.AI_BRAIN_STORAGE ?? "./data/player-models"})`,
+  );
+  logger.info(
+    "[AIBrain] Set SMART_MATCHMAKING=true to enable playstyle-based pairing",
+  );
 });
 
 process.on("SIGTERM", async () => {
