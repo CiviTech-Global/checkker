@@ -23,6 +23,7 @@ import { useSocket } from "../../src/hooks/useSocket";
 import { useWallet } from "../../src/hooks/useWallet";
 import { useLocalProfile, type SimpleStats } from "../../src/context/LocalProfileContext";
 import Icon from "../../src/components/Icon";
+import LoadingSkeleton from "../../src/components/LoadingSkeleton";
 import { getAvatar, AVATARS, getTier } from "@checkker/shared";
 
 type StatsTab = "all" | "offline" | "online";
@@ -86,6 +87,7 @@ export default function ProfileScreen() {
 
   const [activeTab, setActiveTab] = useState<StatsTab>("all");
   const [serverGames, setServerGames] = useState<any[]>([]);
+  const [profileLoading, setProfileLoading] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(localProfile.offlineName);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
@@ -95,6 +97,7 @@ export default function ProfileScreen() {
   // Sync online stats when server data arrives
   useEffect(() => {
     onProfileData((data) => {
+      setProfileLoading(false);
       if (Array.isArray(data.recentGames)) {
         setServerGames(data.recentGames);
       }
@@ -115,7 +118,10 @@ export default function ProfileScreen() {
 
   // Fetch server profile if connected
   useEffect(() => {
-    if (connected) getProfile();
+    if (connected) {
+      setProfileLoading(true);
+      getProfile();
+    }
   }, [connected, getProfile]);
 
   // Listen for auth challenge and sign it
@@ -405,7 +411,24 @@ export default function ProfileScreen() {
       </Animated.View>
 
       {/* Online Games with replays */}
-      {serverGames.length > 0 && activeTab !== "offline" && (
+      {profileLoading && activeTab !== "offline" ? (
+        <View style={[styles.section, glassStyle]}>
+          <LoadingSkeleton width="45%" height={16} />
+
+          {[0, 1, 2].map((item) => (
+            <View key={item} style={styles.gameRow}>
+              <LoadingSkeleton width={24} height={24} borderRadius={12} />
+              <LoadingSkeleton width={60} height={14} />
+
+              <View style={{ flex: 1 }}>
+                <LoadingSkeleton width="70%" height={14} />
+              </View>
+
+              <LoadingSkeleton width={32} height={14} />
+            </View>
+          ))}
+        </View>
+      ) : serverGames.length > 0 && activeTab !== "offline" ? (
         <Animated.View
           entering={FadeIn.duration(300).delay(350)}
           style={[styles.section, glassStyle]}
@@ -449,7 +472,7 @@ export default function ProfileScreen() {
             );
           })}
         </Animated.View>
-      )}
+      ) : null}
 
       {/* Game History */}
       {gameHistory.length > 0 && (

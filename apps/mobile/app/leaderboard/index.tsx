@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  ActivityIndicator,
   RefreshControl,
 } from "react-native";
 import Animated, { FadeIn, SlideInUp } from "react-native-reanimated";
@@ -20,6 +19,7 @@ import { useSocket } from "../../src/hooks/useSocket";
 import { getAvatar } from "@checkker/shared";
 import { useLocalProfile } from "../../src/context/LocalProfileContext";
 import Icon from "../../src/components/Icon";
+import LoadingSkeleton from "../../src/components/LoadingSkeleton";
 
 interface LeaderboardEntry {
   id: string;
@@ -149,14 +149,26 @@ export default function LeaderboardScreen() {
       </View>
 
       {loading ? (
-        <View style={styles.loadingSection}>
-          <ActivityIndicator size="large" color={colors.accent.gold} />
-          <Text style={styles.loadingText}>Loading leaderboard...</Text>
+        <View style={styles.skeletonList}>
+          {[0, 1, 2, 3, 4, 5].map((item) => (
+            <View key={item} style={styles.skeletonRow}>
+              <LoadingSkeleton width={36} height={36} borderRadius={18} />
+
+              <View style={styles.skeletonPlayer}>
+                <LoadingSkeleton width="65%" height={16} />
+                <LoadingSkeleton width="45%" height={10} />
+              </View>
+
+              <LoadingSkeleton width={52} height={18} />
+            </View>
+          ))}
         </View>
       ) : entries.length === 0 ? (
         <View style={styles.loadingSection}>
           <Text style={styles.emptyText}>No player ranks</Text>
-          <Text style={styles.emptySubtext}>Play ranked games to appear here!</Text>
+          <Text style={styles.emptySubtext}>
+            Play ranked games to appear here!
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -184,6 +196,21 @@ export default function LeaderboardScreen() {
 }
 
 const styles = StyleSheet.create({
+  skeletonList: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    gap: spacing.sm,
+  },
+  skeletonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  skeletonPlayer: {
+    flex: 1,
+    gap: spacing.xs,
+  },
   container: { flex: 1, backgroundColor: colors.bg.primary },
   header: {
     flexDirection: "row",
