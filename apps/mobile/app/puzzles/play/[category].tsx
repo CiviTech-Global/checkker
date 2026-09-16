@@ -25,6 +25,7 @@ import {
 } from "../../../src/theme/tokens";
 import { useSpringPress } from "../../../src/utils/animations";
 import Icon from "../../../src/components/Icon";
+import { trackEvent } from "../../../src/utils/analytics";
 
 const CATEGORY_LABELS: Record<string, string> = {
   daily: "Daily Puzzle",
@@ -94,6 +95,20 @@ export default function PuzzlePlayScreen() {
     }
   }, [puzzles, category]);
 
+  const currentPuzzle =
+    puzzleList.length > 0 && currentIndex < puzzleList.length
+      ? puzzleList[currentIndex]
+      : null;
+
+  useEffect(() => {
+    if (!currentPuzzle) return;
+
+    trackEvent("puzzle_opened", {
+      puzzleId: currentPuzzle.id,
+      category,
+    });
+  }, [currentPuzzle, category]);
+
   useEffect(() => {
     if (puzzleResult && awaitingResult.current) {
       awaitingResult.current = false;
@@ -101,19 +116,20 @@ export default function PuzzlePlayScreen() {
       setShowResult(true);
       setLastCorrect(puzzleResult.correct);
       setSolution(puzzleResult.solution);
+
       if (puzzleResult.correct) {
+        trackEvent("puzzle_solved", {
+          puzzleId: currentPuzzle?.id,
+          category,
+        });
+
         setStreak((s) => s + 1);
         setSolved((s) => s + 1);
       } else {
         setStreak(0);
       }
     }
-  }, [puzzleResult]);
-
-  const currentPuzzle =
-    puzzleList.length > 0 && currentIndex < puzzleList.length
-      ? puzzleList[currentIndex]
-      : null;
+  }, [puzzleResult, currentPuzzle?.id, category]);
 
   const turnColor = currentPuzzle
     ? currentPuzzle.fen.split(" ")[1] === "w"

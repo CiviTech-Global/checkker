@@ -27,6 +27,7 @@ import { getLegalMovesForHand } from "@checkker/chess";
 import ChessBoard from "../../src/components/ChessBoard";
 const ChessBoardGL = lazy(() => import("../../src/components/ChessBoardGL"));
 import { features } from "../../src/config/features";
+import { trackEvent } from "../../src/utils/analytics";
 import CardHand from "../../src/components/CardHand";
 import OpponentHand from "../../src/components/OpponentHand";
 import ScorePile from "../../src/components/ScorePile";
@@ -232,6 +233,23 @@ export default function GameScreen() {
   const isBotGame = id?.startsWith("bot-") ?? false;
 
   const gs = gameState as any;
+
+  useEffect(() => {
+    if (!gs?.gameId) return;
+
+    if (isBotGame) {
+      trackEvent("bot_game_started", {
+        gameId: gs.gameId,
+      });
+    } else if (gs.betAmountUsd === 0) {
+      trackEvent("free_game_started", {
+        gameId: gs.gameId,
+        mode: gs.mode,
+        difficulty: gs.difficulty,
+      });
+    }
+  }, [gs?.gameId, gs?.betAmountUsd, gs?.mode, gs?.difficulty, isBotGame]);
+
   const color: Color = gs?.color ?? "white";
   const drawPileCount = gs?.drawPileCount ?? 0;
   const showLastCardTension =
