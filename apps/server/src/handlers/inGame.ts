@@ -10,6 +10,7 @@ export function registerInGameHandlers(
   server: GameServer,
   getMatches: () => Map<string, Match>,
   moveRateLimiter: { allow: (id: string, key: string) => boolean },
+  socialRateLimiter: { allow: (id: string, key: string) => boolean },
 ) {
   socket.on("play_move", async ({ gameId, card, move }: { gameId: string; card: string; move: string }) => {
     if (!moveRateLimiter.allow(socket.id, "play_move")) {
@@ -61,6 +62,10 @@ export function registerInGameHandlers(
   });
 
   socket.on("chat_message", ({ gameId, text }: { gameId: string; text: string }) => {
+    if (!socialRateLimiter.allow(socket.id, "chat_message")) {
+      return;
+    }
+
     const match = getMatches().get(gameId);
     if (!match) return;
     if (socket.id !== match.white.id && socket.id !== match.black.id) return;
