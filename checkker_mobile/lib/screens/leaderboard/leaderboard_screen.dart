@@ -59,17 +59,21 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
         foregroundColor: AppColors.text.primary,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: Icon(Icons.refresh, color: AppColors.text.muted),
-            onPressed: _refresh,
+          Semantics(
+            label: 'Refresh leaderboard',
+            button: true,
+            child: IconButton(
+              icon: Icon(Icons.refresh, color: AppColors.text.muted),
+              onPressed: _refresh,
+            ),
           ),
         ],
       ),
       body: _loading && _data == null
           ? const Center(child: CircularProgressIndicator())
           : _data == null || _data!.entries.isEmpty
-              ? _buildEmptyState()
-              : _buildLeaderboard(),
+          ? _buildEmptyState()
+          : _buildLeaderboard(),
     );
   }
 
@@ -82,12 +86,18 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
           const SizedBox(height: AppSpacing.md),
           Text(
             'No rankings available',
-            style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.body),
+            style: TextStyle(
+              color: AppColors.text.muted,
+              fontSize: AppTypography.body,
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
             'Play online games to appear on the leaderboard',
-            style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.sm),
+            style: TextStyle(
+              color: AppColors.text.muted,
+              fontSize: AppTypography.sm,
+            ),
           ),
         ],
       ),
@@ -139,7 +149,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
   }
 
   Widget _buildEntryTile(Map<String, dynamic> entry, int rank, int? myRank) {
-    final displayName = entry['displayName'] as String? ??
+    final displayName =
+        entry['displayName'] as String? ??
         entry['username'] as String? ??
         'Player';
     final rating = entry['rating'] as int? ?? 1000;
@@ -215,7 +226,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                 Text(
                   displayName,
                   style: TextStyle(
-                    color: isMe ? AppColors.accent.goldBright : AppColors.text.primary,
+                    color: isMe
+                        ? AppColors.accent.goldBright
+                        : AppColors.text.primary,
                     fontSize: AppTypography.sm,
                     fontWeight: FontWeight.w600,
                   ),

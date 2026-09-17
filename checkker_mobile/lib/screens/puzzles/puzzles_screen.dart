@@ -81,9 +81,18 @@ class _PuzzlesScreenState extends ConsumerState<PuzzlesScreen> {
                       ),
                       child: Row(
                         children: [
-                          IconButton(
-                            onPressed: () => context.canPop() ? context.pop() : context.go('/'),
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          Semantics(
+                            label: 'Go back',
+                            button: true,
+                            child: IconButton(
+                              onPressed: () => context.canPop()
+                                  ? context.pop()
+                                  : context.go('/'),
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                           Expanded(
                             child: Text(
@@ -106,7 +115,9 @@ class _PuzzlesScreenState extends ConsumerState<PuzzlesScreen> {
                   // Streak Banner
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                      ),
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
@@ -128,8 +139,12 @@ class _PuzzlesScreenState extends ConsumerState<PuzzlesScreen> {
                             Container(
                               width: 1,
                               height: 40,
-                              margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                              color: AppColors.text.onParchment.withValues(alpha: 0.2),
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.lg,
+                              ),
+                              color: AppColors.text.onParchment.withValues(
+                                alpha: 0.2,
+                              ),
                             ),
                             _StreakStat(value: _solved, label: 'Solved'),
                           ],
@@ -138,38 +153,41 @@ class _PuzzlesScreenState extends ConsumerState<PuzzlesScreen> {
                     ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
                   ),
 
-                  const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: AppSpacing.lg),
+                  ),
 
                   // Categories
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
                     sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final cat = puzzleCategories[index];
-                          return _CategoryCard(
-                            category: cat,
-                            onTap: () => _onCategoryTap(cat),
-                          )
-                              .animate()
-                              .slideY(
-                                begin: 0.3,
-                                end: 0,
-                                duration: 300.ms,
-                                delay: Duration(milliseconds: 100 + index * 70),
-                                curve: Curves.easeOut,
-                              )
-                              .fadeIn(
-                                duration: 300.ms,
-                                delay: Duration(milliseconds: 100 + index * 70),
-                              );
-                        },
-                        childCount: puzzleCategories.length,
-                      ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final cat = puzzleCategories[index];
+                        return _CategoryCard(
+                              category: cat,
+                              onTap: () => _onCategoryTap(cat),
+                            )
+                            .animate()
+                            .slideY(
+                              begin: 0.3,
+                              end: 0,
+                              duration: 300.ms,
+                              delay: Duration(milliseconds: 100 + index * 70),
+                              curve: Curves.easeOut,
+                            )
+                            .fadeIn(
+                              duration: 300.ms,
+                              delay: Duration(milliseconds: 100 + index * 70),
+                            );
+                      }, childCount: puzzleCategories.length),
                     ),
                   ),
 
-                  const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: AppSpacing.xxl),
+                  ),
                 ],
               ),
       ),
@@ -237,11 +255,7 @@ class _CategoryCard extends StatelessWidget {
           child: Row(
             children: [
               // Accent bar
-              Container(
-                width: 4,
-                height: 90,
-                color: _accentColor,
-              ),
+              Container(width: 4, height: 90, color: _accentColor),
               // Content
               Expanded(
                 child: Padding(
@@ -253,10 +267,7 @@ class _CategoryCard extends StatelessWidget {
                         children: [
                           Text(
                             category.symbol,
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: _accentColor,
-                            ),
+                            style: TextStyle(fontSize: 20, color: _accentColor),
                           ),
                           const SizedBox(width: AppSpacing.xs),
                           Text(

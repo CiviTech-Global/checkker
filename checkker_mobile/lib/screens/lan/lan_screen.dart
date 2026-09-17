@@ -38,26 +38,32 @@ class _LanScreenState extends ConsumerState<LanScreen> {
     _discoverIp();
     final socket = ref.read(socketServiceProvider);
     _lastGameId = socket.gameId;
-    _subs.add(socket.lanGameHostedStream.listen((data) {
-      if (mounted) setState(() => _hostCode = data['code'] as String?);
-    }));
-    _subs.add(socket.lanJoinResultStream.listen((data) {
-      if (!mounted) return;
-      setState(() => _connecting = false);
-      if (data['success'] != true) {
-        final error = data['error'] as String? ?? 'Could not join the game.';
-        setState(() => _connectionError = error);
-        _showSnack(error);
-      }
-    }));
-    _subs.add(socket.gameStateStream.listen((_) {
-      if (!mounted) return;
-      final gameId = socket.gameId;
-      if (gameId != null && gameId != _lastGameId) {
-        _lastGameId = gameId;
-        context.push('/game/$gameId');
-      }
-    }));
+    _subs.add(
+      socket.lanGameHostedStream.listen((data) {
+        if (mounted) setState(() => _hostCode = data['code'] as String?);
+      }),
+    );
+    _subs.add(
+      socket.lanJoinResultStream.listen((data) {
+        if (!mounted) return;
+        setState(() => _connecting = false);
+        if (data['success'] != true) {
+          final error = data['error'] as String? ?? 'Could not join the game.';
+          setState(() => _connectionError = error);
+          _showSnack(error);
+        }
+      }),
+    );
+    _subs.add(
+      socket.gameStateStream.listen((_) {
+        if (!mounted) return;
+        final gameId = socket.gameId;
+        if (gameId != null && gameId != _lastGameId) {
+          _lastGameId = gameId;
+          context.push('/game/$gameId');
+        }
+      }),
+    );
   }
 
   Future<void> _discoverIp() async {
@@ -144,9 +150,12 @@ class _LanScreenState extends ConsumerState<LanScreen> {
       } else {
         setState(() {
           _connecting = false;
-          _connectionError = 'Could not connect to $addr. Make sure the host is reachable.';
+          _connectionError =
+              'Could not connect to $addr. Make sure the host is reachable.';
         });
-        _showSnack('Could not connect to $addr. Make sure the host is reachable.');
+        _showSnack(
+          'Could not connect to $addr. Make sure the host is reachable.',
+        );
       }
     });
   }
@@ -173,9 +182,14 @@ class _LanScreenState extends ConsumerState<LanScreen> {
               // Header
               Row(
                 children: [
-                  IconButton(
-                    onPressed: () => context.canPop() ? context.pop() : context.go('/'),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  Semantics(
+                    label: 'Go back',
+                    button: true,
+                    child: IconButton(
+                      onPressed: () =>
+                          context.canPop() ? context.pop() : context.go('/'),
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    ),
                   ),
                   Expanded(
                     child: Text(
@@ -235,7 +249,8 @@ class _LanScreenState extends ConsumerState<LanScreen> {
         _OptionCard(
           icon: Icons.wifi_tethering,
           title: 'Host Game',
-          description: 'Create a game and share your local IP with a friend nearby',
+          description:
+              'Create a game and share your local IP with a friend nearby',
           onTap: _handleHost,
         ),
         const SizedBox(height: AppSpacing.md),
@@ -322,10 +337,7 @@ class _LanScreenState extends ConsumerState<LanScreen> {
               Text(
                 'Your address: $ip — if you are hosting the server locally, '
                 'the other player should connect to it first.',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: AppColors.text.muted,
-                ),
+                style: TextStyle(fontSize: 11, color: AppColors.text.muted),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -444,7 +456,9 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent.primary,
                     foregroundColor: AppColors.text.primary,
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.md,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppRadius.lg),
                     ),
@@ -453,11 +467,17 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Text(
                           'Connect',
-                          style: TextStyle(fontSize: AppTypography.body, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontSize: AppTypography.body,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                 ),
               ),
@@ -469,7 +489,9 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.accent.gold,
                     side: BorderSide(color: AppColors.border.subtle),
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.sm,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppRadius.lg),
                     ),
@@ -492,8 +514,14 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                 for (final host in _discoveredHosts)
                   ListTile(
                     dense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                    leading: Icon(Icons.dns, color: AppColors.accent.gold, size: 20),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                    ),
+                    leading: Icon(
+                      Icons.dns,
+                      color: AppColors.accent.gold,
+                      size: 20,
+                    ),
                     title: Text(
                       '${host.address}:${host.port}',
                       style: TextStyle(
@@ -502,8 +530,13 @@ class _LanScreenState extends ConsumerState<LanScreen> {
                         fontSize: AppTypography.sm,
                       ),
                     ),
-                    trailing: Icon(Icons.chevron_right, color: AppColors.text.muted),
-                    onTap: _connecting ? null : () => _connectToDiscovered(host),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      color: AppColors.text.muted,
+                    ),
+                    onTap: _connecting
+                        ? null
+                        : () => _connectToDiscovered(host),
                   ),
               ],
             ],
@@ -593,7 +626,10 @@ class _SecondaryButton extends StatelessWidget {
       onPressed: onPressed,
       style: TextButton.styleFrom(
         foregroundColor: AppColors.text.primary,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xl,
+          vertical: AppSpacing.sm,
+        ),
         backgroundColor: AppColors.bg.secondary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
@@ -601,7 +637,10 @@ class _SecondaryButton extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(fontSize: AppTypography.body, fontWeight: FontWeight.w600),
+        style: const TextStyle(
+          fontSize: AppTypography.body,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

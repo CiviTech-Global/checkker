@@ -92,19 +92,31 @@ class DonateScreen extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {
-                                Clipboard.setData(ClipboardData(text: wallet.address));
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('${wallet.symbol} address copied to clipboard'),
-                                    backgroundColor: AppColors.accent.green,
-                                    duration: const Duration(seconds: 2),
-                                  ),
-                                );
-                              },
-                              icon: Icon(Icons.copy, color: AppColors.text.muted, size: 20),
-                              tooltip: 'Copy address',
+                            Semantics(
+                              label: 'Copy wallet address',
+                              button: true,
+                              child: IconButton(
+                                onPressed: () {
+                                  Clipboard.setData(
+                                    ClipboardData(text: wallet.address),
+                                  );
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        '${wallet.symbol} address copied to clipboard',
+                                      ),
+                                      backgroundColor: AppColors.accent.green,
+                                      duration: const Duration(seconds: 2),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(
+                                  Icons.copy,
+                                  color: AppColors.text.muted,
+                                  size: 20,
+                                ),
+                                tooltip: 'Copy address',
+                              ),
                             ),
                           ],
                         ),

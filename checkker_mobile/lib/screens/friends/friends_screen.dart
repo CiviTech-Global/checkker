@@ -33,81 +33,113 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     final socket = ref.read(socketServiceProvider);
     _lastGameId = socket.gameId;
 
-    _subs.add(socket.friendsDataStream.listen((data) {
-      if (!mounted) return;
-      setState(() {
-        _data = data;
-        _loading = false;
-      });
-    }));
+    _subs.add(
+      socket.friendsDataStream.listen((data) {
+        if (!mounted) return;
+        setState(() {
+          _data = data;
+          _loading = false;
+        });
+      }),
+    );
 
-    _subs.add(socket.friendRequestResultStream.listen((data) {
-      if (!mounted) return;
-      setState(() => _sending = false);
-      if (data['success'] == true) {
-        _usernameController.clear();
+    _subs.add(
+      socket.friendRequestResultStream.listen((data) {
+        if (!mounted) return;
+        setState(() => _sending = false);
+        if (data['success'] == true) {
+          _usernameController.clear();
+          socket.getFriends();
+          _showSnack('Friend request sent to ${data['username']}.');
+        } else {
+          _showSnack(
+            data['error'] as String? ?? 'Could not send request',
+            error: true,
+          );
+        }
+      }),
+    );
+
+    _subs.add(
+      socket.incomingFriendRequestStream.listen((data) {
+        if (!mounted) return;
         socket.getFriends();
-        _showSnack('Friend request sent to ${data['username']}.');
-      } else {
-        _showSnack(data['error'] as String? ?? 'Could not send request', error: true);
-      }
-    }));
+        _showSnack('${data['fromUsername']} wants to be your friend.');
+      }),
+    );
 
-    _subs.add(socket.incomingFriendRequestStream.listen((data) {
-      if (!mounted) return;
-      socket.getFriends();
-      _showSnack('${data['fromUsername']} wants to be your friend.');
-    }));
+    _subs.add(
+      socket.friendAcceptedStream.listen((data) {
+        if (!mounted) return;
+        socket.getFriends();
+        _showSnack('${data['username']} accepted your request!');
+      }),
+    );
 
-    _subs.add(socket.friendAcceptedStream.listen((data) {
-      if (!mounted) return;
-      socket.getFriends();
-      _showSnack('${data['username']} accepted your request!');
-    }));
+    _subs.add(
+      socket.inviteSentStream.listen((data) {
+        if (!mounted) return;
+        if (data['success'] == true) {
+          _awaitingGame = true;
+          _showSnack(
+            data['online'] == true
+                ? 'Waiting for your friend to accept...'
+                : 'Your friend is offline — they will see the invite later.',
+          );
+        } else {
+          _showSnack(
+            data['error'] as String? ?? 'Could not send invite',
+            error: true,
+          );
+        }
+      }),
+    );
 
-    _subs.add(socket.inviteSentStream.listen((data) {
-      if (!mounted) return;
-      if (data['success'] == true) {
-        _awaitingGame = true;
-        _showSnack(data['online'] == true
-            ? 'Waiting for your friend to accept...'
-            : 'Your friend is offline — they will see the invite later.');
-      } else {
-        _showSnack(data['error'] as String? ?? 'Could not send invite', error: true);
-      }
-    }));
+    _subs.add(
+      socket.privateInviteStream.listen((data) {
+        if (!mounted) return;
+        _showInviteDialog(data);
+      }),
+    );
 
-    _subs.add(socket.privateInviteStream.listen((data) {
-      if (!mounted) return;
-      _showInviteDialog(data);
-    }));
-
-    _subs.add(socket.inviteDeclinedStream.listen((data) {
-      if (!mounted) return;
-      _awaitingGame = false;
-      _showSnack('${data['byUsername'] ?? 'Your friend'} declined the invite.', error: true);
-    }));
-
-    _subs.add(socket.inviteResponseResultStream.listen((data) {
-      if (!mounted) return;
-      if (data['success'] != true) {
+    _subs.add(
+      socket.inviteDeclinedStream.listen((data) {
+        if (!mounted) return;
         _awaitingGame = false;
-        _showSnack(data['error'] as String? ?? 'Invite is no longer valid.', error: true);
-      }
-    }));
+        _showSnack(
+          '${data['byUsername'] ?? 'Your friend'} declined the invite.',
+          error: true,
+        );
+      }),
+    );
+
+    _subs.add(
+      socket.inviteResponseResultStream.listen((data) {
+        if (!mounted) return;
+        if (data['success'] != true) {
+          _awaitingGame = false;
+          _showSnack(
+            data['error'] as String? ?? 'Invite is no longer valid.',
+            error: true,
+          );
+        }
+      }),
+    );
 
     // Navigate into the game once the private match starts.
-    _subs.add(socket.gameStateStream.listen((GameClientState? state) {
-      if (!mounted) return;
-      final gameId = socket.gameId;
-      if (gameId != null && gameId != _lastGameId && _awaitingGame) {
-        _awaitingGame = false;
+    _subs.add(
+      socket.gameStateStream.listen((GameClientState? state) {
+        if (!mounted) return;
+        final gameId = socket.gameId;
+        if (gameId != null && gameId != _lastGameId && _awaitingGame) {
+          _awaitingGame = false;
+          _lastGameId = gameId;
+          context.push('/game/$gameId');
+          return;
+        }
         _lastGameId = gameId;
-        context.push('/game/$gameId');
-        return;
-      }
-      _lastGameId = gameId;
-    }));
+      }),
+    );
 
     socket.getFriends();
   }
@@ -122,10 +154,12 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   }
 
   void _showSnack(String message, {bool error = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message),
-      backgroundColor: error ? AppColors.accent.red : null,
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: error ? AppColors.accent.red : null,
+      ),
+    );
   }
 
   void _showInviteDialog(Map<String, dynamic> data) {
@@ -135,7 +169,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.bg.secondary,
-        title: Text('Game Invite', style: TextStyle(color: AppColors.text.primary)),
+        title: Text(
+          'Game Invite',
+          style: TextStyle(color: AppColors.text.primary),
+        ),
         content: Text(
           '${data['fromUsername']} invited you to a ${data['tc'] ?? 'blitz'} game!',
           style: TextStyle(color: AppColors.text.secondary),
@@ -146,7 +183,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               Navigator.of(ctx).pop();
               socket.respondInvite(inviteId, false);
             },
-            child: Text('Decline', style: TextStyle(color: AppColors.text.muted)),
+            child: Text(
+              'Decline',
+              style: TextStyle(color: AppColors.text.muted),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -154,7 +194,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               _awaitingGame = true;
               socket.respondInvite(inviteId, true);
             },
-            child: Text('Accept', style: TextStyle(color: AppColors.accent.goldBright)),
+            child: Text(
+              'Accept',
+              style: TextStyle(color: AppColors.accent.goldBright),
+            ),
           ),
         ],
       ),
@@ -176,7 +219,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.bg.secondary,
-        title: Text('Remove Friend', style: TextStyle(color: AppColors.text.primary)),
+        title: Text(
+          'Remove Friend',
+          style: TextStyle(color: AppColors.text.primary),
+        ),
         content: Text(
           'Remove ${friend.username} from your friends?',
           style: TextStyle(color: AppColors.text.secondary),
@@ -184,7 +230,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Cancel', style: TextStyle(color: AppColors.text.muted)),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: AppColors.text.muted),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -193,7 +242,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               socket.removeFriend(friend.friendshipId);
               socket.getFriends();
             },
-            child: Text('Remove', style: TextStyle(color: AppColors.accent.red)),
+            child: Text(
+              'Remove',
+              style: TextStyle(color: AppColors.accent.red),
+            ),
           ),
         ],
       ),
@@ -238,7 +290,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             Text(
               'Connect your wallet to add friends and play private games.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.body),
+              style: TextStyle(
+                color: AppColors.text.muted,
+                fontSize: AppTypography.body,
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             ElevatedButton(
@@ -259,12 +314,15 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       padding: const EdgeInsets.all(AppSpacing.md),
       children: [
         // Add friend
-        Text('ADD FRIEND',
-            style: TextStyle(
-                color: AppColors.text.muted,
-                fontSize: AppTypography.xs,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5)),
+        Text(
+          'ADD FRIEND',
+          style: TextStyle(
+            color: AppColors.text.muted,
+            fontSize: AppTypography.xs,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+          ),
+        ),
         const SizedBox(height: AppSpacing.sm),
         Row(
           children: [
@@ -290,7 +348,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               onPressed: _sending ? null : _sendRequest,
               child: _sending
                   ? const SizedBox(
-                      width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Text('Add'),
             ),
           ],
@@ -299,24 +360,30 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
 
         // Pending requests
         if (pending.isNotEmpty) ...[
-          Text('PENDING REQUESTS',
-              style: TextStyle(
-                  color: AppColors.text.muted,
-                  fontSize: AppTypography.xs,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5)),
+          Text(
+            'PENDING REQUESTS',
+            style: TextStyle(
+              color: AppColors.text.muted,
+              fontSize: AppTypography.xs,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
+          ),
           const SizedBox(height: AppSpacing.sm),
           ...pending.map(_buildPendingTile),
           const SizedBox(height: AppSpacing.lg),
         ],
 
         // Friends list
-        Text('FRIENDS',
-            style: TextStyle(
-                color: AppColors.text.muted,
-                fontSize: AppTypography.xs,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5)),
+        Text(
+          'FRIENDS',
+          style: TextStyle(
+            color: AppColors.text.muted,
+            fontSize: AppTypography.xs,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+          ),
+        ),
         const SizedBox(height: AppSpacing.sm),
         if (_loading && _data == null)
           const Padding(
@@ -329,7 +396,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             child: Text(
               'No friends yet — add someone by username above.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.sm),
+              style: TextStyle(
+                color: AppColors.text.muted,
+                fontSize: AppTypography.sm,
+              ),
             ),
           )
         else
@@ -357,25 +427,34 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             child: Text(
               request.fromUsername,
               style: TextStyle(
-                  color: AppColors.text.primary,
-                  fontSize: AppTypography.sm,
-                  fontWeight: FontWeight.w600),
+                color: AppColors.text.primary,
+                fontSize: AppTypography.sm,
+                fontWeight: FontWeight.w600,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          IconButton(
-            icon: Icon(Icons.check_circle, color: AppColors.accent.green),
-            onPressed: () {
-              socket.respondFriendRequest(request.friendshipId, true);
-              socket.getFriends();
-            },
+          Semantics(
+            label: 'Accept friend request',
+            button: true,
+            child: IconButton(
+              icon: Icon(Icons.check_circle, color: AppColors.accent.green),
+              onPressed: () {
+                socket.respondFriendRequest(request.friendshipId, true);
+                socket.getFriends();
+              },
+            ),
           ),
-          IconButton(
-            icon: Icon(Icons.cancel, color: AppColors.accent.red),
-            onPressed: () {
-              socket.respondFriendRequest(request.friendshipId, false);
-              socket.getFriends();
-            },
+          Semantics(
+            label: 'Decline friend request',
+            button: true,
+            child: IconButton(
+              icon: Icon(Icons.cancel, color: AppColors.accent.red),
+              onPressed: () {
+                socket.respondFriendRequest(request.friendshipId, false);
+                socket.getFriends();
+              },
+            ),
           ),
         ],
       ),
@@ -402,10 +481,16 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.bg.tertiary,
-                  border: Border.all(color: AppColors.border.subtle, width: 1.5),
+                  border: Border.all(
+                    color: AppColors.border.subtle,
+                    width: 1.5,
+                  ),
                 ),
                 child: Center(
-                  child: Text(avatar.symbol, style: const TextStyle(fontSize: 22)),
+                  child: Text(
+                    avatar.symbol,
+                    style: const TextStyle(fontSize: 22),
+                  ),
                 ),
               ),
               Positioned(
@@ -416,7 +501,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                   height: 12,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: friend.online ? AppColors.accent.green : AppColors.text.muted,
+                    color: friend.online
+                        ? AppColors.accent.green
+                        : AppColors.text.muted,
                     border: Border.all(color: AppColors.bg.secondary, width: 2),
                   ),
                 ),
@@ -431,27 +518,45 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                 Text(
                   friend.username,
                   style: TextStyle(
-                      color: AppColors.text.primary,
-                      fontSize: AppTypography.sm,
-                      fontWeight: FontWeight.w600),
+                    color: AppColors.text.primary,
+                    fontSize: AppTypography.sm,
+                    fontWeight: FontWeight.w600,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '${friend.rating} ELO · ${friend.online ? 'Online' : 'Offline'}',
-                  style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.xs),
+                  style: TextStyle(
+                    color: AppColors.text.muted,
+                    fontSize: AppTypography.xs,
+                  ),
                 ),
               ],
             ),
           ),
           TextButton.icon(
-            onPressed: () =>
-                ref.read(socketServiceProvider).inviteFriend(friend.userId, tc: 'blitz'),
-            icon: Icon(Icons.sports_esports, size: 18, color: AppColors.accent.goldBright),
-            label: Text('Invite',
-                style: TextStyle(color: AppColors.accent.goldBright, fontSize: AppTypography.sm)),
+            onPressed: () => ref
+                .read(socketServiceProvider)
+                .inviteFriend(friend.userId, tc: 'blitz'),
+            icon: Icon(
+              Icons.sports_esports,
+              size: 18,
+              color: AppColors.accent.goldBright,
+            ),
+            label: Text(
+              'Invite',
+              style: TextStyle(
+                color: AppColors.accent.goldBright,
+                fontSize: AppTypography.sm,
+              ),
+            ),
           ),
           IconButton(
-            icon: Icon(Icons.person_remove, size: 20, color: AppColors.text.muted),
+            icon: Icon(
+              Icons.person_remove,
+              size: 20,
+              color: AppColors.text.muted,
+            ),
             onPressed: () => _confirmRemove(friend),
           ),
         ],
