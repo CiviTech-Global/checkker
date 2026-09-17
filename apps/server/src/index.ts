@@ -12,6 +12,7 @@ import { initMonitoring, sentryRequestHandler, sentryErrorHandler, flushSentry }
 import { parseArgs } from "./cli-args";
 import { logger } from "./logger";
 import { startAccountDeletionWorker } from "./workers/accountDeletion";
+import { getMetrics } from "./metrics";
 
 const cli = parseArgs();
 const PORT = cli.port ?? (process.env.PORT ? parseInt(process.env.PORT, 10) : 3001);
@@ -152,6 +153,10 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "checkker", version: 1 });
 });
 
+app.get("/metrics", (_req, res) => {
+  res.type("text/plain").send(getMetrics());
+});
+
 function adminGate(req: express.Request, res: express.Response, next: express.NextFunction): void {
   if (!ADMIN_API_KEY) {
     // In production, block all admin access if no key is configured.
@@ -204,7 +209,7 @@ if (webDist) {
   const path = require("path") as typeof import("path");
   app.use(express.static(webDist));
   // SPA fallback for client-side routes (skip API + socket paths).
-  app.get(/^\/(?!socket\.io|health|admin|api|uploads).*/, (_req, res) => {
+  app.get(/^\/(?!socket\.io|health|metrics|admin|api|uploads).*/, (_req, res) => {
     res.sendFile(path.join(webDist, "index.html"));
   });
   logger.info({ webDist }, "[web] Serving web client");

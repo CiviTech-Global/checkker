@@ -17,6 +17,7 @@ import { ContractService } from "./blockchain/ContractService";
 import { SocketRateLimiter } from "./rateLimit";
 import { addGameBreadcrumb, setSentryTag, clearSentryUser } from "./monitoring";
 import { cleanupExpiredChallenges } from "./auth/WalletAuth";
+import { incrementMetric } from "./metrics";
 
 import {
   registerAuthHandlers,
@@ -211,6 +212,7 @@ export class GameServer {
       this.startGame(opponent.player, player, tc, "casual", "beginner", "free");
     } else {
       this.queue.push({ player, tc });
+      incrementMetric("queue_waits");
       const timeoutMs = player.casual ? 15000 : 30000;
       const timeout = setTimeout(() => {
         const stillInQueue = this.queue.find((q) => q.player.id === player.id);
@@ -242,6 +244,7 @@ export class GameServer {
       this.startGame(opponent.player, player, tc, mode, difficulty, stake);
     } else {
       queue.push({ player, tc, stake });
+      incrementMetric("queue_waits");
       player.socket.emit("queue_joined", { mode, difficulty, tc, stake, betAmountUsd: isFreeStake(stake) ? 0 : getBetAmountUsd(difficulty) });
 
       const timeout = setTimeout(() => {
@@ -382,6 +385,7 @@ export class GameServer {
     }
 
     this.matches.set(game.id, match);
+    incrementMetric("games_started");
 
     game.startTimeoutCheck({
       onTimeout: () => {
@@ -509,6 +513,8 @@ export class GameServer {
     const { game, white, black, mode, betSetup } = match;
     const result = game.getResult();
     if (!result) return;
+
+    incrementMetric("games_completed");
 
     let whiteOutcome: "win" | "loss" | "draw" = "draw";
     let blackOutcome: "win" | "loss" | "draw" = "draw";
