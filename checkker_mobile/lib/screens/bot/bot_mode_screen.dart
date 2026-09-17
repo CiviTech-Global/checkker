@@ -19,9 +19,13 @@ class BotModeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Delegate Mode'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => context.push('/bot/config'),
+          Semantics(
+            label: 'Open bot settings',
+            button: true,
+            child: IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () => context.push('/bot/config'),
+            ),
           ),
         ],
       ),
@@ -85,7 +89,9 @@ class BotModeScreen extends ConsumerWidget {
       return;
     }
     final difficulty = config.difficulty.name;
-    context.push('/game/queue?mode=$mode&difficulty=$difficulty&tc=blitz&bot=true');
+    context.push(
+      '/game/queue?mode=$mode&difficulty=$difficulty&tc=blitz&bot=true',
+    );
   }
 }
 
@@ -109,7 +115,11 @@ class _MaturityCard extends StatelessWidget {
         children: [
           Text(
             'Bot Maturity',
-            style: TextStyle(color: AppColors.text.primary, fontSize: 16, fontWeight: FontWeight.w700),
+            style: TextStyle(
+              color: AppColors.text.primary,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Row(
@@ -141,10 +151,20 @@ class _MaturityCard extends StatelessWidget {
               child: Wrap(
                 spacing: AppSpacing.xs,
                 children: maturity.unlockedTraits
-                    .map((id) => Chip(
-                          label: Text(id, style: TextStyle(fontSize: 11, color: AppColors.text.primary)),
-                          backgroundColor: AppColors.accent.gold.withValues(alpha: 0.15),
-                        ))
+                    .map(
+                      (id) => Chip(
+                        label: Text(
+                          id,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.text.primary,
+                          ),
+                        ),
+                        backgroundColor: AppColors.accent.gold.withValues(
+                          alpha: 0.15,
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
             ),
@@ -200,9 +220,21 @@ class _ArenaButton extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(label,
-                          style: TextStyle(color: AppColors.text.primary, fontSize: 16, fontWeight: FontWeight.w700)),
-                      Text(subtitle, style: TextStyle(color: AppColors.text.muted, fontSize: 13)),
+                      Text(
+                        label,
+                        style: TextStyle(
+                          color: AppColors.text.primary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: AppColors.text.muted,
+                          fontSize: 13,
+                        ),
+                      ),
                     ],
                   ),
                 ),

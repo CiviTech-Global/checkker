@@ -76,7 +76,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
-          child: Text('Error: $e', style: TextStyle(color: AppColors.accent.red)),
+          child: Text(
+            'Error: $e',
+            style: TextStyle(color: AppColors.accent.red),
+          ),
         ),
         data: (profile) => ListView(
           padding: const EdgeInsets.all(AppSpacing.md),
@@ -123,10 +126,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               boxShadow: AppShadows.gold,
             ),
             child: Center(
-              child: Text(
-                avatar.symbol,
-                style: const TextStyle(fontSize: 40),
-              ),
+              child: Text(avatar.symbol, style: const TextStyle(fontSize: 40)),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -161,19 +161,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadius.md),
-                        borderSide: BorderSide(color: AppColors.accent.gold, width: 2),
+                        borderSide: BorderSide(
+                          color: AppColors.accent.gold,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.xs),
-                IconButton(
-                  icon: Icon(Icons.check, color: AppColors.accent.green),
-                  onPressed: _saveName,
+                Semantics(
+                  label: 'Save profile name',
+                  button: true,
+                  child: IconButton(
+                    icon: Icon(Icons.check, color: AppColors.accent.green),
+                    onPressed: _saveName,
+                  ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.close, color: AppColors.accent.red),
-                  onPressed: () => setState(() => _isEditingName = false),
+                Semantics(
+                  label: 'Cancel profile name editing',
+                  button: true,
+                  child: IconButton(
+                    icon: Icon(Icons.close, color: AppColors.accent.red),
+                    onPressed: () => setState(() => _isEditingName = false),
+                  ),
                 ),
               ],
             )
@@ -249,42 +260,43 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             builder: (context, constraints) {
               final columns = AppSizes.gridColumns(constraints.maxWidth, 48);
               return GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: columns,
-              mainAxisSpacing: AppSpacing.xs,
-              crossAxisSpacing: AppSpacing.xs,
-            ),
-            itemCount: avatars.length,
-            itemBuilder: (context, index) {
-              final av = avatars[index];
-              final isSelected = av.id == (profile.avatarId ?? avatars[0].id);
-              return GestureDetector(
-                onTap: () => _selectAvatar(av.id),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.accent.gold.withValues(alpha: 0.2)
-                        : AppColors.bg.tertiary,
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                    border: Border.all(
-                      color: isSelected
-                          ? AppColors.accent.gold
-                          : AppColors.border.subtle,
-                      width: isSelected ? 2 : 1,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      av.symbol,
-                      style: const TextStyle(fontSize: 22),
-                    ),
-                  ),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columns,
+                  mainAxisSpacing: AppSpacing.xs,
+                  crossAxisSpacing: AppSpacing.xs,
                 ),
+                itemCount: avatars.length,
+                itemBuilder: (context, index) {
+                  final av = avatars[index];
+                  final isSelected =
+                      av.id == (profile.avatarId ?? avatars[0].id);
+                  return GestureDetector(
+                    onTap: () => _selectAvatar(av.id),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.accent.gold.withValues(alpha: 0.2)
+                            : AppColors.bg.tertiary,
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.accent.gold
+                              : AppColors.border.subtle,
+                          width: isSelected ? 2 : 1,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          av.symbol,
+                          style: const TextStyle(fontSize: 22),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               );
-            },
-          );
             },
           ),
         ],
@@ -328,13 +340,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 crossAxisSpacing: AppSpacing.xs,
                 children: [
                   _statTile('Played', '${stats.gamesPlayed}'),
-                  _statTile('Wins', '${stats.wins}', color: AppColors.accent.green),
-                  _statTile('Losses', '${stats.losses}', color: AppColors.accent.red),
-                  _statTile('Draws', '${stats.draws}', color: AppColors.accent.blue),
+                  _statTile(
+                    'Wins',
+                    '${stats.wins}',
+                    color: AppColors.accent.green,
+                  ),
+                  _statTile(
+                    'Losses',
+                    '${stats.losses}',
+                    color: AppColors.accent.red,
+                  ),
+                  _statTile(
+                    'Draws',
+                    '${stats.draws}',
+                    color: AppColors.accent.blue,
+                  ),
                   _statTile('Win %', '$winRate%', color: AppColors.accent.gold),
                   _statTile('Streak', '${stats.currentStreak}'),
-                  _statTile('Best', '${stats.bestStreak}', color: AppColors.accent.goldBright),
-                  _statTile('High', '${stats.highScore}', color: AppColors.accent.terraCotta),
+                  _statTile(
+                    'Best',
+                    '${stats.bestStreak}',
+                    color: AppColors.accent.goldBright,
+                  ),
+                  _statTile(
+                    'High',
+                    '${stats.highScore}',
+                    color: AppColors.accent.terraCotta,
+                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.xs),
@@ -410,9 +442,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             final resultColor = game.result == 'win'
                 ? AppColors.accent.green
                 : game.result == 'loss'
-                    ? AppColors.accent.red
-                    : AppColors.text.muted;
-            final delta = (game.myRatingAfter != null && game.myRatingBefore != null)
+                ? AppColors.accent.red
+                : AppColors.text.muted;
+            final delta =
+                (game.myRatingAfter != null && game.myRatingBefore != null)
                 ? game.myRatingAfter! - game.myRatingBefore!
                 : null;
             return Padding(
@@ -435,8 +468,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         game.result == 'win'
                             ? 'W'
                             : game.result == 'loss'
-                                ? 'L'
-                                : 'D',
+                            ? 'L'
+                            : 'D',
                         style: TextStyle(
                           color: resultColor,
                           fontSize: AppTypography.md,
@@ -480,7 +513,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ),
                           ),
                         ),
-                      Icon(Icons.chevron_right, color: AppColors.text.muted, size: 18),
+                      Icon(
+                        Icons.chevron_right,
+                        color: AppColors.text.muted,
+                        size: 18,
+                      ),
                     ],
                   ),
                 ),
@@ -509,7 +546,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: Center(
               child: Text(
                 'No games played yet',
-                style: TextStyle(color: AppColors.text.muted, fontSize: AppTypography.sm),
+                style: TextStyle(
+                  color: AppColors.text.muted,
+                  fontSize: AppTypography.sm,
+                ),
               ),
             ),
           );
@@ -563,8 +603,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     final modeLabel = game.mode == 'bot'
         ? game.difficulty.isNotEmpty
-            ? game.difficulty[0].toUpperCase() + game.difficulty.substring(1)
-            : 'Bot'
+              ? game.difficulty[0].toUpperCase() + game.difficulty.substring(1)
+              : 'Bot'
         : game.mode[0].toUpperCase() + game.mode.substring(1);
 
     return Padding(

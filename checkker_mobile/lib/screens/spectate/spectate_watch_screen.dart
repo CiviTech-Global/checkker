@@ -16,7 +16,8 @@ class SpectateWatchScreen extends ConsumerStatefulWidget {
   const SpectateWatchScreen({super.key, this.id});
 
   @override
-  ConsumerState<SpectateWatchScreen> createState() => _SpectateWatchScreenState();
+  ConsumerState<SpectateWatchScreen> createState() =>
+      _SpectateWatchScreenState();
 }
 
 class _SpectateWatchScreenState extends ConsumerState<SpectateWatchScreen> {
@@ -142,14 +143,16 @@ class _SpectateWatchScreenState extends ConsumerState<SpectateWatchScreen> {
     final winnerName = winner == null
         ? ''
         : winner.name == 'white'
-            ? _state?.whiteProfile.displayName ?? 'White'
-            : _state?.blackProfile.displayName ?? 'Black';
+        ? _state?.whiteProfile.displayName ?? 'White'
+        : _state?.blackProfile.displayName ?? 'Black';
     return '$winnerName wins by $type';
   }
 
   @override
   Widget build(BuildContext context) {
-    final fen = _state?.fen ?? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+    final fen =
+        _state?.fen ??
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
     final whiteName = _state?.whiteProfile.displayName ?? 'White Bot';
     final blackName = _state?.blackProfile.displayName ?? 'Black Bot';
     final whiteRating = _state?.whiteProfile.rating ?? 0;
@@ -162,9 +165,13 @@ class _SpectateWatchScreenState extends ConsumerState<SpectateWatchScreen> {
         title: const Text('Spectating'),
         backgroundColor: AppColors.bg.secondary,
         foregroundColor: AppColors.text.primary,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: _leave,
+        leading: Semantics(
+          label: 'Leave spectating',
+          button: true,
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: _leave,
+          ),
         ),
       ),
       body: Stack(
@@ -331,14 +338,19 @@ class _PlayerBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: isActive
             ? AppColors.accent.primary.withValues(alpha: 0.15)
             : AppColors.bg.secondary,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
-          color: isActive ? AppColors.accent.green.withValues(alpha: 0.5) : AppColors.border.subtle,
+          color: isActive
+              ? AppColors.accent.green.withValues(alpha: 0.5)
+              : AppColors.border.subtle,
         ),
       ),
       child: Row(
@@ -373,7 +385,10 @@ class _PlayerBar extends StatelessWidget {
               ),
               child: Text(
                 difficulty[0].toUpperCase() + difficulty.substring(1),
-                style: TextStyle(fontSize: AppTypography.xs, color: AppColors.text.muted),
+                style: TextStyle(
+                  fontSize: AppTypography.xs,
+                  color: AppColors.text.muted,
+                ),
               ),
             ),
           const SizedBox(width: AppSpacing.xs),
@@ -410,8 +425,8 @@ class _ControlButton extends StatelessWidget {
     final color = isDestructive
         ? AppColors.accent.red
         : isDisabled
-            ? AppColors.text.muted.withValues(alpha: 0.4)
-            : AppColors.text.primary;
+        ? AppColors.text.muted.withValues(alpha: 0.4)
+        : AppColors.text.primary;
 
     return GestureDetector(
       onTap: onTap,
