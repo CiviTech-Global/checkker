@@ -7,6 +7,7 @@
  */
 
 import type { Request, Response, NextFunction } from "express";
+import { incrementMetric } from "./metrics";
 
 let sentry: typeof import("@sentry/node") | null = null;
 
@@ -92,6 +93,7 @@ export function setSentryTag(key: string, value: string): void {
 
 /** Capture an error with optional context metadata. */
 export function captureError(error: unknown, context?: Record<string, string>): void {
+  incrementMetric("errors");
   console.error("[error]", context?.source ?? "", error);
   if (sentry?.captureException) {
     sentry.captureException(error, { extra: context });
