@@ -26,6 +26,7 @@ class _ReplayScreenState extends ConsumerState<ReplayScreen> {
   String? _error;
   String _fen = chess_lib.Chess.DEFAULT_POSITION;
   final _subs = <StreamSubscription>[];
+  Timer? _loadTimer;
 
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _ReplayScreenState extends ConsumerState<ReplayScreen> {
     _subs.add(
       socket.replayMovesStream.listen((data) {
         if (data.gameId != widget.gameId) return;
+        _loadTimer?.cancel();
         setState(() {
           _moves = data.moves;
           _loading = false;
@@ -45,10 +47,20 @@ class _ReplayScreenState extends ConsumerState<ReplayScreen> {
       }),
     );
     socket.getGameMoves(widget.gameId);
+    _loadTimer = Timer(const Duration(seconds: 10), () {
+      if (!mounted || !_loading) return;
+
+      setState(() {
+        _loading = false;
+        _error =
+            'Could not load this replay. Check your connection or game ID.';
+      });
+    });
   }
 
   @override
   void dispose() {
+    _loadTimer?.cancel();
     for (final sub in _subs) {
       sub.cancel();
     }
@@ -149,7 +161,11 @@ class _ReplayScreenState extends ConsumerState<ReplayScreen> {
     await Clipboard.setData(ClipboardData(text: text));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Game copied to clipboard (Checkker Notation + replay link)')),
+      const SnackBar(
+        content: Text(
+          'Game copied to clipboard (Checkker Notation + replay link)',
+        ),
+      ),
     );
   }
 
@@ -292,8 +308,12 @@ class _ReplayScreenState extends ConsumerState<ReplayScreen> {
                   child: Text(
                     white.san ?? white.moveUci,
                     style: TextStyle(
-                      color: i == _currentIndex ? AppColors.accent.gold : AppColors.text.primary,
-                      fontWeight: i == _currentIndex ? FontWeight.bold : FontWeight.normal,
+                      color: i == _currentIndex
+                          ? AppColors.accent.gold
+                          : AppColors.text.primary,
+                      fontWeight: i == _currentIndex
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                 ),
@@ -302,8 +322,12 @@ class _ReplayScreenState extends ConsumerState<ReplayScreen> {
                     child: Text(
                       black.san ?? black.moveUci,
                       style: TextStyle(
-                        color: i + 1 == _currentIndex ? AppColors.accent.gold : AppColors.text.primary,
-                        fontWeight: i + 1 == _currentIndex ? FontWeight.bold : FontWeight.normal,
+                        color: i + 1 == _currentIndex
+                            ? AppColors.accent.gold
+                            : AppColors.text.primary,
+                        fontWeight: i + 1 == _currentIndex
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   ),
@@ -339,7 +363,10 @@ class _ReplayScreenState extends ConsumerState<ReplayScreen> {
 
   Widget _buildControls() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.lg),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.md,
+        horizontal: AppSpacing.lg,
+      ),
       decoration: BoxDecoration(
         color: AppColors.bg.secondary,
         border: Border(

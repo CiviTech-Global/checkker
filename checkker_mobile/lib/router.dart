@@ -36,14 +36,41 @@ final goRouter = GoRouter(
   // player to the setup screen before the menu. Once set it is skipped, and the
   // address stays editable from Settings → Game Server.
   redirect: (context, state) {
+    final uri = state.uri;
+
+    // Convert checkker://replay/123 into /replay/123.
+    if (uri.scheme == 'checkker' && uri.host == 'replay') {
+      if (uri.pathSegments.length != 1 || uri.pathSegments.first.isEmpty) {
+        return '/';
+      }
+
+      final gameId = Uri.encodeComponent(uri.pathSegments.first);
+      return '/replay/$gameId';
+    }
+
     final configured = SettingsService().settings.serverUrl.trim().isNotEmpty;
     final atSetup = state.matchedLocation == '/server-setup';
-    if (!configured && !atSetup) return '/server-setup';
-    if (configured && atSetup) return '/';
+
+    if (!configured && !atSetup) {
+      final next = Uri.encodeComponent(uri.toString());
+      return '/server-setup?next=$next';
+    }
+
+    if (configured && atSetup) {
+      final next = uri.queryParameters['next'];
+      if (next != null && next.startsWith('/') && !next.startsWith('//')) {
+        return next;
+      }
+      return '/';
+    }
+
     return null;
   },
   routes: [
-    GoRoute(path: '/server-setup', builder: (_, _) => const ServerSetupScreen()),
+    GoRoute(
+      path: '/server-setup',
+      builder: (_, _) => const ServerSetupScreen(),
+    ),
     GoRoute(path: '/', builder: (_, _) => const HomeScreen()),
     GoRoute(path: '/game/casual', builder: (_, _) => const CasualScreen()),
     GoRoute(path: '/game/ranked', builder: (_, _) => const RankedScreen()),
@@ -57,18 +84,34 @@ final goRouter = GoRouter(
         isBot: state.uri.queryParameters['bot'] == 'true',
       ),
     ),
-    GoRoute(path: '/game/:id', builder: (_, state) => GameScreen(id: state.pathParameters['id']!)),
-    GoRoute(path: '/bot/difficulty', builder: (_, _) => const DifficultyScreen()),
+    GoRoute(
+      path: '/game/:id',
+      builder: (_, state) => GameScreen(id: state.pathParameters['id']!),
+    ),
+    GoRoute(
+      path: '/bot/difficulty',
+      builder: (_, _) => const DifficultyScreen(),
+    ),
     GoRoute(path: '/bot/config', builder: (_, _) => const BotConfigScreen()),
     GoRoute(path: '/bot/mode', builder: (_, _) => const BotModeScreen()),
     GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
     GoRoute(path: '/leaderboard', builder: (_, _) => const LeaderboardScreen()),
     GoRoute(path: '/tutorial', builder: (_, _) => const TutorialHubScreen()),
-    GoRoute(path: '/tutorial/book', builder: (_, _) => const TutorialBookScreen()),
-    GoRoute(path: '/tutorial/lesson/:id', builder: (_, state) => TutorialLessonScreen(id: state.pathParameters['id']!)),
+    GoRoute(
+      path: '/tutorial/book',
+      builder: (_, _) => const TutorialBookScreen(),
+    ),
+    GoRoute(
+      path: '/tutorial/lesson/:id',
+      builder: (_, state) =>
+          TutorialLessonScreen(id: state.pathParameters['id']!),
+    ),
     GoRoute(path: '/shop', builder: (_, _) => const ShopScreen()),
     GoRoute(path: '/friends', builder: (_, _) => const FriendsScreen()),
-    GoRoute(path: '/notifications', builder: (_, _) => const NotificationsScreen()),
+    GoRoute(
+      path: '/notifications',
+      builder: (_, _) => const NotificationsScreen(),
+    ),
     GoRoute(
       path: '/offline',
       builder: (_, state) => OfflineGameScreen(
@@ -76,13 +119,31 @@ final goRouter = GoRouter(
       ),
     ),
     GoRoute(path: '/puzzles', builder: (_, _) => const PuzzlesScreen()),
-    GoRoute(path: '/puzzles/play/:category', builder: (_, state) => PuzzlePlayScreen(category: state.pathParameters['category']!)),
-    GoRoute(path: '/replay/:gameId', builder: (_, state) => ReplayScreen(gameId: state.pathParameters['gameId']!)),
+    GoRoute(
+      path: '/puzzles/play/:category',
+      builder: (_, state) =>
+          PuzzlePlayScreen(category: state.pathParameters['category']!),
+    ),
+    GoRoute(
+      path: '/replay/:gameId',
+      builder: (_, state) =>
+          ReplayScreen(gameId: state.pathParameters['gameId']!),
+    ),
     GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
-    GoRoute(path: '/settings/server', builder: (_, _) => const ServerSetupScreen(isInitialSetup: false)),
+    GoRoute(
+      path: '/settings/server',
+      builder: (_, _) => const ServerSetupScreen(isInitialSetup: false),
+    ),
     GoRoute(path: '/spectate', builder: (_, _) => const SpectateBrowseScreen()),
-    GoRoute(path: '/spectate/watch', builder: (_, _) => const SpectateWatchScreen()),
-    GoRoute(path: '/spectate/:id', builder: (_, state) => SpectateWatchScreen(id: state.pathParameters['id'])),
+    GoRoute(
+      path: '/spectate/watch',
+      builder: (_, _) => const SpectateWatchScreen(),
+    ),
+    GoRoute(
+      path: '/spectate/:id',
+      builder: (_, state) =>
+          SpectateWatchScreen(id: state.pathParameters['id']),
+    ),
     GoRoute(path: '/lan', builder: (_, _) => const LanScreen()),
     GoRoute(path: '/auth/connect', builder: (_, _) => const ConnectScreen()),
     GoRoute(path: '/auth/setup', builder: (_, _) => const SetupScreen()),

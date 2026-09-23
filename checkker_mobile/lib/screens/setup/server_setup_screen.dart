@@ -106,13 +106,21 @@ class _ServerSetupScreenState extends State<ServerSetupScreen> {
   /// fallback ("continue/go back") keeps the entered value.
   void _finish({required bool success}) {
     if (widget.isInitialSetup) {
-      context.go('/');
+      final next = GoRouterState.of(context).uri.queryParameters['next'];
+
+      if (next != null && next.startsWith('/') && !next.startsWith('//')) {
+        context.go(next);
+      } else {
+        context.go('/');
+      }
     } else {
       final messenger = ScaffoldMessenger.of(context);
       context.pop();
       if (success) {
         messenger.showSnackBar(
-          SnackBar(content: Text('Connected to ${_normalize(_controller.text)}')),
+          SnackBar(
+            content: Text('Connected to ${_normalize(_controller.text)}'),
+          ),
         );
       }
     }
@@ -128,7 +136,9 @@ class _ServerSetupScreenState extends State<ServerSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final maxWidth = AppSizes.contentMaxWidth(MediaQuery.of(context).size.width);
+    final maxWidth = AppSizes.contentMaxWidth(
+      MediaQuery.of(context).size.width,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.bg.primary,
@@ -196,7 +206,10 @@ class _ServerSetupScreenState extends State<ServerSetupScreen> {
                       labelStyle: TextStyle(color: AppColors.text.muted),
                       hintText: 'http://192.168.1.105:3001',
                       hintStyle: TextStyle(color: AppColors.text.muted),
-                      prefixIcon: Icon(Icons.dns_outlined, color: AppColors.accent.primary),
+                      prefixIcon: Icon(
+                        Icons.dns_outlined,
+                        color: AppColors.accent.primary,
+                      ),
                       filled: true,
                       fillColor: AppColors.bg.secondary,
                       enabledBorder: OutlineInputBorder(
@@ -205,7 +218,10 @@ class _ServerSetupScreenState extends State<ServerSetupScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadius.lg),
-                        borderSide: BorderSide(color: AppColors.accent.primary, width: 1.5),
+                        borderSide: BorderSide(
+                          color: AppColors.accent.primary,
+                          width: 1.5,
+                        ),
                       ),
                       disabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -235,8 +251,8 @@ class _ServerSetupScreenState extends State<ServerSetupScreen> {
                       onPressed: _connecting ? null : _connect,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.accent.primary,
-                        disabledBackgroundColor:
-                            AppColors.accent.primary.withValues(alpha: 0.4),
+                        disabledBackgroundColor: AppColors.accent.primary
+                            .withValues(alpha: 0.4),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -248,7 +264,9 @@ class _ServerSetupScreenState extends State<ServerSetupScreen> {
                               height: 22,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
-                                valueColor: AlwaysStoppedAnimation(Colors.white),
+                                valueColor: AlwaysStoppedAnimation(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : Text(
