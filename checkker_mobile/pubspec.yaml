@@ -53,6 +53,8 @@ dependencies:
   # iOS/macOS 26 SDK symbol that doesn't exist in the CI Xcode (16.x), which
   # breaks the iOS/macOS builds. Revisit once the SDK ships in CI.
   connectivity_plus: ^6.1.3
+  firebase_core: ^4.15.0
+  firebase_messaging: ^16.7.0
 
 dev_dependencies:
   flutter_test:
