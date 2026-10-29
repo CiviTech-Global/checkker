@@ -8,7 +8,16 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import Animated, { FadeIn, SlideInUp } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  SlideInUp,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  withRepeat,
+  withSequence,
+  Easing,
+} from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import {
@@ -19,6 +28,7 @@ import {
   shadows,
 } from "../../src/theme/tokens";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
+import { useReducedMotion } from "../../src/hooks/useReducedMotion";
 import { useSocket } from "../../src/hooks/useSocket";
 import Icon, { type IconName } from "../../src/components/Icon";
 import { getCosmeticDef } from "@checkker/shared";
@@ -76,6 +86,37 @@ function CosmeticCard({
   const pieceColors = def?.piece;
   const cardBackColors = def?.cardBack;
 
+  const isEpic = cosmetic.rarity === "epic";
+  const previewGradient = isEpic
+    ? gradients.neonViolet
+    : cosmetic.rarity === "rare"
+      ? gradients.goldToBronze
+      : gradients.velvet;
+
+  // Gentle idle float for the card preview (respects reduced motion).
+  const reducedMotion = useReducedMotion();
+  const bobY = useSharedValue(0);
+  const floatStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: bobY.value }],
+  }));
+  useEffect(() => {
+    if (reducedMotion) {
+      bobY.value = 0;
+      return;
+    }
+    const loop = withRepeat(
+      withSequence(
+        withTiming(-3, { duration: 1400, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 1400, easing: Easing.inOut(Easing.ease) }),
+      ),
+      -1,
+    );
+    bobY.value = loop;
+    return () => {
+      bobY.value = 0;
+    };
+  }, [reducedMotion, bobY]);
+
   return (
     <Animated.View
       entering={SlideInUp.duration(300)
@@ -95,110 +136,132 @@ function CosmeticCard({
             styles.card,
             styles.cardVertical,
             isEquipped && styles.cardEquipped,
+            !isEquipped &&
+              cosmetic.rarity !== "common" && {
+                borderColor:
+                  cosmetic.rarity === "epic"
+                    ? colors.accent.primary
+                    : colors.accent.gold,
+                ...shadows.glow,
+              },
           ]}
         >
           {/* Preview Area */}
-          <LinearGradient
-            colors={gradients.velvet}
-            style={[styles.cardPreview, styles.cardPreviewVertical]}
+          <Animated.View
+            style={[styles.cardPreview, styles.cardPreviewVertical, floatStyle]}
           >
-            {isBoard && boardColors ? (
-              <View style={styles.boardPreviewWrapper}>
-                <View style={styles.miniBoard}>
-                  {[0, 1, 2, 3].map((row) => (
-                    <View key={row} style={styles.miniBoardRow}>
-                      {[0, 1, 2, 3].map((col) => {
-                        const isLight = (row + col) % 2 === 0;
-                        return (
-                          <View
-                            key={col}
-                            style={[
-                              styles.miniBoardSquare,
-                              {
-                                backgroundColor: isLight
-                                  ? boardColors.light
-                                  : boardColors.dark,
-                              },
-                            ]}
-                          />
-                        );
-                      })}
-                    </View>
-                  ))}
-                </View>
-              </View>
-            ) : isPiece && pieceColors ? (
-              <View style={styles.piecePreviewWrapper}>
-                <View style={styles.pieceShowcaseRow}>
-                  <View style={styles.pieceSlot}>
-                    <Text
-                      style={[styles.pieceGlyph, { color: pieceColors.white }]}
-                    >
-                      ♚
-                    </Text>
-                    <Text
-                      style={[
-                        styles.pieceSubLabel,
-                        { color: pieceColors.white },
-                      ]}
-                    >
-                      White
-                    </Text>
-                  </View>
-                  <View style={styles.pieceDivider} />
-                  <View style={styles.pieceSlot}>
-                    <Text
-                      style={[styles.pieceGlyph, { color: pieceColors.black }]}
-                    >
-                      ♛
-                    </Text>
-                    <Text
-                      style={[
-                        styles.pieceSubLabel,
-                        { color: pieceColors.black },
-                      ]}
-                    >
-                      Black
-                    </Text>
+            <LinearGradient
+              colors={previewGradient}
+              style={[styles.cardPreview, styles.cardPreviewVertical]}
+            >
+              {isBoard && boardColors ? (
+                <View style={styles.boardPreviewWrapper}>
+                  <View style={styles.miniBoard}>
+                    {[0, 1, 2, 3].map((row) => (
+                      <View key={row} style={styles.miniBoardRow}>
+                        {[0, 1, 2, 3].map((col) => {
+                          const isLight = (row + col) % 2 === 0;
+                          return (
+                            <View
+                              key={col}
+                              style={[
+                                styles.miniBoardSquare,
+                                {
+                                  backgroundColor: isLight
+                                    ? boardColors.light
+                                    : boardColors.dark,
+                                },
+                              ]}
+                            />
+                          );
+                        })}
+                      </View>
+                    ))}
                   </View>
                 </View>
-              </View>
-            ) : isCardBack && cardBackColors ? (
-              <View style={styles.cardBackWrapper}>
-                <View
-                  style={[
-                    styles.cardBackCard,
-                    { backgroundColor: cardBackColors.primary },
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.cardBackInnerBorder,
-                      { borderColor: cardBackColors.accent },
-                    ]}
-                  >
-                    <View
-                      style={[
-                        styles.cardBackDiamond,
-                        { borderColor: cardBackColors.accent },
-                      ]}
-                    >
+              ) : isPiece && pieceColors ? (
+                <View style={styles.piecePreviewWrapper}>
+                  <View style={styles.pieceShowcaseRow}>
+                    <View style={styles.pieceSlot}>
                       <Text
                         style={[
-                          styles.cardBackDiamondText,
-                          { color: cardBackColors.accent },
+                          styles.pieceGlyph,
+                          { color: pieceColors.white },
                         ]}
                       >
-                        ♦
+                        ♚
+                      </Text>
+                      <Text
+                        style={[
+                          styles.pieceSubLabel,
+                          { color: pieceColors.white },
+                        ]}
+                      >
+                        White
+                      </Text>
+                    </View>
+                    <View style={styles.pieceDivider} />
+                    <View style={styles.pieceSlot}>
+                      <Text
+                        style={[
+                          styles.pieceGlyph,
+                          { color: pieceColors.black },
+                        ]}
+                      >
+                        ♛
+                      </Text>
+                      <Text
+                        style={[
+                          styles.pieceSubLabel,
+                          { color: pieceColors.black },
+                        ]}
+                      >
+                        Black
                       </Text>
                     </View>
                   </View>
                 </View>
-              </View>
-            ) : (
-              <Icon name={typeIcon as IconName} size={36} color={rarityColor} />
-            )}
-          </LinearGradient>
+              ) : isCardBack && cardBackColors ? (
+                <View style={styles.cardBackWrapper}>
+                  <View
+                    style={[
+                      styles.cardBackCard,
+                      { backgroundColor: cardBackColors.primary },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.cardBackInnerBorder,
+                        { borderColor: cardBackColors.accent },
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.cardBackDiamond,
+                          { borderColor: cardBackColors.accent },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.cardBackDiamondText,
+                            { color: cardBackColors.accent },
+                          ]}
+                        >
+                          ♦
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              ) : (
+                <Icon
+                  name={typeIcon as IconName}
+                  size={36}
+                  color={rarityColor}
+                />
+              )}
+            </LinearGradient>
+          </Animated.View>
 
           {/* Info Area */}
           <View style={[styles.cardInfo, styles.cardInfoVertical]}>
