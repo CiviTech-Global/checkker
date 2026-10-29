@@ -15,13 +15,29 @@ import {
   colors,
   spacing,
   radius,
-  glassStyle,
   gradients,
   shadows,
 } from "../../src/theme/tokens";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
 import { useSocket } from "../../src/hooks/useSocket";
-import Icon from "../../src/components/Icon";
+import Icon, { type IconName } from "../../src/components/Icon";
+import { getCosmeticDef } from "@checkker/shared";
+
+interface ShopCosmeticItem {
+  id: string;
+  name: string;
+  type: "board" | "piece" | "card_back";
+  description?: string | null;
+  rarity: "common" | "rare" | "epic";
+  price: number;
+  assetUrl?: string | null;
+  isDefault?: boolean;
+}
+
+interface UserCosmeticEntry {
+  cosmeticId: string;
+  equipped: boolean;
+}
 
 const TABS = ["Board Themes", "Piece Themes", "Card Backs"] as const;
 const TAB_TYPES = ["board", "piece", "card_back"] as const;
@@ -34,7 +50,7 @@ function CosmeticCard({
   onEquip,
   onBuy,
 }: {
-  cosmetic: any;
+  cosmetic: ShopCosmeticItem;
   isOwned: boolean;
   isEquipped: boolean;
   index: number;
@@ -46,11 +62,26 @@ function CosmeticCard({
   const rarityColor =
     cosmetic.rarity === "rare" ? colors.accent.gold : colors.text.muted;
   const typeIcon =
-    cosmetic.type === "board" ? "grid-view" : cosmetic.type === "piece" ? "chess-piece" : "cards-playing";
+    cosmetic.type === "board"
+      ? "grid-view"
+      : cosmetic.type === "piece"
+        ? "chess-piece"
+        : "cards-playing";
+
+  const isBoard = cosmetic.type === "board";
+  const isPiece = cosmetic.type === "piece";
+  const isCardBack = cosmetic.type === "card_back";
+  const def = getCosmeticDef(cosmetic.assetUrl);
+  const boardColors = def?.board;
+  const pieceColors = def?.piece;
+  const cardBackColors = def?.cardBack;
 
   return (
     <Animated.View
-      entering={SlideInUp.duration(300).delay(staggerDelay(index, 60)).springify().damping(15)}
+      entering={SlideInUp.duration(300)
+        .delay(staggerDelay(index, 60))
+        .springify()
+        .damping(15)}
       style={animatedStyle}
     >
       <TouchableOpacity
@@ -62,31 +93,129 @@ function CosmeticCard({
         <View
           style={[
             styles.card,
+            styles.cardVertical,
             isEquipped && styles.cardEquipped,
           ]}
         >
           {/* Preview Area */}
           <LinearGradient
             colors={gradients.velvet}
-            style={styles.cardPreview}
+            style={[styles.cardPreview, styles.cardPreviewVertical]}
           >
-            <Icon name={typeIcon as any} size={36} color={rarityColor} />
+            {isBoard && boardColors ? (
+              <View style={styles.boardPreviewWrapper}>
+                <View style={styles.miniBoard}>
+                  {[0, 1, 2, 3].map((row) => (
+                    <View key={row} style={styles.miniBoardRow}>
+                      {[0, 1, 2, 3].map((col) => {
+                        const isLight = (row + col) % 2 === 0;
+                        return (
+                          <View
+                            key={col}
+                            style={[
+                              styles.miniBoardSquare,
+                              {
+                                backgroundColor: isLight
+                                  ? boardColors.light
+                                  : boardColors.dark,
+                              },
+                            ]}
+                          />
+                        );
+                      })}
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ) : isPiece && pieceColors ? (
+              <View style={styles.piecePreviewWrapper}>
+                <View style={styles.pieceShowcaseRow}>
+                  <View style={styles.pieceSlot}>
+                    <Text
+                      style={[styles.pieceGlyph, { color: pieceColors.white }]}
+                    >
+                      ♚
+                    </Text>
+                    <Text
+                      style={[
+                        styles.pieceSubLabel,
+                        { color: pieceColors.white },
+                      ]}
+                    >
+                      White
+                    </Text>
+                  </View>
+                  <View style={styles.pieceDivider} />
+                  <View style={styles.pieceSlot}>
+                    <Text
+                      style={[styles.pieceGlyph, { color: pieceColors.black }]}
+                    >
+                      ♛
+                    </Text>
+                    <Text
+                      style={[
+                        styles.pieceSubLabel,
+                        { color: pieceColors.black },
+                      ]}
+                    >
+                      Black
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ) : isCardBack && cardBackColors ? (
+              <View style={styles.cardBackWrapper}>
+                <View
+                  style={[
+                    styles.cardBackCard,
+                    { backgroundColor: cardBackColors.primary },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.cardBackInnerBorder,
+                      { borderColor: cardBackColors.accent },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.cardBackDiamond,
+                        { borderColor: cardBackColors.accent },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.cardBackDiamondText,
+                          { color: cardBackColors.accent },
+                        ]}
+                      >
+                        ♦
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            ) : (
+              <Icon name={typeIcon as IconName} size={36} color={rarityColor} />
+            )}
           </LinearGradient>
 
           {/* Info Area */}
-          <View style={styles.cardInfo}>
+          <View style={[styles.cardInfo, styles.cardInfoVertical]}>
             <Text style={styles.cardName} numberOfLines={1}>
               {cosmetic.name}
             </Text>
             {cosmetic.description ? (
-              <Text style={styles.cardDesc} numberOfLines={1}>
+              <Text style={styles.cardDesc} numberOfLines={2}>
                 {cosmetic.description}
               </Text>
             ) : null}
 
             {/* Rarity Dot + Label */}
             <View style={styles.rarityRow}>
-              <View style={[styles.rarityDot, { backgroundColor: rarityColor }]} />
+              <View
+                style={[styles.rarityDot, { backgroundColor: rarityColor }]}
+              />
               <Text style={[styles.rarityLabel, { color: rarityColor }]}>
                 {cosmetic.rarity.toUpperCase()}
               </Text>
@@ -103,7 +232,9 @@ function CosmeticCard({
               <Text
                 style={[
                   styles.priceText,
-                  { color: isFree ? colors.accent.green : colors.text.secondary },
+                  {
+                    color: isFree ? colors.accent.green : colors.text.secondary,
+                  },
                 ]}
               >
                 {isFree ? "FREE" : `${cosmetic.price} coins`}
@@ -137,7 +268,10 @@ export default function ShopScreen() {
   useEffect(() => {
     onCosmeticPurchased((data) => {
       if (data.success) {
-        Alert.alert("Purchased!", `Item unlocked. Balance: ${data.coins} coins.`);
+        Alert.alert(
+          "Purchased!",
+          `Item unlocked. Balance: ${data.coins} coins.`,
+        );
       } else {
         Alert.alert("Purchase failed", data.error ?? "Something went wrong.");
       }
@@ -154,32 +288,41 @@ export default function ShopScreen() {
   const filtered = useMemo(() => {
     if (!cosmetics) return [];
     const type = TAB_TYPES[activeTab];
-    return cosmetics.filter((c: any) => c.type === type);
+    return (cosmetics as ShopCosmeticItem[]).filter((c) => c.type === type);
   }, [cosmetics, activeTab]);
 
   const isOwned = (id: string) =>
-    userCosmetics?.some((uc: any) => uc.cosmeticId === id) ?? false;
+    (userCosmetics as UserCosmeticEntry[] | null)?.some(
+      (uc) => uc.cosmeticId === id,
+    ) ?? false;
 
   const isEquipped = (id: string) =>
-    userCosmetics?.some((uc: any) => uc.cosmeticId === id && uc.equipped) ?? false;
+    (userCosmetics as UserCosmeticEntry[] | null)?.some(
+      (uc) => uc.cosmeticId === id && uc.equipped,
+    ) ?? false;
 
   const handleEquip = (id: string) => {
     equipCosmetic(id);
   };
 
-  const handleBuy = (item: any) => {
+  const handleBuy = (item: ShopCosmeticItem) => {
     const price = item.isDefault ? 0 : item.price;
     if (price > coins) {
-      Alert.alert("Not enough coins", `${item.name} costs ${price} coins but you have ${coins}. Win games to earn more!`);
+      Alert.alert(
+        "Not enough coins",
+        `${item.name} costs ${price} coins but you have ${coins}. Win games to earn more!`,
+      );
       return;
     }
     Alert.alert(
       "Buy " + item.name + "?",
-      price === 0 ? "This item is free." : `This will cost ${price} coins. You have ${coins}.`,
+      price === 0
+        ? "This item is free."
+        : `This will cost ${price} coins. You have ${coins}.`,
       [
         { text: "Cancel", style: "cancel" },
         { text: "Buy", onPress: () => purchaseCosmetic(item.id) },
-      ]
+      ],
     );
   };
 
@@ -192,7 +335,9 @@ export default function ShopScreen() {
       {/* Header */}
       <Animated.View entering={FadeIn.duration(300)} style={styles.header}>
         <TouchableOpacity
-          onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
+          onPress={() =>
+            router.canGoBack() ? router.back() : router.replace("/")
+          }
           style={styles.backBtn}
         >
           <Icon name="arrow-back" size={24} color={colors.text.primary} />
@@ -205,7 +350,10 @@ export default function ShopScreen() {
       </Animated.View>
 
       {/* Tab Selector */}
-      <Animated.View entering={FadeIn.duration(300).delay(100)} style={styles.tabRow}>
+      <Animated.View
+        entering={FadeIn.duration(300).delay(100)}
+        style={styles.tabRow}
+      >
         {TABS.map((tab, i) => (
           <TouchableOpacity
             key={tab}
@@ -239,7 +387,7 @@ export default function ShopScreen() {
         </Animated.View>
       ) : (
         <View style={styles.grid}>
-          {filtered.map((item: any, i: number) => (
+          {filtered.map((item: ShopCosmeticItem, i: number) => (
             <View key={item.id} style={styles.gridCell}>
               <CosmeticCard
                 cosmetic={item}
@@ -264,6 +412,9 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: spacing.xxl,
+    maxWidth: 1100,
+    width: "100%",
+    alignSelf: "center",
   },
   header: {
     flexDirection: "row",
@@ -345,7 +496,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   gridCell: {
-    width: "48%",
+    width: "23.5%",
+    minWidth: 120,
   },
   card: {
     borderRadius: radius.lg,
@@ -353,6 +505,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border.subtle,
     backgroundColor: colors.bg.secondary,
+  },
+  cardVertical: {
+    minHeight: 280,
+  },
+  cardBoard: {
+    minHeight: 280,
   },
   cardEquipped: {
     borderColor: colors.accent.gold,
@@ -364,9 +522,120 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  cardPreviewVertical: {
+    height: 155,
+  },
+  cardPreviewBoard: {
+    height: 155,
+  },
+  boardPreviewWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: spacing.xs,
+  },
+  miniBoard: {
+    width: 86,
+    height: 86,
+    borderRadius: radius.sm,
+    overflow: "hidden",
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.15)",
+  },
+  miniBoardRow: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  miniBoardSquare: {
+    flex: 1,
+  },
+  piecePreviewWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: spacing.xs,
+    width: "100%",
+  },
+  pieceShowcaseRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    width: 104,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+    paddingVertical: spacing.xs,
+    paddingHorizontal: 2,
+  },
+  pieceSlot: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
+    minWidth: 38,
+  },
+  pieceGlyph: {
+    fontSize: 32,
+    lineHeight: 36,
+  },
+  pieceSubLabel: {
+    fontSize: 9,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    opacity: 0.85,
+    textTransform: "uppercase",
+  },
+  pieceDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: "rgba(255,255,255,0.12)",
+  },
+  cardBackWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: spacing.xs,
+  },
+  cardBackCard: {
+    width: 60,
+    height: 90,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.2)",
+    overflow: "hidden",
+    padding: 3,
+  },
+  cardBackInnerBorder: {
+    flex: 1,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardBackDiamond: {
+    width: 24,
+    height: 24,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    transform: [{ rotate: "45deg" }],
+  },
+  cardBackDiamondText: {
+    fontSize: 11,
+    lineHeight: 12,
+    transform: [{ rotate: "-45deg" }],
+  },
   cardInfo: {
     padding: spacing.sm,
     gap: 3,
+  },
+  cardInfoVertical: {
+    flex: 1,
+    justifyContent: "space-between",
+    paddingVertical: spacing.md,
+  },
+  cardInfoBoard: {
+    flex: 1,
+    justifyContent: "space-between",
+    paddingVertical: spacing.md,
   },
   cardName: {
     fontSize: 14,
