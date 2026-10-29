@@ -19,7 +19,6 @@ import {
 import {
   getLegalMovesForHand,
   getCaptureBonus,
-  pseudoLegalMoves,
   applyPseudoLegalMove,
   hasAnyPlayableCard,
 } from "@checkker/chess";
@@ -246,30 +245,22 @@ export class GameEngine {
     const card = player.hand[cardIdx];
     const piece = cardToPiece(card);
 
-    if (piece !== "wild") {
-      const legal = getLegalMovesForHand(this.chess, [card])[0].moves;
-      if (!legal.includes(moveStr)) {
-        return { success: false, error: "Illegal move for this card" };
-      }
+    // Validate against AUTHORITATIVE LEGAL moves (king safety enforced).
+    // Never accept pseudo-legal moves — they may leave the king in check.
+    const legalMoves = getLegalMovesForHand(this.chess, [card])[0];
+    if (!legalMoves.moves.includes(moveStr)) {
+      return { success: false, error: "Illegal move for this card" };
     }
 
-    // let moveResult;
-    // try {
-    //   moveResult = this.chess.move(moveStr);
-    // } catch {
-    //   return { success: false, error: "Invalid chess move" };
-    // }
-
-    let moveResult: Move;
-    const candidate = pseudoLegalMoves(this.chess).find(
-      (m) => m.lan === moveStr,
-    );
+    const candidate = this.chess
+      .moves({ verbose: true })
+      .find((m) => m.lan === moveStr);
 
     if (!candidate) {
       return { success: false, error: "Invalid chess move" };
     }
     applyPseudoLegalMove(this.chess, candidate);
-    moveResult = candidate;
+    const moveResult: Move = candidate;
 
     player.hand.splice(cardIdx, 1);
 
@@ -357,7 +348,10 @@ export class GameEngine {
   }
 
   private checkGameEnd(): void {
-    const boardHasMoves = pseudoLegalMoves(this.chess).length > 0;
+    // Use AUTHORITATIVE LEGAL moves for game-over detection (no legal moves
+    // for the side to move == checkmate/stalemate; pseudo-legal moves may
+    // include moves that leave the king in check and must be excluded).
+    const boardHasMoves = this.chess.moves().length > 0;
     const handHasPlayableCard = hasAnyPlayableCard(
       this.chess,
       this.currentPlayer.hand,

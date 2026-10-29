@@ -11,9 +11,12 @@ import {
   cardId,
   scoreGame,
 } from "@checkker/shared";
-import { getLegalMovesForHand, getCaptureBonus, pseudoLegalMoves,
+import {
+  getLegalMovesForHand,
+  getCaptureBonus,
   applyPseudoLegalMove,
-  hasAnyPlayableCard, } from "@checkker/chess";
+  hasAnyPlayableCard,
+} from "@checkker/chess";
 import { evaluateScorePile } from "@checkker/poker";
 
 /**
@@ -90,7 +93,9 @@ export class LocalGameEngine {
     while (
       !this.result &&
       guard++ < 20 &&
-      !getLegalMovesForHand(this.chess, player.hand).some((g) => g.moves.length > 0)
+      !getLegalMovesForHand(this.chess, player.hand).some(
+        (g) => g.moves.length > 0,
+      )
     ) {
       this.deadPile.push(...player.hand.splice(0, player.hand.length));
       this.drawToFull(this.turn);
@@ -154,10 +159,16 @@ export class LocalGameEngine {
   /** Legal moves for the side to move, grouped per card in hand. */
   getLegalMoves(): Array<{ card: Card; moves: string[] }> {
     const grouped = getLegalMovesForHand(this.chess, this.currentPlayer.hand);
-    return grouped.map((g, i) => ({ card: this.currentPlayer.hand[i], moves: g.moves }));
+    return grouped.map((g, i) => ({
+      card: this.currentPlayer.hand[i],
+      moves: g.moves,
+    }));
   }
 
-  playCard(cardIdStr: string, moveStr: string): { success: boolean; error?: string } {
+  playCard(
+    cardIdStr: string,
+    moveStr: string,
+  ): { success: boolean; error?: string } {
     if (this.result) return { success: false, error: "Game already ended" };
 
     const player = this.currentPlayer;
@@ -167,14 +178,15 @@ export class LocalGameEngine {
     const card = player.hand[cardIdx];
     const piece = cardToPiece(card);
 
-    if (piece !== "wild") {
-      const legal = getLegalMovesForHand(this.chess, [card])[0].moves;
-      if (!legal.includes(moveStr)) {
-        return { success: false, error: "Illegal move for this card" };
-      }
+    // Validate against AUTHORITATIVE LEGAL moves (king safety enforced).
+    const legalMoves = getLegalMovesForHand(this.chess, [card])[0];
+    if (!legalMoves.moves.includes(moveStr)) {
+      return { success: false, error: "Illegal move for this card" };
     }
 
-    const candidate = pseudoLegalMoves(this.chess).find((m) => m.lan === moveStr);
+    const candidate = this.chess
+      .moves({ verbose: true })
+      .find((m) => m.lan === moveStr);
     if (!candidate) {
       return { success: false, error: "Invalid chess move" };
     }
@@ -212,7 +224,10 @@ export class LocalGameEngine {
       card,
       color: this.turn,
       captured: wasCapture
-        ? { type: moveResult.captured!, color: this.turn === "white" ? "black" : "white" }
+        ? {
+            type: moveResult.captured!,
+            color: this.turn === "white" ? "black" : "white",
+          }
         : undefined,
       bonusCards,
     });
@@ -225,11 +240,18 @@ export class LocalGameEngine {
   }
 
   private checkGameEnd(): void {
-    const boardHasMoves = pseudoLegalMoves(this.chess).length > 0;
-    const handHasPlayableCard = hasAnyPlayableCard(this.chess, this.currentPlayer.hand);
+    // Use AUTHORITATIVE LEGAL moves for game-over detection.
+    const boardHasMoves = this.chess.moves().length > 0;
+    const handHasPlayableCard = hasAnyPlayableCard(
+      this.chess,
+      this.currentPlayer.hand,
+    );
 
     if (!boardHasMoves || !handHasPlayableCard) {
-      this.result = { type: "checkmate", winner: this.turn === "white" ? "black" : "white" };
+      this.result = {
+        type: "checkmate",
+        winner: this.turn === "white" ? "black" : "white",
+      };
       return;
     }
     if (this.chess.isThreefoldRepetition()) {
@@ -247,7 +269,10 @@ export class LocalGameEngine {
   }
 
   resign(color: Color): void {
-    this.result = { type: "resignation", winner: color === "white" ? "black" : "white" };
+    this.result = {
+      type: "resignation",
+      winner: color === "white" ? "black" : "white",
+    };
   }
 
   isOver(): boolean {

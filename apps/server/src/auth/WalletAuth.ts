@@ -2,10 +2,16 @@ import { verifyMessage } from "ethers";
 import { v4 as uuid } from "uuid";
 
 /** Pending authentication challenges keyed by wallet address */
-const pendingChallenges = new Map<string, { nonce: string; message: string; expiresAt: number }>();
+const pendingChallenges = new Map<
+  string,
+  { nonce: string; message: string; expiresAt: number }
+>();
 
 /** Generate a challenge message for wallet signature verification */
-export function createChallenge(walletAddress: string): { nonce: string; message: string } {
+export function createChallenge(walletAddress: string): {
+  nonce: string;
+  message: string;
+} {
   const nonce = uuid();
   const timestamp = new Date().toISOString();
   const message = `Sign in to Checkker\nWallet: ${walletAddress}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
@@ -22,7 +28,7 @@ export function createChallenge(walletAddress: string): { nonce: string; message
 /** Verify a signed challenge and return the recovered address */
 export function verifyChallenge(
   walletAddress: string,
-  signature: string
+  signature: string,
 ): { valid: boolean; error?: string } {
   const key = walletAddress.toLowerCase();
   const challenge = pendingChallenges.get(key);
@@ -83,7 +89,10 @@ interface Session {
 const sessions = new Map<string, Session>();
 
 /** Create a session token for an authenticated wallet. */
-export function createSession(walletAddress: string, ip: string = "unknown"): string {
+export function createSession(
+  walletAddress: string,
+  ip: string = "unknown",
+): string {
   const token = uuid() + uuid().replace(/-/g, "");
   sessions.set(token, {
     walletAddress: walletAddress.toLowerCase(),
@@ -94,7 +103,10 @@ export function createSession(walletAddress: string, ip: string = "unknown"): st
 }
 
 /** Resolve a session token to its wallet address, or null if invalid/expired. */
-export function verifySession(token: string, currentIp?: string): string | null {
+export function verifySession(
+  token: string,
+  currentIp?: string,
+): string | null {
   const session = sessions.get(token);
   if (!session) return null;
   if (Date.now() > session.expiresAt) {
@@ -124,4 +136,35 @@ export function revokeAllSessionsForWallet(walletAddress: string): void {
       sessions.delete(token);
     }
   }
+}
+
+/* ── Wallet ownership proof tracking ─────────────────────────────────────
+ * Records wallets that recently completed a signed challenge verification, so
+ * the `link_wallet` flow can require proof of ownership before attaching a new
+ * wallet to an existing account.
+ */
+const RECENTLY_VERIFIED_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+
+const recentlyVerifiedWallets = new Map<string, number>();
+
+/** Mark a wallet as recently verified (after a successful challenge signature check). */
+export function markWalletVerified(
+  walletAddress: string,
+  timestamp: number = Date.now(),
+): void {
+  recentlyVerifiedWallets.set(walletAddress.toLowerCase(), timestamp);
+}
+
+/** Whether the wallet has been verified (signed a challenge) within the window. */
+export function wasWalletVerifiedRecently(
+  walletAddress: string,
+  withinMs: number = RECENTLY_VERIFIED_WINDOW_MS,
+): boolean {
+  const ts = recentlyVerifiedWallets.get(walletAddress.toLowerCase());
+  if (!ts) return false;
+  if (Date.now() - ts > withinMs) {
+    recentlyVerifiedWallets.delete(walletAddress.toLowerCase());
+    return false;
+  }
+  return true;
 }

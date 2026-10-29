@@ -14,21 +14,30 @@ export interface LegalMovesForCard {
 
 export function getLegalMovesForCard(game: Chess, card: Card): string[] {
   const piece = cardToPiece(card);
-  const allMoves = pseudoLegalMoves(game);
+  // IMPORTANT: use chess.js's LEGAL move generation (which filters out moves
+  // that leave the king in check / are otherwise illegal). Pseudo-legal moves
+  // ignore king safety, so they must never be used for validation, applying,
+  // or game-over detection.
+  const allMoves = game.moves({ verbose: true });
 
   if (piece === "wild") {
     return allMoves.map((m) => m.from + m.to + (m.promotion ?? ""));
   }
 
-  const targetType = (
-    piece === "pawn" ? "p" :
-    piece === "king" ? "k" :
-    piece === "queen" ? "q" :
-    piece === "rook" ? "r" :
-    piece === "bishop" ? "b" :
-    piece === "knight" ? "n" :
-    null
-  );
+  const targetType =
+    piece === "pawn"
+      ? "p"
+      : piece === "king"
+        ? "k"
+        : piece === "queen"
+          ? "q"
+          : piece === "rook"
+            ? "r"
+            : piece === "bishop"
+              ? "b"
+              : piece === "knight"
+                ? "n"
+                : null;
   if (!targetType) return [];
 
   return allMoves
@@ -38,7 +47,7 @@ export function getLegalMovesForCard(game: Chess, card: Card): string[] {
 
 export function getLegalMovesForHand(
   game: Chess,
-  hand: Card[]
+  hand: Card[],
 ): LegalMovesForCard[] {
   return hand.map((card) => ({
     card,
@@ -48,16 +57,27 @@ export function getLegalMovesForHand(
 }
 
 export function hasAnyPlayableCard(game: Chess, hand: Card[]): boolean {
-  return getLegalMovesForHand(game, hand).some((entry) => entry.moves.length > 0);
+  return getLegalMovesForHand(game, hand).some(
+    (entry) => entry.moves.length > 0,
+  );
 }
 
-export function getCaptureBonus(capturedPiece: string, isCheck: boolean): number {
+export function getCaptureBonus(
+  capturedPiece: string,
+  isCheck: boolean,
+): number {
   let bonus = 1;
   switch (capturedPiece) {
-    case "q": bonus += 2; break;
-    case "r": bonus += 1; break;
+    case "q":
+      bonus += 2;
+      break;
+    case "r":
+      bonus += 1;
+      break;
     case "n":
-    case "b": bonus += 1; break;
+    case "b":
+      bonus += 1;
+      break;
   }
   if (isCheck) bonus += 1;
   return bonus;
@@ -72,6 +92,10 @@ export function isCheckmate(game: Chess): boolean {
 }
 
 export function isDraw(game: Chess): boolean {
-  return game.isDraw() || game.isStalemate() || game.isThreefoldRepetition() ||
-    game.isInsufficientMaterial();
+  return (
+    game.isDraw() ||
+    game.isStalemate() ||
+    game.isThreefoldRepetition() ||
+    game.isInsufficientMaterial()
+  );
 }

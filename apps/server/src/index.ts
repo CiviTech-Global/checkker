@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import crypto from "crypto";
 import { GameServer } from "./GameServer";
 import { initPlayerStoreDb } from "./PlayerStore";
 import usersRouter from "./routes/users";
@@ -205,7 +206,13 @@ function adminGate(
     return;
   }
   const key = req.headers["x-admin-api-key"];
-  if (key !== ADMIN_API_KEY) {
+  // Timing-safe comparison to prevent timing attacks on the admin key.
+  const provided = Buffer.from(String(key ?? ""));
+  const expected = Buffer.from(String(ADMIN_API_KEY));
+  const keyMatches =
+    provided.length === expected.length &&
+    crypto.timingSafeEqual(provided, expected);
+  if (!keyMatches) {
     res.status(401).json({ status: "error", message: "Unauthorized" });
     return;
   }
