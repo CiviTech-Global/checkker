@@ -16,11 +16,15 @@ import {
   cardId,
   scoreGame,
 } from "@checkker/shared";
-import { getLegalMovesForHand, getCaptureBonus, pseudoLegalMoves, applyPseudoLegalMove, hasAnyPlayableCard} from "@checkker/chess";
+import {
+  getLegalMovesForHand,
+  getCaptureBonus,
+  applyPseudoLegalMove,
+  hasAnyPlayableCard,
+} from "@checkker/chess";
 import { evaluateScorePile } from "@checkker/poker";
 import { getTopMoves, type MoveEvaluation } from "./bot/evaluators";
 import type { Move } from "chess.js";
-
 
 export type PublicGameState = {
   id: string;
@@ -78,7 +82,12 @@ export class GameEngine {
     moveHistory: MoveRecord[];
   }> = [];
 
-  constructor(whiteRating: number, blackRating: number, tc: TimeControl, deck?: Card[]) {
+  constructor(
+    whiteRating: number,
+    blackRating: number,
+    tc: TimeControl,
+    deck?: Card[],
+  ) {
     this.id = uuid();
     this.chess = new Chess();
     this.timeControl = tc;
@@ -210,7 +219,10 @@ export class GameEngine {
     return getLegalMovesForHand(this.chess, player.hand);
   }
 
-  playCard(cardIdStr: string, moveStr: string): { success: boolean; error?: string } {
+  playCard(
+    cardIdStr: string,
+    moveStr: string,
+  ): { success: boolean; error?: string } {
     if (this.result) return { success: false, error: "Game already ended" };
 
     // Save snapshot for undo before making changes
@@ -233,29 +245,22 @@ export class GameEngine {
     const card = player.hand[cardIdx];
     const piece = cardToPiece(card);
 
-    if (piece !== "wild") {
-      const legal = getLegalMovesForHand(this.chess, [card])[0].moves;
-      if (!legal.includes(moveStr)) {
-        return { success: false, error: "Illegal move for this card" };
-      }
+    // Validate against AUTHORITATIVE LEGAL moves (king safety enforced).
+    // Never accept pseudo-legal moves — they may leave the king in check.
+    const legalMoves = getLegalMovesForHand(this.chess, [card])[0];
+    if (!legalMoves.moves.includes(moveStr)) {
+      return { success: false, error: "Illegal move for this card" };
     }
 
-    // let moveResult;
-    // try {
-    //   moveResult = this.chess.move(moveStr);
-    // } catch {
-    //   return { success: false, error: "Invalid chess move" };
-    // }
-
-    let moveResult: Move;
-    const promotion = moveStr.length > 4 ? moveStr.slice(4) : undefined;
-    const candidate = pseudoLegalMoves(this.chess).find((m) => m.lan === moveStr);
+    const candidate = this.chess
+      .moves({ verbose: true })
+      .find((m) => m.lan === moveStr);
 
     if (!candidate) {
       return { success: false, error: "Invalid chess move" };
     }
     applyPseudoLegalMove(this.chess, candidate);
-    moveResult = candidate;
+    const moveResult: Move = candidate;
 
     player.hand.splice(cardIdx, 1);
 
@@ -266,7 +271,10 @@ export class GameEngine {
         move: moveStr,
         card,
         color: this.turn,
-        captured: { type: "k", color: this.turn === "white" ? "black" : "white" },
+        captured: {
+          type: "k",
+          color: this.turn === "white" ? "black" : "white",
+        },
         bonusCards: 0,
         check: false,
         mate: true,
@@ -296,7 +304,10 @@ export class GameEngine {
       card,
       color: this.turn,
       captured: wasCapture
-        ? { type: moveResult.captured!, color: this.turn === "white" ? "black" : "white" }
+        ? {
+            type: moveResult.captured!,
+            color: this.turn === "white" ? "black" : "white",
+          }
         : undefined,
       bonusCards,
       check: isCheckMove && !isMate,
@@ -337,12 +348,20 @@ export class GameEngine {
   }
 
   private checkGameEnd(): void {
-    const boardHasMoves = pseudoLegalMoves(this.chess).length > 0;
-    const handHasPlayableCard = hasAnyPlayableCard(this.chess, this.currentPlayer.hand);
-
+    // Use AUTHORITATIVE LEGAL moves for game-over detection (no legal moves
+    // for the side to move == checkmate/stalemate; pseudo-legal moves may
+    // include moves that leave the king in check and must be excluded).
+    const boardHasMoves = this.chess.moves().length > 0;
+    const handHasPlayableCard = hasAnyPlayableCard(
+      this.chess,
+      this.currentPlayer.hand,
+    );
 
     if (!boardHasMoves || !handHasPlayableCard) {
-      this.result = { type: "checkmate", winner: this.turn === "white" ? "black" : "white" };
+      this.result = {
+        type: "checkmate",
+        winner: this.turn === "white" ? "black" : "white",
+      };
       return;
     }
     if (this.chess.isThreefoldRepetition()) {
@@ -360,11 +379,17 @@ export class GameEngine {
   }
 
   resign(color: Color): void {
-    this.result = { type: "resignation", winner: color === "white" ? "black" : "white" };
+    this.result = {
+      type: "resignation",
+      winner: color === "white" ? "black" : "white",
+    };
   }
 
   timeOut(color: Color): void {
-    this.result = { type: "timeout", winner: color === "white" ? "black" : "white" };
+    this.result = {
+      type: "timeout",
+      winner: color === "white" ? "black" : "white",
+    };
   }
 
   isOver(): boolean {
@@ -375,7 +400,10 @@ export class GameEngine {
     return this.result;
   }
 
-  startTimeoutCheck(callbacks: { onTimeout: () => void; onTick?: () => void }): void {
+  startTimeoutCheck(callbacks: {
+    onTimeout: () => void;
+    onTick?: () => void;
+  }): void {
     this.onTimeoutCallback = callbacks.onTimeout;
     this.onTickCallback = callbacks.onTick ?? null;
     this.timeoutInterval = setInterval(() => {
@@ -420,13 +448,31 @@ export class GameEngine {
     return true;
   }
 
-  async getBestMoves(topN: number = 3): Promise<{ white: MoveEvaluation[]; black: MoveEvaluation[] }> {
+  async getBestMoves(
+    topN: number = 3,
+  ): Promise<{ white: MoveEvaluation[]; black: MoveEvaluation[] }> {
     const fen = this.chess.fen();
     const whiteLegal = getLegalMovesForHand(this.chess, this.white.hand);
     const blackLegal = getLegalMovesForHand(this.chess, this.black.hand);
     return {
-      white: await getTopMoves(fen, this.white.hand, whiteLegal, "white", topN, this.white.scorePile, this.drawPile.length),
-      black: await getTopMoves(fen, this.black.hand, blackLegal, "black", topN, this.black.scorePile, this.drawPile.length),
+      white: await getTopMoves(
+        fen,
+        this.white.hand,
+        whiteLegal,
+        "white",
+        topN,
+        this.white.scorePile,
+        this.drawPile.length,
+      ),
+      black: await getTopMoves(
+        fen,
+        this.black.hand,
+        blackLegal,
+        "black",
+        topN,
+        this.black.scorePile,
+        this.drawPile.length,
+      ),
     };
   }
 
@@ -459,7 +505,11 @@ export class GameEngine {
   }
 
   /** Authoritative clock state for lightweight clock_tick broadcasts. */
-  getClockState(): { whiteTimeRemainingMs: number; blackTimeRemainingMs: number; turn: Color } {
+  getClockState(): {
+    whiteTimeRemainingMs: number;
+    blackTimeRemainingMs: number;
+    turn: Color;
+  } {
     const elapsed = !this.result ? Date.now() - this.lastMoveTimestamp : 0;
     const whiteActive = this.turn === "white";
     return {

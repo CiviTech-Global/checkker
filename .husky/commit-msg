@@ -5,7 +5,7 @@
 # Allowed types: feat, fix, refactor, test, docs, chore, ci, perf, build
 pattern="^(feat|fix|refactor|test|docs|chore|ci|perf|build)(\(.+\))?: .{1,72}"
 
-if ! echo "$1" | grep -qE "$pattern"; then
+if ! grep -qE "$pattern" "$1"; then
   echo ""
   echo "  Commit message does not follow Conventional Commits format."
   echo ""

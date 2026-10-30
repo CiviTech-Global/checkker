@@ -9,7 +9,7 @@
     "start": "node dist/index.js",
     "test": "jest --runInBand",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts",
+    "lint": "eslint src",
     "clean": "rm -rf .turbo dist",
     "bundle": "esbuild src/index.ts --bundle --platform=node --target=node18 --outfile=dist/server.bundle.js --external:stockfish --external:@prisma/client"
   },
@@ -20,6 +20,7 @@
     "@checkker/shared": "*",
     "@sentry/node": "^8.52.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "ethers": "^6.17.0",
     "express": "^4.22.2",
     "express-rate-limit": "^8.5.2",
