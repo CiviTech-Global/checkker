@@ -1,3 +1,4 @@
+import { logger } from "../logger";
 import { Chess, getLegalMovesForHand } from "@checkker/chess";
 import { type BotDifficulty, type Card, type Color } from "@checkker/shared";
 import type { GameEngine } from "../GameEngine";
@@ -74,13 +75,13 @@ export class BotPlayer {
           }
           const playResult = game.playCard(result.cardId, result.move);
           if (!playResult.success) {
-            console.error(`[BotPlayer ${this.id}] playCard failed: ${playResult.error}`);
+            logger.error(`[BotPlayer ${this.id}] playCard failed: ${playResult.error}`);
           }
           resolve();
         }, this.delayMs);
       });
     } catch (error) {
-      console.error(`[BotPlayer ${this.id}] Error during playTurn:`, error);
+      logger.error({ err: error }, `[BotPlayer ${this.id}] Error during playTurn:`);
     } finally {
       this.thinking = false;
     }

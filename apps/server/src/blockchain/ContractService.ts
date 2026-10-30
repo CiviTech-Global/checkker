@@ -1,3 +1,4 @@
+import { logger } from "../logger";
 import { Contract, JsonRpcProvider, WebSocketProvider, Wallet } from "ethers";
 import {
   BLOCKCHAIN_ENABLED,
@@ -80,7 +81,7 @@ async function retryWrite(
       const nonce = await nonceManager.acquire();
       const tx = await call(nonce);
       await tx.wait();
-      console.log(`[ContractService] ${label} OK (attempt ${attempt}): ${tx.hash}`);
+      logger.info(`[ContractService] ${label} OK (attempt ${attempt}): ${tx.hash}`);
       return tx.hash;
     } catch (err: any) {
       lastError = err;
@@ -92,19 +93,19 @@ async function retryWrite(
         msg.includes("already known")
       ) {
         nonceManager.reset();
-        console.warn(`[ContractService] ${label} nonce issue (attempt ${attempt}), resetting nonce`);
+        logger.warn(`[ContractService] ${label} nonce issue (attempt ${attempt}), resetting nonce`);
         await new Promise((r) => setTimeout(r, 200));
         continue;
       }
 
       if (msg.includes("revert") || msg.includes("execution reverted")) {
-        console.error(`[ContractService] ${label} reverted: ${msg}`);
+        logger.error(`[ContractService] ${label} reverted: ${msg}`);
         throw err;
       }
 
       if (attempt < retries) {
         const delay = BASE_RETRY_MS * Math.pow(2, attempt - 1);
-        console.warn(`[ContractService] ${label} failed (attempt ${attempt}), retrying in ${delay}ms: ${msg}`);
+        logger.warn(`[ContractService] ${label} failed (attempt ${attempt}), retrying in ${delay}ms: ${msg}`);
         await new Promise((r) => setTimeout(r, delay));
       }
     }
@@ -142,7 +143,7 @@ export const ContractService = {
       }
       return null;
     } catch (err) {
-      console.error(`[ContractService] reconcileGame failed for ${gameId}:`, err);
+      logger.error({ err }, `[ContractService] reconcileGame failed for ${gameId}:`);
       return null;
     }
   },

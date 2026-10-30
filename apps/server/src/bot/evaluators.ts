@@ -1,3 +1,4 @@
+import { logger } from "../logger";
 import type { BotDifficulty, Card, Color, MoveEvaluation } from "@checkker/shared";
 import { AIBrain, type AnalyzedMove } from "@checkker/ai-brain";
 import type { LegalMovesForCard } from "@checkker/chess";
@@ -9,12 +10,12 @@ const brain = new AIBrain();
 
 if (stockfishEnabled) {
   brain.configureEngine("auto");
-  console.log(`[AIBrain] Stockfish engine enabled (path: ${process.env.STOCKFISH_PATH ?? "auto-find"})`);
+  logger.info(`[AIBrain] Stockfish engine enabled (path: ${process.env.STOCKFISH_PATH ?? "auto-find"})`);
 }
 
 if (process.env.AI_BRAIN_PERSISTENCE === "true") {
   brain.enablePersistence(storageDir);
-  console.log(`[AIBrain] Player persistence enabled (dir: ${storageDir})`);
+  logger.info(`[AIBrain] Player persistence enabled (dir: ${storageDir})`);
 }
 
 if (process.env.AI_COACH_PROVIDER && process.env.AI_COACH_API_KEY) {
@@ -24,7 +25,7 @@ if (process.env.AI_COACH_PROVIDER && process.env.AI_COACH_API_KEY) {
     model: process.env.AI_COACH_MODEL ?? "gpt-4o-mini",
     baseUrl: process.env.AI_COACH_BASE_URL ?? "https://api.openai.com/v1",
   });
-  console.log(`[AIBrain] LLM coach enabled (provider: ${process.env.AI_COACH_PROVIDER})`);
+  logger.info(`[AIBrain] LLM coach enabled (provider: ${process.env.AI_COACH_PROVIDER})`);
 }
 
 export type { MoveEvaluation };
