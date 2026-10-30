@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Animated, { FadeIn, SlideInUp } from "react-native-reanimated";
 import { colors, radius, spacing, typography } from "../../src/theme/tokens";
@@ -8,6 +8,7 @@ import { useBot } from "../../src/context/BotContext";
 import { lastPlayed, type LastPlayedMatch } from "../../src/services/LastPlayedService";
 import { haptics } from "../../src/services/HapticsService";
 import Icon from "../../src/components/Icon";
+import LoadingSkeleton from "../../src/components/LoadingSkeleton";
 import { trackEvent } from "../../src/utils/analytics";
 
 /* ── Deposit countdown ───────────────────────────────────────────────── */
@@ -187,7 +188,7 @@ export default function QueueScreen() {
         </View>
       ) : searching ? (
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={colors.accent.primary} />
+          <LoadingSkeleton width={56} height={56} borderRadius={28} />
           <Text style={styles.searchText}>Searching for opponent…</Text>
           {isBot && (
             <View style={styles.botBadge}>
@@ -197,7 +198,7 @@ export default function QueueScreen() {
         </View>
       ) : (
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={colors.accent.primary} />
+          <LoadingSkeleton width={56} height={56} borderRadius={28} />
           <Text style={styles.searchText}>Connecting to server…</Text>
         </View>
       )}
