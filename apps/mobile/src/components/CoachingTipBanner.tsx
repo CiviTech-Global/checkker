@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Animated, {
-  FadeIn,
   FadeOut,
   SlideInDown,
   useSharedValue,

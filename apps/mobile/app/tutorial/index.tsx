@@ -14,7 +14,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withSpring,
   Easing,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
@@ -28,7 +27,6 @@ import {
   radius,
   glassStyle,
   gradients,
-  springConfig,
 } from "../../src/theme/tokens";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
 import Icon from "../../src/components/Icon";

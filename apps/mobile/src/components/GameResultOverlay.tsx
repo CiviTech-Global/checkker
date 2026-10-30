@@ -11,7 +11,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-import { colors, radius, spacing, glassStyle, gradients, springConfig, shadows } from "../theme/tokens";
+import { colors, radius, spacing, glassStyle, gradients, shadows } from "../theme/tokens";
 import { useSpringPress, staggerDelay } from "../utils/animations";
 import type { GameResult, Color, ScoredGame, PokerResult } from "@checkker/shared";
 import { PokerHand } from "@checkker/shared";

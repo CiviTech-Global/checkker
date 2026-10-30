@@ -2,14 +2,12 @@ import "@ethersproject/shims";
 import { useEffect } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import * as SplashScreen from "expo-router";
-import { colors, typography } from "../src/theme/tokens";
+import { colors } from "../src/theme/tokens";
 import { LocalProfileProvider, useLocalProfile } from "../src/context/LocalProfileContext";
 import { BotProvider } from "../src/context/BotContext";
 import { useSocket } from "../src/hooks/useSocket";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
 import { initMonitoring } from "../src/utils/analytics";
-import type { GameResult } from "@checkker/shared";
 
 initMonitoring();
 

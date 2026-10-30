@@ -19,7 +19,7 @@ export default function ConnectWalletScreen() {
     onAuthChallenge,
     onAuthError,
   } = useSocket();
-  const [authStep, setAuthStep] = useState<"idle" | "connecting" | "signing" | "verifying" | "done">("idle");
+  const [, setAuthStep] = useState<"idle" | "connecting" | "signing" | "verifying" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
   const attemptedRef = useRef(false);
 
