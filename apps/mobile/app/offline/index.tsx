@@ -22,7 +22,7 @@ function describeResult(snapshot: LocalGameSnapshot, playerColor: string): strin
     case "resignation":
       return result.winner === playerColor ? "The bot resigned — you win!" : "You resigned.";
     case "timeout":
-      return result.winner === playerColor ? "You win on time!" : "You lost on time.";
+      return result.winner === playerColor ? "You win on time!" : "You lose on time.";
     case "draw":
       return "Draw.";
     case "deckExhausted":
