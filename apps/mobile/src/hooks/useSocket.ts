@@ -6,6 +6,7 @@ import type { Puzzle, PuzzleResult, PuzzlesListData } from "../types/puzzle";
 import { ADDRESS_OF_SERVER } from "../config/features";
 import { setEquippedFromData } from "../utils/cosmetics";
 import { registerForPushNotifications } from "../utils/push";
+import { trackEvent } from "../utils/analytics";
 
 /* ── Lazy socket singleton ──────────────────────────────────────────── */
 
@@ -499,7 +500,20 @@ function attachListeners(s: Socket) {
     _betCancelledCallback?.(data);
   });
 
-  s.on("queue_joined", (data: { mode: string; difficulty: string; tc: string; betAmountUsd: number }) => {
+  s.on("queue_joined", (data: {
+    mode: string;
+    difficulty: string;
+    tc: string;
+    stake: "free" | "bet";
+    betAmountUsd: number;
+  }) => {
+    if (data.stake === "free") {
+      trackEvent("queue_joined", {
+        mode: data.mode,
+        difficulty: data.difficulty,
+        tc: data.tc,
+      });
+    }
     _queueJoinedCallback?.(data);
   });
 
