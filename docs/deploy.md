@@ -81,10 +81,11 @@ The server serves the web export from `WEB_DIST` if available.
 
 ### Docker
 
-A `Dockerfile` is provided at the repository root:
+The server image is defined by `apps/server/Dockerfile` (the canonical file;
+build context must be the repository root so workspace packages are available):
 
 ```bash
-docker build -t checkker-server .
+docker build -f apps/server/Dockerfile -t checkker-server .
 docker run -p 3001:3001 --env-file .env checkker-server
 ```
 
