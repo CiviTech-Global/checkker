@@ -23,7 +23,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Chess } from "chess.js";
 import type { Card, Color, GameResult, PokerResult } from "@checkker/shared";
 import { cardToPiece, cardId } from "@checkker/shared";
-import { getLegalMovesForHand } from "@checkker/chess";
+import { getLegalMovesForHand, findCardForSquare } from "@checkker/chess";
 import ChessBoard from "../../src/components/ChessBoard";
 const ChessBoardGL = lazy(() => import("../../src/components/ChessBoardGL"));
 import { features } from "../../src/config/features";
@@ -376,15 +376,19 @@ export default function GameScreen() {
     }
   }, [result, color]);
 
-  const legalMovesMap = useMemo(() => {
+  const legalMovesList = useMemo(() => {
     try {
-      const chess = new Chess(fen);
-      const entries = getLegalMovesForHand(chess, myHand);
-      return new Map(entries.map((e) => [cardId(e.card), e.moves]));
+      return getLegalMovesForHand(new Chess(fen), myHand);
     } catch {
-      return new Map<string, string[]>();
+      return [];
     }
   }, [fen, myHand]);
+  
+  const legalMovesMap = useMemo(
+    () => new Map(legalMovesList.map((e) => [cardId(e.card), e.moves])),
+    [legalMovesList]
+  );
+
 
   const highlightedSquares = useMemo(() => {
     if (selectedCardIdx == null) return [];
@@ -409,7 +413,17 @@ export default function GameScreen() {
   }, [myTurn]);
 
   const handleSquarePress = useCallback((square: string) => {
-    if (!myTurn || selectedCardIdx == null) return;
+    if (!myTurn) return;
+
+    if (selectedCardIdx == null) {
+      const idx = findCardForSquare(legalMovesList, square);
+      if (idx == null) return;
+      haptics.cardTap();
+      setSelectedCardIdx(idx);
+      setSelectedSourceSquare(square);
+      return;
+    }
+
     const card = myHand[selectedCardIdx];
     if (!card) return;
     const cid = cardId(card);
@@ -422,7 +436,19 @@ export default function GameScreen() {
         return;
       }
       const matching = allMoves.filter((m: string) => m.slice(2, 4) === square);
-      if (matching.length === 0) return;
+      if (matching.length === 0) {
+        // Not a destination — treat as picking a different piece.
+        const idx = findCardForSquare(legalMovesList, square);
+        if (idx == null) {
+          setSelectedCardIdx(null);
+          setSelectedSourceSquare(null);
+          return;
+        }
+        haptics.cardTap();
+        setSelectedCardIdx(idx);
+        setSelectedSourceSquare(square);
+        return;
+      }
       if (matching.length > 1 && matching[0].length > 4) {
         setPromotionMoves(matching);
         return;
@@ -432,10 +458,27 @@ export default function GameScreen() {
       setSelectedCardIdx(null);
       setSelectedSourceSquare(null);
     } else {
+      if (square === selectedSourceSquare) {
+        setSelectedCardIdx(null);
+        setSelectedSourceSquare(null);
+        return;
+      }
       const matching = allMoves.filter(
         (m: string) => m.startsWith(selectedSourceSquare) && m.slice(2, 4) === square
       );
-      if (matching.length === 0) return;
+      if (matching.length === 0) {
+        // Not a destination — treat as picking a different piece.
+        const idx = findCardForSquare(legalMovesList, square);
+        if (idx == null) {
+          setSelectedCardIdx(null);
+          setSelectedSourceSquare(null);
+          return;
+        }
+        haptics.cardTap();
+        setSelectedCardIdx(idx);
+        setSelectedSourceSquare(square);
+        return;
+      }
       if (matching.length > 1 && matching[0].length > 4) {
         setPromotionMoves(matching);
         return;
@@ -445,7 +488,7 @@ export default function GameScreen() {
       setSelectedCardIdx(null);
       setSelectedSourceSquare(null);
     }
-  }, [myTurn, selectedCardIdx, myHand, legalMovesMap, selectedSourceSquare, playMove]);
+  }, [myTurn, selectedCardIdx, myHand, legalMovesMap, legalMovesList, selectedSourceSquare, playMove]);
 
   const handlePromotionSelect = useCallback((piece: string) => {
     if (!promotionMoves || selectedCardIdx == null) return;

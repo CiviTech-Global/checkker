@@ -13,7 +13,7 @@ import {
 } from "@checkker/shared";
 import { getLegalMovesForHand, getCaptureBonus, pseudoLegalMoves,
   applyPseudoLegalMove,
-  hasAnyPlayableCard, } from "@checkker/chess";
+  hasAnyPlayableCard, LegalMovesForCard } from "@checkker/chess";
 import { evaluateScorePile } from "@checkker/poker";
 
 /**
@@ -152,9 +152,8 @@ export class LocalGameEngine {
   }
 
   /** Legal moves for the side to move, grouped per card in hand. */
-  getLegalMoves(): Array<{ card: Card; moves: string[] }> {
-    const grouped = getLegalMovesForHand(this.chess, this.currentPlayer.hand);
-    return grouped.map((g, i) => ({ card: this.currentPlayer.hand[i], moves: g.moves }));
+  getLegalMoves(): LegalMovesForCard[] {
+    return getLegalMovesForHand(this.chess, this.currentPlayer.hand);
   }
 
   playCard(cardIdStr: string, moveStr: string): { success: boolean; error?: string } {
