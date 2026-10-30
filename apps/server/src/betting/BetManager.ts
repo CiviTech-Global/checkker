@@ -1,3 +1,4 @@
+import { logger } from "../logger";
 import type { BotDifficulty, GameMode, GameResult, StakeLevel } from "@checkker/shared";
 import { BET_AMOUNTS_USD, isFreeStake, DEPOSIT_TIMEOUT_MS } from "@checkker/shared";
 import { ContractService } from "../blockchain/ContractService";
@@ -35,7 +36,7 @@ export const BetManager = {
       const unsettled = await repo.findUnsettledConfirmed();
       if (unsettled.length === 0) return;
 
-      console.log(`[BetManager] Reconciling ${unsettled.length} unsettled bet(s)`);
+      logger.info(`[BetManager] Reconciling ${unsettled.length} unsettled bet(s)`);
       for (const bet of unsettled) {
         const game = bet.game;
         if (!game || !(game as any).result) {
@@ -49,18 +50,18 @@ export const BetManager = {
           // has passed and cancel if so.
           const pastDeadline = await ContractService.isPastDepositDeadline(bet.gameId);
           if (pastDeadline) {
-            console.log(`[BetManager] Reclaiming deposit for expired game ${bet.gameId}`);
+            logger.info(`[BetManager] Reclaiming deposit for expired game ${bet.gameId}`);
             try {
               await BetManager.cancelBet(bet.gameId);
             } catch (err) {
-              console.error(`[BetManager] Failed to cancel expired game ${bet.gameId}:`, err);
+              logger.error({ err }, `[BetManager] Failed to cancel expired game ${bet.gameId}:`);
             }
           }
           continue;
         }
 
         // On-chain is already resolved — just mark our DB records accordingly.
-        console.log(`[BetManager] Game ${bet.gameId} already resolved on-chain (status=${onChain.status})`);
+        logger.info(`[BetManager] Game ${bet.gameId} already resolved on-chain (status=${onChain.status})`);
         const bets = await repo.findByGame(bet.gameId);
         for (const b of bets) {
           if (onChain.status === 2) {
@@ -76,7 +77,7 @@ export const BetManager = {
         }
       }
     } catch (err) {
-      console.error("[BetManager] reconcileOnStartup failed:", err);
+      logger.error({ err }, "[BetManager] reconcileOnStartup failed:");
     }
   },
 
@@ -98,7 +99,7 @@ export const BetManager = {
     }
 
     if (!ContractService.enabled) {
-      console.log("[BetManager] Blockchain not enabled, skipping escrow");
+      logger.info("[BetManager] Blockchain not enabled, skipping escrow");
       return null;
     }
 
@@ -107,7 +108,7 @@ export const BetManager = {
 
     try {
       await ContractService.createGame(gameId, whiteAddress, blackAddress, wei);
-      console.log(`[BetManager] Created escrow for game ${gameId}: $${usd} (${wei} wei)`);
+      logger.info(`[BetManager] Created escrow for game ${gameId}: $${usd} (${wei} wei)`);
 
       const repo = await getBetRepository();
       if (repo) {
@@ -118,7 +119,7 @@ export const BetManager = {
             amountWei: wei,
             amountUsd: usd,
             depositTxHash: "",
-          }).catch((err: any) => console.error("[BetManager] Failed to create white bet record:", err));
+          }).catch((err: any) => logger.error({ err }, "[BetManager] Failed to create white bet record:"));
         }
         if (blackUserId) {
           await repo.create({
@@ -127,13 +128,13 @@ export const BetManager = {
             amountWei: wei,
             amountUsd: usd,
             depositTxHash: "",
-          }).catch((err: any) => console.error("[BetManager] Failed to create black bet record:", err));
+          }).catch((err: any) => logger.error({ err }, "[BetManager] Failed to create black bet record:"));
         }
       }
 
       return { gameId, betAmountWei: wei, betAmountUsd: usd, isFree: false };
     } catch (err) {
-      console.error("[BetManager] Failed to create escrow:", err);
+      logger.error({ err }, "[BetManager] Failed to create escrow:");
       return null;
     }
   },
@@ -149,7 +150,7 @@ export const BetManager = {
         await repo.confirmDeposit(bet.id, depositTxHash || undefined);
       }
     } catch (err) {
-      console.error("[BetManager] Failed to confirm deposit:", err);
+      logger.error({ err }, "[BetManager] Failed to confirm deposit:");
     }
   },
 
@@ -190,7 +191,7 @@ export const BetManager = {
 
         if (result.type === "draw" || result.type === "deckExhausted") {
           txHash = await ContractService.reportDraw(gameId);
-          console.log(`[BetManager] Draw settled for game ${gameId}: ${txHash}`);
+          logger.info(`[BetManager] Draw settled for game ${gameId}: ${txHash}`);
 
           const repo = await getBetRepository();
           if (repo && txHash) {
@@ -205,7 +206,7 @@ export const BetManager = {
 
         if (winnerAddress) {
           txHash = await ContractService.reportWinner(gameId, winnerAddress);
-          console.log(`[BetManager] Winner settled for game ${gameId}: ${txHash}`);
+          logger.info(`[BetManager] Winner settled for game ${gameId}: ${txHash}`);
 
           const repo = await getBetRepository();
           if (repo && txHash) {
@@ -223,11 +224,11 @@ export const BetManager = {
         return null;
       } catch (err: any) {
         lastError = err?.message ?? String(err);
-        console.error(`[BetManager] Settlement attempt ${attempt}/${MAX_SETTLEMENT_RETRIES} failed for game ${gameId}:`, lastError);
+        logger.error({ err: lastError }, `[BetManager] Settlement attempt ${attempt}/${MAX_SETTLEMENT_RETRIES} failed for game ${gameId}:`);
 
         // Contract revert means game is already settled — not an error
         if (lastError.includes("revert") || lastError.includes("execution reverted")) {
-          console.log(`[BetManager] Game ${gameId} already settled on-chain, updating DB records`);
+          logger.info(`[BetManager] Game ${gameId} already settled on-chain, updating DB records`);
           const repo = await getBetRepository();
           if (repo) {
             const bets = await repo.findByGame(gameId);
@@ -244,7 +245,7 @@ export const BetManager = {
 
         if (attempt < MAX_SETTLEMENT_RETRIES) {
           const delay = Math.min(1000 * Math.pow(2, attempt - 1), 30000);
-          console.log(`[BetManager] Retrying settlement in ${delay}ms (attempt ${attempt + 1}/${MAX_SETTLEMENT_RETRIES})`);
+          logger.info(`[BetManager] Retrying settlement in ${delay}ms (attempt ${attempt + 1}/${MAX_SETTLEMENT_RETRIES})`);
           await new Promise((r) => setTimeout(r, delay));
         }
       }
@@ -252,7 +253,7 @@ export const BetManager = {
 
     // All retries exhausted
     const errorMsg = lastError ?? "Unknown error";
-    console.error(`[BetManager] Settlement failed for game ${gameId} after ${MAX_SETTLEMENT_RETRIES} retries: ${errorMsg}`);
+    logger.error(`[BetManager] Settlement failed for game ${gameId} after ${MAX_SETTLEMENT_RETRIES} retries: ${errorMsg}`);
     const repo = await getBetRepository();
     if (repo) {
       const bets = await repo.findByGame(gameId);
@@ -270,7 +271,7 @@ export const BetManager = {
     for (let attempt = 1; attempt <= MAX_SETTLEMENT_RETRIES; attempt++) {
       try {
         const txHash = await ContractService.cancelGame(gameId);
-        console.log(`[BetManager] Cancelled bet for game ${gameId}: ${txHash}`);
+        logger.info(`[BetManager] Cancelled bet for game ${gameId}: ${txHash}`);
 
         const repo = await getBetRepository();
         if (repo) {
@@ -284,7 +285,7 @@ export const BetManager = {
       } catch (err: any) {
         const msg = err?.message ?? String(err);
         if (msg.includes("revert") || msg.includes("execution reverted")) {
-          console.log(`[BetManager] Game ${gameId} already cancelled on-chain`);
+          logger.info(`[BetManager] Game ${gameId} already cancelled on-chain`);
           return null;
         }
         if (attempt < MAX_SETTLEMENT_RETRIES) {
@@ -313,13 +314,13 @@ export const BetManager = {
           await repo.markSettlementFailed(bet.id, "Max retries reached").catch(() => {});
           continue;
         }
-        console.log(`[BetManager] Retrying settlement for bet ${bet.id} (game ${bet.gameId})`);
+        logger.info(`[BetManager] Retrying settlement for bet ${bet.id} (game ${bet.gameId})`);
         retriedCount++;
       }
 
       return retriedCount;
     } catch (err) {
-      console.error("[BetManager] retryFailedSettlements failed:", err);
+      logger.error({ err }, "[BetManager] retryFailedSettlements failed:");
       return 0;
     }
   },

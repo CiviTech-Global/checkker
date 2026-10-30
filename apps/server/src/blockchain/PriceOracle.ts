@@ -1,3 +1,4 @@
+import { logger } from "../logger";
 import { parseEther } from "ethers";
 
 let cachedPrice: { bnbUsd: number; fetchedAt: number } | null = null;
@@ -24,7 +25,7 @@ export async function getBnbUsdPrice(): Promise<number> {
       return price;
     }
   } catch (err) {
-    console.error("[PriceOracle] Failed to fetch BNB price:", err);
+    logger.error({ err }, "[PriceOracle] Failed to fetch BNB price:");
   }
 
   // Fallback: use cached price if available, or a default

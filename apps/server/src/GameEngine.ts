@@ -248,7 +248,6 @@ export class GameEngine {
     // }
 
     let moveResult: Move;
-    const promotion = moveStr.length > 4 ? moveStr.slice(4) : undefined;
     const candidate = pseudoLegalMoves(this.chess).find((m) => m.lan === moveStr);
 
     if (!candidate) {
