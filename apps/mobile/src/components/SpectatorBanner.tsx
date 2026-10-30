@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Animated, {
-  FadeIn,
   FadeOut,
   SlideInUp,
 } from "react-native-reanimated";

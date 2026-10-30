@@ -9,7 +9,6 @@ import { AVATARS } from "@checkker/shared";
 import {
   updateLocalProfile,
   recordOfflineGame,
-  syncOnlineStats,
   resetStats,
   clearGameHistory,
   writeStats,
@@ -59,7 +58,6 @@ const OPPONENT_NAMES = [
 
 const MODES: GameMode[] = ["bot", "lan", "ranked", "casual"];
 const DIFFICULTIES = ["easy", "medium", "hard"];
-const RESULT_TYPES: GameResultType[] = ["checkmate", "resignation", "timeout", "draw"];
 
 /* ── Create Demo Data ──────────────────────────────────────────────── */
 
@@ -72,9 +70,6 @@ export function createDemoData(): LeaderboardEntry[] {
   resetStats();
 
   // 3. Generate ~30 game history entries with varied data
-  const now = Date.now();
-  const dayMs = 24 * 60 * 60 * 1000;
-
   for (let i = 0; i < 30; i++) {
     const outcomes: GameOutcome[] = ["win", "win", "win", "loss", "loss", "draw"];
     const outcome = pick(outcomes); // ~50% win, ~33% loss, ~17% draw

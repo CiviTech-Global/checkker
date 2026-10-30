@@ -16,14 +16,12 @@ import Animated, {
   withSequence,
   Easing,
 } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import {
   colors,
   spacing,
   radius,
   glassStyle,
-  gradients,
 } from "../../src/theme/tokens";
 import { useSocket } from "../../src/hooks/useSocket";
 import { useSpringPress, staggerDelay } from "../../src/utils/animations";
@@ -210,7 +208,7 @@ export default function BotDifficultyScreen() {
     setSelectedDifficulty(difficulty);
   };
 
-  const handleSelectPersonality = (personality: BotPersonality) => {
+  const handleSelectPersonality = (_personality: BotPersonality) => {
     if (!selectedDifficulty) return;
     if (!connected) {
       const offlineDifficulty = selectedDifficulty === "master" ? "advanced" : selectedDifficulty;

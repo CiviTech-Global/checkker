@@ -92,7 +92,6 @@ export class SceneSync {
         const addPiece = newBySquare.get(addSq)!;
         if (addPiece.type === rem.type && addPiece.color === rem.color) {
           // This is a move
-          const fromSquare = rem.square;
           const toCoords = squareTo3D(addSq, this.config);
 
           // Check if there's a piece being captured at the destination

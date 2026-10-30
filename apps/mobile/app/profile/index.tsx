@@ -458,7 +458,7 @@ export default function ProfileScreen() {
           style={[styles.section, glassStyle]}
         >
           <Text style={styles.sectionTitle}>Recent Games</Text>
-          {gameHistory.map((game, i) => {
+          {gameHistory.map((game, _i) => {
             const resultColor =
               game.result === "win"
                 ? colors.accent.green

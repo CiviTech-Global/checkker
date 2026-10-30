@@ -15,7 +15,7 @@ import { Chess } from "chess.js";
 import { formatCheckkerGame, buildReplayLink } from "@checkker/shared";
 import ChessBoard from "../../src/components/ChessBoard";
 import { useSocket } from "../../src/hooks/useSocket";
-import { colors, spacing, radius, glassStyle } from "../../src/theme/tokens";
+import { colors, spacing, radius } from "../../src/theme/tokens";
 
 function ReplayControlButton({
   icon,

@@ -13,7 +13,7 @@ const strategies: BotStrategy[] = ["balanced", "aggressive", "defensive", "gambl
 
 export default function BotConfigScreen() {
   const router = useRouter();
-  const { config, maturity, setConfig, setEnabled } = useBot();
+  const { config, maturity, setConfig } = useBot();
   const { authState, updateBotConfig, onBotConfigUpdated, onBotError, guestIdentify } = useSocket();
   const [local, setLocal] = useState(config);
   const [saving, setSaving] = useState(false);

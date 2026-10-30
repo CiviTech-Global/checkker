@@ -1,5 +1,5 @@
 import { ScrollView, View, Text, StyleSheet } from "react-native";
-import { colors, radius, spacing } from "../theme/tokens";
+import { colors, radius } from "../theme/tokens";
 import type { MoveRecord } from "@checkker/shared";
 import { cardId } from "@checkker/shared";
 import { useRef, useEffect } from "react";
