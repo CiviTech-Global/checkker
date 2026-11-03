@@ -148,9 +148,21 @@ GitHub Actions workflows are in `.github/workflows/`:
 - `build-flutter.yml` — Flutter builds for Android, iOS, Linux, macOS, Windows.
 - `deploy-server.yml` — server deployment (configure for your host).
 
+## Prometheus Metrics
+
+The server exposes operational metrics at `GET /metrics` in Prometheus text format.
+
+Available counters:
+
+- `games_started` — total number of games started.
+- `games_completed` — total number of games completed.
+- `queue_waits` — total number of players added to a waiting queue.
+- `errors` — total number of captured server errors.
+
 ## Post-Deploy Checks
 
 1. `GET /health` returns `200 OK`.
 2. WebSocket connection at `/socket.io/` succeeds.
 3. A bot game can be started and completed.
 4. Database migrations / Prisma generate ran successfully.
+5. `GET /metrics` returns Prometheus metrics.
