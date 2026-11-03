@@ -389,3 +389,83 @@ describe("GameEngine — draw mechanics", () => {
     engine.dispose();
   });
 });
+
+/* ── Deck exhaustion ─────────────────────────────────────────────────── */
+
+/**
+ * Build a deck of exactly 6 cards: 3 for white, 3 for black, empty draw pile.
+ * Like testDeck we rely on the fact that drawToFull pops from the array end,
+ * so white's hand is the last 3 entries and black's the 3 before that.
+ */
+function sixCardDeck(whiteHand: Card[], blackHand: Card[]): Card[] {
+  return [
+    ...blackHand.slice().reverse(),
+    ...whiteHand.slice().reverse(),
+  ];
+}
+
+describe("GameEngine — deck exhaustion", () => {
+  /**
+   * Rule under test: when a player must draw and the draw pile is empty,
+   * GameEngine reshuffles the dead pile once. If the pile is empty *again*
+   * after that single reshuffle, the game ends with result "deckExhausted".
+   *
+   * A 6-card deck makes this reachable deterministically:
+   *   - construction draws all 6 cards (pile empty);
+   *   - play 1 (white)  -> dead [c1], black still has 3, no redraw;
+   *   - play 2 (black)  -> dead [c1,c2], white drops to 2 and eats ONE
+   *     reshuffled card back (draws 1, pile 1 left);
+   *   - play 3 (white)  -> black eats the last pile card (pile 0);
+   *   - play 4 (black)  -> white drops to 2, pile empty, the single allowed
+   *     reshuffle is spent -> result = deckExhausted.
+   *
+   * All six cards are pawn ranks (both sides play one-square pawn advances on
+   * distinct files) so every play is legal and non-capturing — the deck, not
+   * the board, is the variable under test.
+   */
+  it("ends with deckExhausted when the single dead-pile reshuffle is spent", () => {
+    const whiteHand = [c("3", "clubs"), c("3", "diamonds"), c("3", "hearts")];
+    const blackHand = [c("4", "clubs"), c("4", "diamonds"), c("4", "hearts")];
+    const engine = new GameEngine(1200, 1200, "blitz", sixCardDeck(whiteHand, blackHand));
+
+    // Construction consumes the whole deck: 3 cards each, empty pile.
+    const initial = engine.getState();
+    expect(initial.drawPile.length).toBe(0);
+    expect(initial.white.hand.length).toBe(3);
+    expect(initial.black.hand.length).toBe(3);
+    expect(initial.result).toBeNull();
+
+    // play 1: white e-pawn, no capture.
+    expect(engine.playCard(cardId(c("3", "clubs")), "e2e3")).toEqual({ success: true });
+    expect(engine.getState().result).toBeNull(); // first reshuffle not yet needed
+    expect(engine.getState().deadPile.length).toBe(1);
+
+    // play 2: black e-pawn. White's refill afterwards reshuffles 2 dead
+    // cards and draws 1, so the pile is down to 1 — game still live.
+    expect(engine.playCard(cardId(c("4", "clubs")), "e7e6")).toEqual({ success: true });
+    expect(engine.getState().result).toBeNull();
+    expect(engine.getState().drawPile.length).toBe(1);
+    expect(engine.getState().white.hand.length).toBe(3);
+
+    // play 3: white d-pawn, no capture. Black's refill takes the last card.
+    expect(engine.playCard(cardId(c("3", "diamonds")), "d2d3")).toEqual({ success: true });
+    expect(engine.getState().result).toBeNull();
+    expect(engine.getState().drawPile.length).toBe(0);
+
+    // play 4: black d-pawn. White's refill now needs a second reshuffle:
+    // the pile is empty and the reshuffle flag is already spent.
+    expect(engine.playCard(cardId(c("4", "diamonds")), "d7d6")).toEqual({ success: true });
+
+    const result = engine.getState().result;
+    expect(result).not.toBeNull();
+    expect(result!.type).toBe("deckExhausted");
+    expect(engine.isOver()).toBe(true);
+
+    // Any further play is rejected on the ended game.
+    expect(engine.playCard(cardId(c("3", "hearts")), "a2a3")).toEqual({
+      success: false,
+      error: "Game already ended",
+    });
+    engine.dispose();
+  });
+});
