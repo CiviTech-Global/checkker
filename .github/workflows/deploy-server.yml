@@ -7,21 +7,39 @@ on:
       - "apps/server/**"
       - "packages/**"
       - "package-lock.json"
+      - "apps/server/Dockerfile"
+      - ".dockerignore"
+      - ".github/workflows/deploy-server.yml"
+  # PR builds produce a local amd64 image, scan it, and expose the result as a
+  # required status check. Nothing is pushed or deployed from a pull request.
+  # No branch filter: stacked PRs target a feature branch, not `main`.
+  pull_request:
+    paths:
+      - "apps/server/**"
+      - "packages/**"
+      - "package-lock.json"
+      - "apps/server/Dockerfile"
+      - ".dockerignore"
       - ".github/workflows/deploy-server.yml"
   workflow_dispatch:
 
-# Deploys must serialize: cancel-in-progress is off on purpose so an in-flight
-# rollout finishing beats a newer commit starting mid-air.
+# Production deploys serialize: cancel-in-progress is off on purpose so an
+# in-flight rollout finishing beats a newer commit starting mid-air. PR image
+# builds are safe to supersede.
 concurrency:
   group: deploy-server-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
   packages: write
 
+env:
+  IMAGE: ghcr.io/${{ github.repository }}/server
+
 jobs:
-  build-and-push:
+  build-scan:
+    name: Build, scan, and publish server image
     runs-on: ubuntu-latest
 
     steps:
@@ -31,6 +49,7 @@ jobs:
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
       - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           registry: ghcr.io
@@ -41,35 +60,99 @@ jobs:
         id: meta
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
         with:
-          images: ghcr.io/${{ github.repository }}/server
+          images: ${{ env.IMAGE }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha
+            type=raw,value=scan-${{ github.sha }}
 
-      - name: Build and push image
+      # On main this publishes linux/amd64 + linux/arm64. On PRs it loads a
+      # single amd64 image into the local Docker daemon so Trivy can scan it.
+      - name: Build image
+        id: build
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           context: .
           file: apps/server/Dockerfile
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
+          platforms: ${{ github.event_name == 'pull_request' && 'linux/amd64' || 'linux/amd64,linux/arm64' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Optional remote rollout: configure DEPLOY_HOST, DEPLOY_USER and
-      # DEPLOY_SSH_KEY secrets to pull and restart the container on a host.
-      - name: Trigger remote rollout
-        if: ${{ vars.DEPLOY_ENABLED == 'true' }}
+      # Blocks the PR/main build when a fixable HIGH or CRITICAL vulnerability
+      # is present in the OS packages or bundled libraries.
+      - name: Scan image for HIGH/CRITICAL vulnerabilities
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE }}:scan-${{ github.sha }}
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          severity: HIGH,CRITICAL
+          vuln-type: os,library
+
+      - name: Verify multi-arch manifest
+        if: github.event_name != 'pull_request'
+        run: docker buildx imagetools inspect "${{ env.IMAGE }}:scan-${{ github.sha }}"
+
+      # Optional production rollout: configure DEPLOY_HOST, DEPLOY_USER and
+      # DEPLOY_SSH_KEY secrets, then set the DEPLOY_ENABLED repo variable.
+      - name: Trigger production rollout
+        if: github.event_name == 'push' && vars.DEPLOY_ENABLED == 'true'
         uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            docker pull ghcr.io/${{ github.repository }}/server:latest
+            docker pull ${{ env.IMAGE }}:latest
             docker rm -f checkker-server || true
             docker run -d --name checkker-server --restart unless-stopped \
               -p 3001:3001 -p 47831:47831/udp \
               --env-file /etc/checkker/server.env \
-              ghcr.io/${{ github.repository }}/server:latest
+              ${{ env.IMAGE }}:latest
+
+  deploy-staging:
+    name: Deploy to staging
+    needs: build-scan
+    if: github.event_name == 'push' && vars.STAGING_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+
+    steps:
+      - name: Deploy staging container
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            # Pin the exact commit that passed the scan instead of racing :latest.
+            docker pull ${{ env.IMAGE }}:scan-${{ github.sha }}
+            docker rm -f checkker-staging || true
+            docker run -d --name checkker-staging --restart unless-stopped \
+              -p 3002:3001 -p 47832:47831/udp \
+              --env-file /etc/checkker/staging.env \
+              ${{ env.IMAGE }}:scan-${{ github.sha }}
+
+      - name: Smoke test staging
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 20); do
+            if curl -fsS "${{ vars.STAGING_URL }}/health" >/dev/null \
+              && curl -fsS "${{ vars.STAGING_URL }}/ready" >/dev/null; then
+              echo "staging is healthy"
+              exit 0
+            fi
+            echo "waiting for staging (attempt ${attempt}/20)..."
+            sleep 3
+          done
+          echo "staging did not become healthy"
+          exit 1
