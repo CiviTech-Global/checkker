@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
@@ -769,6 +769,16 @@ class SocketService {
       _connectedController.add(false);
     });
 
+    // FCM token registration responses
+    s.on('fcm_token_registered', (data) {
+      debugPrint('[push] Token successfully stored on server');
+    });
+
+    s.on('fcm_token_error', (data) {
+      final json = _toMap(data);
+      debugPrint('[push] Token registration failed: ${json['error']}');
+    });
+
     // Game events
     s.on('game_start', (data) {
       final json = _toMap(data);
@@ -1364,8 +1374,35 @@ class SocketService {
   }
 
   // FCM token
-  void registerFcmToken(String token) {
+  Future<bool> registerFcmToken(String token) async {
+    final completer = Completer<bool>();
+
+    void onSuccess(dynamic data) {
+      if (!completer.isCompleted) {
+        completer.complete(true);
+      }
+    }
+
+    void onError(dynamic data) {
+      if (!completer.isCompleted) {
+        completer.complete(false);
+      }
+    }
+
+    socket.once('fcm_token_registered', onSuccess);
+    socket.once('fcm_token_error', onError);
+
     socket.emit('register_fcm_token', {'token': token});
+
+    try {
+      return await completer.future.timeout(const Duration(seconds: 10));
+    } on TimeoutException {
+      debugPrint('[push] Token registration timed out');
+      return false;
+    } finally {
+      socket.off('fcm_token_registered', onSuccess);
+      socket.off('fcm_token_error', onError);
+    }
   }
 
   // Spectate methods
