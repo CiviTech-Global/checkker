@@ -1,3 +1,4 @@
+import type { SocketRateLimiter } from "../rateLimit";
 import type { Socket } from "socket.io";
 import type { Player } from "./types";
 import type { GameServer } from "../GameServer";
@@ -12,6 +13,7 @@ export function registerFriendHandlers(
   server: GameServer,
   privateInvites: Map<string, any>,
   userSockets: Map<string, Socket>,
+  rateLimiter: SocketRateLimiter,
 ) {
   const emitFriendsData = async (targetSocket: Socket, userId: string) => {
     const { FriendshipRepository } = await import("@checkker/database");
@@ -40,6 +42,13 @@ export function registerFriendHandlers(
   });
 
   socket.on("send_friend_request", async ({ username }: { username: string }) => {
+    if (!rateLimiter.allow(socket.id, "send_friend_request")) {
+      socket.emit("friend_request_result", {
+        success: false,
+        error: "Rate limit exceeded. Slow down.",
+      });
+      return;
+    }
     const auth = authenticatedSockets.get(socket.id);
     if (!auth) {
       socket.emit("friend_request_result", { success: false, error: "Not authenticated" });

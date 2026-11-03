@@ -63,6 +63,7 @@ export class GameServer {
   private challengeCleanupInterval: ReturnType<typeof setInterval>;
   private authRateLimiter = new SocketRateLimiter({ capacity: 5, refillRate: 1 / 60 });
   private moveRateLimiter = new SocketRateLimiter({ capacity: 10, refillRate: 2 });
+  private socialRateLimiter = new SocketRateLimiter({ capacity: 5, refillRate: 1 });
 
   constructor(io: SocketServer) {
     this.io = io;
@@ -85,14 +86,14 @@ export class GameServer {
     registerBotHandlers(socket, this);
     registerCoachingHandlers(socket, () => this.matches);
     registerPuzzleHandlers(socket);
-    registerFriendHandlers(socket, this, this.privateInvites, this.userSockets);
+    registerFriendHandlers(socket, this, this.privateInvites, this.userSockets, this.socialRateLimiter);
     registerLanHandlers(socket, this, this.lanHosts);
     registerNotificationHandlers(socket);
     registerReplayHandlers(socket);
     registerPushHandlers(socket);
     registerCosmeticHandlers(socket);
     registerProfileHandlers(socket);
-    registerInGameHandlers(socket, this, () => this.matches, this.moveRateLimiter);
+    registerInGameHandlers(socket, this, () => this.matches, this.moveRateLimiter, this.socialRateLimiter);
 
     /* ── Disconnect ──────────────────────────────────────────────────── */
 
