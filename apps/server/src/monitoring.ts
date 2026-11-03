@@ -6,6 +6,7 @@
  * process crash capture, and a captureError helper for manual instrumentation.
  */
 
+import { logger } from "./logger";
 import type { Request, Response, NextFunction } from "express";
 
 let sentry: typeof import("@sentry/node") | null = null;
@@ -21,10 +22,10 @@ export function initMonitoring(): void {
         environment: process.env.NODE_ENV ?? "development",
         tracesSampleRate: 0.1,
       });
-      console.log("[monitoring] Sentry enabled");
+      logger.info("[monitoring] Sentry enabled");
     } catch {
       sentry = null;
-      console.warn("[monitoring] SENTRY_DSN set but @sentry/node not installed — falling back to console");
+      logger.warn("[monitoring] SENTRY_DSN set but @sentry/node not installed — falling back to pino");
     }
   }
 
@@ -92,7 +93,7 @@ export function setSentryTag(key: string, value: string): void {
 
 /** Capture an error with optional context metadata. */
 export function captureError(error: unknown, context?: Record<string, string>): void {
-  console.error("[error]", context?.source ?? "", error);
+  logger.error({ err: error, src: context?.source ?? "" }, "[error]");
   if (sentry?.captureException) {
     sentry.captureException(error, { extra: context });
   }

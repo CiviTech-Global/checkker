@@ -1,3 +1,4 @@
+import { logger } from "./logger";
 import { Server as SocketServer } from "socket.io";
 import type { Socket } from "socket.io";
 import { v4 as uuid } from "uuid";
@@ -550,7 +551,7 @@ export class GameServer {
           }
         }
       } catch (err) {
-        console.error(`[GameServer] Bet settlement failed for game ${gameId}:`, err);
+        logger.error({ err }, `[GameServer] Bet settlement failed for game ${gameId}:`);
       }
     }
 

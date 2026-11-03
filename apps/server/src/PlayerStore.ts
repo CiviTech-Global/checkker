@@ -1,3 +1,4 @@
+import { logger } from "./logger";
 import { v4 as uuid } from "uuid";
 import type { PlayerProfile } from "@checkker/shared";
 import type { User } from "@checkker/database";
@@ -11,9 +12,9 @@ export async function initPlayerStoreDb(): Promise<void> {
     const db = await import("@checkker/database");
     UserRepo = db.UserRepository;
     dbEnabled = true;
-    console.log("[PlayerStore] Database-backed mode enabled");
+    logger.info("[PlayerStore] Database-backed mode enabled");
   } catch {
-    console.log("[PlayerStore] Database not available, using in-memory mode");
+    logger.info("[PlayerStore] Database not available, using in-memory mode");
   }
 }
 

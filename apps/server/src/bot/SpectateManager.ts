@@ -1,3 +1,4 @@
+import { logger } from "../logger";
 import { GameEngine } from "../GameEngine";
 import { BotPlayer } from "./BotPlayer";
 import { evaluators } from "./evaluators";
@@ -211,7 +212,7 @@ export class SpectateManager {
 
     const playResult = game.playCard(result.cardId, result.move);
     if (!playResult.success) {
-      console.error(`[SpectateManager] playCard failed: ${playResult.error}`);
+      logger.error(`[SpectateManager] playCard failed: ${playResult.error}`);
     }
   }
 

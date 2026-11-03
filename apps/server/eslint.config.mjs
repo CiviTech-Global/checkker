@@ -27,8 +27,17 @@ export default [
       ...tsPlugin.configs.recommended.rules,
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "@typescript-eslint/no-explicit-any": "warn",
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "no-console": "error",
       eqeqeq: ["error", "always"],
+    },
+  },
+  {
+    // Tests and perf scripts print diagnostics for the developer, not for the
+    // log pipeline: the shared pino logger is level "silent" when
+    // NODE_ENV=test, so routing their output through it would mute it.
+    files: ["src/__tests__/**/*.ts", "src/__perf__/**/*.ts"],
+    rules: {
+      "no-console": "off",
     },
   },
   {

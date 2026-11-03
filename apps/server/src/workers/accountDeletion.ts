@@ -1,3 +1,4 @@
+import { logger } from "../logger";
 import { AccountRepository, SessionRepository, AuditLogRepository } from "@checkker/database";
 
 const CHECK_INTERVAL_MS = 60 * 60 * 1000; // hourly
@@ -30,12 +31,12 @@ async function runDeletionWorker(): Promise<void> {
 export function startAccountDeletionWorker(): void {
   // Run immediately at startup, then on interval.
   runDeletionWorker().catch((err) => {
-    console.error("[deletion-worker] initial run failed", err);
+    logger.error({ err }, "[deletion-worker] initial run failed");
   });
 
   const interval = setInterval(() => {
     runDeletionWorker().catch((err) => {
-      console.error("[deletion-worker] scheduled run failed", err);
+      logger.error({ err }, "[deletion-worker] scheduled run failed");
     });
   }, CHECK_INTERVAL_MS);
 
