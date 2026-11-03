@@ -1,5 +1,4 @@
 ﻿import { appSettings } from "../services/SettingsService";
-import type { AppSettings } from "../services/SettingsService";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,

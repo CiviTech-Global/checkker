@@ -36,7 +36,7 @@ export class PostProcessing {
     material.emissiveIntensity = 0;
   }
 
-  update(dt: number): void {
+  update(_dt: number): void {
     if (!this.enabled) return;
     // Subtle pulsing glow
     this.glowIntensity = 0.2 + Math.sin(performance.now() / 500) * 0.1;

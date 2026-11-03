@@ -51,7 +51,7 @@ export default function RankedScreen() {
   } = useSocket();
   const [searching, setSearching] = useState(false);
   const [selectedTier, setSelectedTier] = useState<DifficultyTier | null>(null);
-  const [queueInfo, setQueueInfo] = useState<{ betAmountUsd: number } | null>(null);
+  const [, setQueueInfo] = useState<{ betAmountUsd: number } | null>(null);
   const [cancelReason, setCancelReason] = useState<string | null>(null);
   const [depositTxPending, setDepositTxPending] = useState(false);
   const [depositTxSent, setDepositTxSent] = useState(false);

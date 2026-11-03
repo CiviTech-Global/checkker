@@ -22,7 +22,7 @@ export default function EditProfileScreen() {
   const { sessionToken } = useSocket();
   const api = useProfileApi(sessionToken);
 
-  const [profile, setProfile] = useState<MyProfile | null>(null);
+  const [, setProfile] = useState<MyProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [displayName, setDisplayName] = useState("");

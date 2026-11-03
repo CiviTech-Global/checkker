@@ -19,9 +19,7 @@ import {
   colors,
   spacing,
   radius,
-  glassStyle,
   gradients,
-  shadows,
 } from "../../../src/theme/tokens";
 import { useSpringPress } from "../../../src/utils/animations";
 import Icon from "../../../src/components/Icon";

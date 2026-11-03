@@ -30,7 +30,7 @@ import {
   playGameStartSound,
   playGameOverSound,
 } from "../../src/utils/sounds";
-import type { Card, Color, MoveRecord } from "@checkker/shared";
+import type { Card, MoveRecord } from "@checkker/shared";
 
 export default function SpectateGameScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

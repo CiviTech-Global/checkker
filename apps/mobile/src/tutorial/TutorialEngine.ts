@@ -1,6 +1,6 @@
 import { Chess } from "chess.js";
 import { getLegalMovesForHand } from "@checkker/chess";
-import { type LessonConfig, type LessonStep } from "./types";
+import { type LessonConfig } from "./types";
 import { LESSONS } from "./lessons";
 
 export class TutorialEngine {

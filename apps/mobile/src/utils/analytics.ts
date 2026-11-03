@@ -75,6 +75,7 @@ export function setSentryTag(key: string, value: string): void {
 
 export function trackEvent(name: string, props?: EventProps): void {
   if (__DEV__) {
+    // eslint-disable-next-line no-console -- intentional dev-only trace in an analytics shim
     console.log(`[analytics] ${name}`, props ?? "");
   }
   sentry?.addBreadcrumb?.({

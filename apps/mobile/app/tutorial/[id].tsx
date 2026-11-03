@@ -54,7 +54,7 @@ function StepDots({ current, total }: { current: number; total: number }) {
   );
 }
 
-function StepDot({ active, index }: { active: boolean; index: number }) {
+function StepDot({ active, index: _index }: { active: boolean; index: number }) {
   const scale = useSharedValue(active ? 1 : 0.6);
   const opacity = useSharedValue(active ? 1 : 0.35);
 
