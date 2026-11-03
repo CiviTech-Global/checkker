@@ -11,6 +11,14 @@ docs
 test-results
 coverage
 *.md
+# Secrets — never copy env files or keys into an image
 .env
-.env.local
+.env.*
+secrets/
 *.pem
+*.key
+# Local noise that never belongs in an image
+e2e/
+graphify-out/
+**/.DS_Store
+uploads/
