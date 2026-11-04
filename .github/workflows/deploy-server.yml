@@ -82,17 +82,39 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # Install the pinned Trivy release directly instead of via trivy-action.
+      # trivy-action >= v0.36.0 installs Trivy >= 0.69.0, whose install script
+      # downloads from get.trivy.dev. That host currently returns NXDOMAIN, so
+      # the action's setup step fails before any scan runs. Downloading the
+      # release asset from GitHub and verifying the published checksum keeps the
+      # binary pinned and auditable without depending on the broken redirector.
+      - name: Install Trivy
+        env:
+          TRIVY_VERSION: 0.76.1
+        run: |
+          set -euo pipefail
+          base="https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}"
+          asset="trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          curl -fsSL -o "/tmp/${asset}" "${base}/${asset}"
+          curl -fsSL -o /tmp/trivy_checksums.txt "${base}/trivy_${TRIVY_VERSION}_checksums.txt"
+          (cd /tmp && grep " ${asset}\$" trivy_checksums.txt | sha256sum -c -)
+          tar -xzf "/tmp/${asset}" -C /tmp trivy
+          sudo install -m 0755 /tmp/trivy /usr/local/bin/trivy
+          trivy --version
+
       # Blocks the PR/main build when a fixable HIGH or CRITICAL vulnerability
       # is present in the OS packages or bundled libraries.
       - name: Scan image for HIGH/CRITICAL vulnerabilities
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          image-ref: ${{ env.IMAGE }}:scan-${{ github.sha }}
-          format: table
-          exit-code: "1"
-          ignore-unfixed: true
-          severity: HIGH,CRITICAL
-          vuln-type: os,library
+        run: |
+          set -euo pipefail
+          trivy image \
+            --format table \
+            --exit-code 1 \
+            --ignore-unfixed \
+            --severity HIGH,CRITICAL \
+            --pkg-types os,library \
+            --cache-dir "${RUNNER_TEMP}/trivy-cache" \
+            "${IMAGE}:scan-${GITHUB_SHA}"
 
       - name: Verify multi-arch manifest
         if: github.event_name != 'pull_request'
