@@ -1,6 +1,6 @@
 # Checkker — Project Status & Remaining Work
 
-> **Updated:** 2026-06-19
+> **Updated:** 2026-11-03
 > **Scope:** What is complete, and what remains to ship (1) a complete functioning
 > game and (2) a complete crypto-betting implementation.
 > **Companion docs:** `docs/TESTNET_BETTING.md` (hands-on setup/test),
@@ -63,15 +63,15 @@ per the roadmap; they are not required for a complete v1.
 1. **Cross-platform audio verification.** Sound was hardened (`PlayerMode.lowLatency`,
    lazy re-init) but not confirmed on every target. Verify SFX + BGM on a physical
    Android device, iOS, web (needs a user gesture to start audio), and Windows
-   desktop. *Files:* `checkker_mobile/lib/services/sound_service.dart`,
+   desktop. _Files:_ `checkker_mobile/lib/services/sound_service.dart`,
    `music_service.dart`.
 2. **Piece-color rendering verification.** The glyph recolor fix
    (`ColorFilter.mode(fill, srcIn)`) makes piece color font-independent; confirm on
    the same matrix of platforms that both armies render correctly.
-   *File:* `checkker_mobile/lib/widgets/piece_glyph.dart`.
+   _File:_ `checkker_mobile/lib/widgets/piece_glyph.dart`.
 3. **Profile "Recent Games" list.** The server streams game history and the replay
    viewer exists, but the profile screen doesn't yet render the recent-games list
-   that links into replays. *File:* `checkker_mobile/lib/screens/profile/`.
+   that links into replays. _File:_ `checkker_mobile/lib/screens/profile/`.
 4. **Runtime theme application polish.** Cosmetics equip works; confirm board/card-back
    themes apply live across all game surfaces (some surfaces still read defaults).
 5. **Reconnection UX during active games & deposits.** Verify a dropped socket
@@ -82,7 +82,7 @@ per the roadmap; they are not required for a complete v1.
 
 6. **Push notification delivery (FCM/APNs).** In-app notifications + token
    scaffolding exist; real delivery needs Firebase/APNs credentials + server send
-   via Firebase Admin SDK. *Files:* `checkker_mobile/lib/services/push_service.dart`,
+   via Firebase Admin SDK. _Files:_ `checkker_mobile/lib/services/push_service.dart`,
    server `register_fcm_token` handler.
 7. **Daily-puzzle freshness & volume.** Daily rotation exists; scale curated puzzle
    content and confirm the rotation cron in production.
@@ -123,7 +123,7 @@ server/database typecheck green):
    `deposit_submitted { gameId, txHash }` after the wallet broadcasts; the server
    threads it into `BetManager.confirmDeposit` → `BetRepository.confirmDeposit(betId, txHash)`
    (the on-chain event path no longer blanks an existing hash).
-   *Files:* `queue_screen.dart` (`_submitDeposit`), `socket_service.dart`
+   _Files:_ `queue_screen.dart` (`_submitDeposit`), `socket_service.dart`
    (`depositSubmitted`), `GameServer.ts` (`deposit_submitted` handler),
    `BetManager.ts`, `BetRepository.ts`.
 2. ✅ **Wallet network picker restricted to BSC.** `connect_screen._restrictToBscNetworks()`
@@ -151,14 +151,14 @@ All five shipped and verified:
    `BSC_WS_URL` env var — when set it uses a `WebSocketProvider` instead of
    `JsonRpcProvider` for reliable real-time `DepositMade` event subscription.
    Falls back to HTTP if not set. Documented in `.env.example`.
-   *Files:* `apps/server/src/blockchain/ContractService.ts`, `.env.example`.
+   _Files:_ `apps/server/src/blockchain/ContractService.ts`, `.env.example`.
 7. ✅ **Settlement retry + idempotency.** `BetManager.settleBet` now retries with
    exponential backoff (1s, 2s, 4s, 8s, 16s) on RPC errors, up to 5 attempts.
    Contract reverts (game already settled) are caught and treated as success.
    On server startup `BetManager.reconcileOnStartup()` finds any unsettled
    bets and reconciles them against on-chain state. Settlement failures are
    persisted to the `Bet` row (`settlementRetries`, `lastSettlementError`).
-   *Files:* `BetManager.ts`, `ContractService.ts`, `BetRepository.ts`,
+   _Files:_ `BetManager.ts`, `ContractService.ts`, `BetRepository.ts`,
    `schema.prisma`.
 8. ✅ **Referee key management.** (Deferred to deployment — KMS integration is
    `apps/server/src/blockchain/ContractService.ts` ready for a secret-manager
@@ -167,14 +167,14 @@ All five shipped and verified:
    `ContractService` that acquires sequential nonces via a spin lock and
    caches the next nonce to avoid `getTransactionCount` calls on every tx.
    On nonce collision it resets and retries automatically.
-   *File:* `apps/server/src/blockchain/ContractService.ts`.
+   _File:_ `apps/server/src/blockchain/ContractService.ts`.
 10. ✅ **Abandonment/disconnect rules.** Confirmed every game-ending path
     (`play_move` → checkmate/draw/deck-exhausted, `resign`, disconnect →
     timeout) maps to exactly one of `reportWinner` / `reportDraw` / `cancelGame`
     through `BetManager.settleBet`. Pending (pre-game) bets are cancelled
     via `cancelBet` on disconnect. Mid-game disconnect triggers timeout +
     `settleBet`.
-    *File:* `apps/server/src/GameServer.ts` (lines 928–1005 trace).
+    _File:_ `apps/server/src/GameServer.ts` (lines 928–1005 trace).
 
 ### 3.3 Contract & test coverage — ✅ DONE (2026-06-19)
 
@@ -184,7 +184,7 @@ All five shipped and verified:
     `claimRefundAfterDeadline()` to reclaim deposits if the counterparty never
     deposits and the server is unavailable — no referee needed. Both deposits
     reclaimed cancels the game automatically.
-    *File:* `packages/contracts/contracts/CheckkerEscrow.sol`.
+    _File:_ `packages/contracts/contracts/CheckkerEscrow.sol`.
 12. ✅ **Dispute / safety mechanism for mainnet.** (Deferred to v2 per the
     roadmap — §3.4 covers audit and multi-sig requirements.)
 13. ✅ **Integration tests.** New `CheckkerEscrow.integration.test.ts` exercises
@@ -192,7 +192,7 @@ All five shipped and verified:
     verification), reportDraw (refund verification), deposit deadline expiry,
     player reclaim after deadline, settlement idempotency, concurrent games,
     and view function correctness. 14 new tests.
-    *File:* `packages/contracts/test/CheckkerEscrow.integration.test.ts`.
+    _File:_ `packages/contracts/test/CheckkerEscrow.integration.test.ts`.
 
 ### 3.4 Mainnet path (explicitly deferred to v2)
 
@@ -218,7 +218,32 @@ All five shipped and verified:
 
 ---
 
-## 5. Quick reference — betting code map
+## 5. CI/CD hardening status (2026-11-03)
+
+The deployment pipeline now covers image security, multi-architecture builds, and
+a staging environment. These changes are stacked on the pinned-workflow branch
+(`ci/adopt-pinned-workflows`) because `deploy-server.yml` is introduced there.
+
+15. ✅ **Image vulnerability scanning.** `deploy-server.yml` builds the server
+    image on every relevant PR and runs Trivy with `HIGH,CRITICAL` severity and
+    `ignore-unfixed: true`. A fixable finding fails the job; adding the job to
+    branch protection makes it a required merge gate.
+16. ✅ **Multi-arch images.** Pushes to `main` build and publish `linux/amd64` +
+    `linux/arm64` images to GHCR, tagged `latest`, `sha-<commit>`, and
+    `scan-<commit>`.
+17. ✅ **Staging deploy + smoke tests.** `deploy-staging` deploys the immutable
+    `scan-<commit>` image to the `staging` environment, exposes `STAGING_URL`,
+    and gates success on `/health` and `/ready`.
+
+**Remaining prerequisite:** task 17's live staging URL requires real
+`STAGING_HOST` / `STAGING_USER` / `STAGING_SSH_KEY` secrets, a `STAGING_URL`
+variable, `STAGING_DEPLOY_ENABLED=true`, and a host with
+`/etc/checkker/staging.env`. Until those exist the job is skipped by design; see
+`docs/deploy.md` → “Staging deploy”.
+
+---
+
+## 6. Quick reference — betting code map
 
 ```
 packages/contracts/contracts/CheckkerEscrow.sol     escrow + payout logic
