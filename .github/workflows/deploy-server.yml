@@ -45,6 +45,13 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
+      # OCI image references must be lowercase, but the repository owner is
+      # "CiviTech-Global". docker/metadata-action normalizes the build tags;
+      # do the same here for the scan, manifest check, and deploy steps.
+      - name: Normalize image reference
+        id: image
+        run: echo "ref=$(echo "$IMAGE" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
@@ -114,11 +121,11 @@ jobs:
             --severity HIGH,CRITICAL \
             --pkg-types os,library \
             --cache-dir "${RUNNER_TEMP}/trivy-cache" \
-            "${IMAGE}:scan-${GITHUB_SHA}"
+            "${{ steps.image.outputs.ref }}:scan-${GITHUB_SHA}"
 
       - name: Verify multi-arch manifest
         if: github.event_name != 'pull_request'
-        run: docker buildx imagetools inspect "${{ env.IMAGE }}:scan-${{ github.sha }}"
+        run: docker buildx imagetools inspect "${{ steps.image.outputs.ref }}:scan-${{ github.sha }}"
 
       # Optional production rollout: configure DEPLOY_HOST, DEPLOY_USER and
       # DEPLOY_SSH_KEY secrets, then set the DEPLOY_ENABLED repo variable.
@@ -130,12 +137,12 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            docker pull ${{ env.IMAGE }}:latest
+            docker pull ${{ steps.image.outputs.ref }}:latest
             docker rm -f checkker-server || true
             docker run -d --name checkker-server --restart unless-stopped \
               -p 3001:3001 -p 47831:47831/udp \
               --env-file /etc/checkker/server.env \
-              ${{ env.IMAGE }}:latest
+              ${{ steps.image.outputs.ref }}:latest
 
   deploy-staging:
     name: Deploy to staging
@@ -148,6 +155,10 @@ jobs:
       url: ${{ vars.STAGING_URL }}
 
     steps:
+      - name: Normalize image reference
+        id: image
+        run: echo "ref=$(echo "$IMAGE" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
       - name: Deploy staging container
         uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1
         with:
@@ -157,12 +168,12 @@ jobs:
           script: |
             set -euo pipefail
             # Pin the exact commit that passed the scan instead of racing :latest.
-            docker pull ${{ env.IMAGE }}:scan-${{ github.sha }}
+            docker pull ${{ steps.image.outputs.ref }}:scan-${{ github.sha }}
             docker rm -f checkker-staging || true
             docker run -d --name checkker-staging --restart unless-stopped \
               -p 3002:3001 -p 47832:47831/udp \
               --env-file /etc/checkker/staging.env \
-              ${{ env.IMAGE }}:scan-${{ github.sha }}
+              ${{ steps.image.outputs.ref }}:scan-${{ github.sha }}
 
       - name: Smoke test staging
         run: |
